@@ -4,6 +4,7 @@
 
 package com.phasmidsoftware.dsaipg.misc.randomwalk;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -20,9 +21,7 @@ public class RandomWalk {
      * @return the (Euclidean) distance from the origin to the current position.
      */
     public double distance() {
-        // TO BE IMPLEMENTED 
-         return 0.0;
-        // END SOLUTION
+        return Math.sqrt((long) x * x + (long) y * y);
     }
 
     /**
@@ -32,9 +31,8 @@ public class RandomWalk {
      * @param dy the distance he moves in the y direction
      */
     private void move(int dx, int dy) {
-        // TO BE IMPLEMENTED  do move
-         throw new RuntimeException("Not implemented");
-        // END SOLUTION
+        x += dx;
+        y += dy;
     }
 
     /**
@@ -43,8 +41,9 @@ public class RandomWalk {
      * @param m the number of steps the drunkard takes
      */
     private void randomWalk(int m) {
-        // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+        for (int i = 0; i < m; i++) {
+            randomMove();
+        }
     }
 
     /**
@@ -90,12 +89,27 @@ throw new RuntimeException("implementation missing");
      *             If args is empty, the method throws a RuntimeException indicating invalid syntax.
      */
     public static void main(String[] args) {
-        if (args.length == 0)
-            throw new RuntimeException("Syntax: RandomWalk steps [experiments]");
-        int m = Integer.parseInt(args[0]);
-        int n = 30;
-        if (args.length > 1) n = Integer.parseInt(args[1]);
-        double meanDistance = randomWalkMulti(m, n);
-        System.out.println(m + " steps: " + meanDistance + " over " + n + " experiments");
+        int start = 0;
+        int increment = 100;
+        int end = 10000;
+        int length = (end - start) / increment + 1;
+        int[] steps = new int[length];
+        for (int i = 0; i < length; i++) {
+            steps[i] = start + i * increment;
+        }
+        int n = 50;
+        ArrayList<Integer> outputSteps = new ArrayList<>();
+        ArrayList<Double> outputMeanDistance = new ArrayList<>();
+
+
+        for (int step : steps) {
+            double meanDistance = randomWalkMulti(step, n);
+            System.out.println(step + " steps: " + meanDistance + " over " + n + " experiments");
+            outputSteps.add(step);
+            outputMeanDistance.add(meanDistance);
+        }
+
+        System.out.println(outputSteps);
+        System.out.println(outputMeanDistance);
     }
 }
