@@ -4,8 +4,9 @@
 
 package com.phasmidsoftware.dsaipg.misc.randomwalk;
 
+import java.util.ArrayList;
 import java.util.Random;
-
+import java.io.*;
 /**
  * The RandomWalk class simulates a two-dimensional random walk. A "drunkard"
  * moves in a random direction for a specified number of steps, and the distance
@@ -21,7 +22,7 @@ public class RandomWalk {
      */
     public double distance() {
         // TO BE IMPLEMENTED 
-         return 0.0;
+         return Math.sqrt((double)this.x * (double)this.x + (double) this.y * (double)this.y);
         // END SOLUTION
     }
 
@@ -33,7 +34,8 @@ public class RandomWalk {
      */
     private void move(int dx, int dy) {
         // TO BE IMPLEMENTED  do move
-         throw new RuntimeException("Not implemented");
+         this.x += dx;
+         this.y += dy;
         // END SOLUTION
     }
 
@@ -43,8 +45,11 @@ public class RandomWalk {
      * @param m the number of steps the drunkard takes
      */
     private void randomWalk(int m) {
-        // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+        this.x = this.y =0;
+        for(int i = 1; i <= m; i++)
+            randomMove();
+        // TO BE IMPLEMENTED
+
     }
 
     /**
@@ -89,13 +94,30 @@ throw new RuntimeException("implementation missing");
      *             and args[1] optionally specifies the number of experiments (default is 30).
      *             If args is empty, the method throws a RuntimeException indicating invalid syntax.
      */
-    public static void main(String[] args) {
-        if (args.length == 0)
-            throw new RuntimeException("Syntax: RandomWalk steps [experiments]");
-        int m = Integer.parseInt(args[0]);
-        int n = 30;
-        if (args.length > 1) n = Integer.parseInt(args[1]);
-        double meanDistance = randomWalkMulti(m, n);
-        System.out.println(m + " steps: " + meanDistance + " over " + n + " experiments");
+    public static void main(String[] args) throws  Exception{
+//        if (args.length == 0)
+//            throw new RuntimeException("Syntax: RandomWalk steps [experiments]");
+//        int m = Integer.parseInt(args[0]);
+        int n,m,gap;
+
+
+        File file = new File("D:\\NortheasternUniversity\\INFO 6205 Program Structure and Algorithms\\Assignment1\\Gap.csv");
+        PrintWriter output = new PrintWriter(file) ;
+
+
+        output.println("m,d,sqrt(m)");
+        for(int i = 100; i <= 10000;i++){
+
+            m = i;
+            n = 30;
+            if (args.length > 1) n = Integer.parseInt(args[1]);
+            double meanDistance = randomWalkMulti(m, n);
+            System.out.println(m + " steps: " + meanDistance + " over " + n + " experiments \n");
+            //System.out.printf("Gap between Sqrt(m) and actual value %.1f%%\n",Math.abs(Math.sqrt(m)-meanDistance)/meanDistance*100);
+            if(i%20==0)
+           output.printf("%d,%.1f,%.1f\n",m,meanDistance,Math.sqrt(m));
+           //System.out.printf("m= %d meanDistance=%.1f sqrtm=%.1f\n",m,meanDistance,Math.sqrt(m));
+        }
+        output.close();
     }
 }
