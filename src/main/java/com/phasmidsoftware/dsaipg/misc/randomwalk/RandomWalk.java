@@ -5,6 +5,10 @@
 package com.phasmidsoftware.dsaipg.misc.randomwalk;
 
 import java.util.Random;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
 
 /**
  * The RandomWalk class simulates a two-dimensional random walk. A "drunkard"
@@ -20,8 +24,10 @@ public class RandomWalk {
      * @return the (Euclidean) distance from the origin to the current position.
      */
     public double distance() {
-        // TO BE IMPLEMENTED 
-         return 0.0;
+        // TO BE IMPLEMENTED
+        long dx = x;
+        long dy = y;
+         return Math.sqrt(dx * dx + dy * dy);
         // END SOLUTION
     }
 
@@ -32,9 +38,8 @@ public class RandomWalk {
      * @param dy the distance he moves in the y direction
      */
     private void move(int dx, int dy) {
-        // TO BE IMPLEMENTED  do move
-         throw new RuntimeException("Not implemented");
-        // END SOLUTION
+       this.x += dx;
+       this.y += dy;
     }
 
     /**
@@ -43,8 +48,9 @@ public class RandomWalk {
      * @param m the number of steps the drunkard takes
      */
     private void randomWalk(int m) {
-        // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+        for (int i = 0; i < m; i++) {
+            this.randomMove();
+        }
     }
 
     /**
@@ -90,12 +96,32 @@ throw new RuntimeException("implementation missing");
      *             If args is empty, the method throws a RuntimeException indicating invalid syntax.
      */
     public static void main(String[] args) {
-        if (args.length == 0)
-            throw new RuntimeException("Syntax: RandomWalk steps [experiments]");
-        int m = Integer.parseInt(args[0]);
-        int n = 30;
-        if (args.length > 1) n = Integer.parseInt(args[1]);
-        double meanDistance = randomWalkMulti(m, n);
-        System.out.println(m + " steps: " + meanDistance + " over " + n + " experiments");
+//        if (args.length == 0)
+//            throw new RuntimeException("Syntax: RandomWalk steps [experiments]");
+//        int m = Integer.parseInt(args[0]);
+//        for (int i = 0; i <= 100; i++) {
+//            int m = i;
+//            int n = 100;
+//            if (args.length > 1) n = Integer.parseInt(args[1]);
+//            double meanDistance = randomWalkMulti(m, n);
+//            System.out.println(m + " steps: " + meanDistance + " over " + n + " experiments");
+//            System.out.println("sqrt of " + m + " steps: " + Math.sqrt(m));
+//            System.out.println("-");
+//        }
+
+        String outputFilePath = "res.txt";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilePath))) {
+            for (int i = 0; i <= 1000; i++) {
+                int m = i;
+                int n = 100;
+                double meanDistance = randomWalkMulti(m, n);
+                writer.write(m + " steps: " + meanDistance + " over " + n + " experiments\n");
+                writer.write("sqrt of " + m + " steps: " + Math.sqrt(m) + "\n");
+                writer.write("-\n");
+            }
+            System.out.println("Results successfully written to " + outputFilePath);
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
+        }
     }
 }
