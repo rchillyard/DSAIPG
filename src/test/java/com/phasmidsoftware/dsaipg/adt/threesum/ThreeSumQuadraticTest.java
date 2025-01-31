@@ -17,13 +17,13 @@ public class ThreeSumQuadraticTest {
     @Test
     public void testGetTriplesWithValidTriplets() {
         int[] inputArray = {-1, 0, 1, 2, -1, -4};
+        Arrays.sort(inputArray);
         ThreeSum threeSum = new ThreeSumQuadratic(inputArray);
-
         Triple[] result = threeSum.getTriples();
 
         Triple[] expected = {
-                new Triple(-1, 0, 1),
-                new Triple(-1, 2, -1)
+                new Triple(-1, -1, 2),
+                new Triple(-1, 0, 1)
         };
         Triple[] actual = threeSum.getTriples();
         System.out.println(Arrays.toString(actual));

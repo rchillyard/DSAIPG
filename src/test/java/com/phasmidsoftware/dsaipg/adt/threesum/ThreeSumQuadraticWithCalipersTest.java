@@ -12,10 +12,11 @@ public class ThreeSumQuadraticWithCalipersTest {
     /**
      * Test case: Ensure `getTriples` finds all unique triples that sum to zero in a simple input.
      */
-//    @Test
+    @Test
     public void testGetTriplesSimple() {
         // FIXME
         int[] input = {-1, 0, 1, 2, -1, -4};
+        Arrays.sort(input);
         ThreeSum threeSum = new ThreeSumQuadraticWithCalipers(input);
         Triple[] expected = {new Triple(-1, -1, 2), new Triple(-1, 0, 1)};
         Triple[] result = threeSum.getTriples();
@@ -39,10 +40,11 @@ public class ThreeSumQuadraticWithCalipersTest {
     /**
      * Test case: Check `getTriples` handles input containing duplicates properly and avoids duplicate triples.
      */
-//    @Test
+    @Test
     public void testGetTriplesWithDuplicates() {
         // FIXME
         int[] input = {-1, -1, -1, 2, 2, 0, 0, 1, 1};
+        Arrays.sort(input);
         ThreeSum threeSum = new ThreeSumQuadraticWithCalipers(input);
         Triple[] expected = {new Triple(-1, -1, 2), new Triple(-1, 0, 1)};
         Triple[] result = threeSum.getTriples();
@@ -89,10 +91,10 @@ public class ThreeSumQuadraticWithCalipersTest {
     /**
      * Test case: Validate `getTriples` on a large input with only one valid triple.
      */
-//    @Test
+    @Test
     public void testGetTriplesSingleValidTriple() {
-        // FIXME
-        int[] input = {-10, -7, -3, 0, 7, 10, 3};
+        int[] input = {-10, -7, 0, 10};
+        Arrays.sort(input);
         ThreeSum threeSum = new ThreeSumQuadraticWithCalipers(input);
         Triple[] expected = {new Triple(-10, 0, 10)};
         Triple[] result = threeSum.getTriples();

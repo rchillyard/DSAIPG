@@ -4,6 +4,8 @@
 
 package com.phasmidsoftware.dsaipg.adt.threesum;
 
+import com.phasmidsoftware.dsaipg.util.Tuple;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +40,7 @@ public class ThreeSumQuadraticWithCalipers implements ThreeSum {
         Collections.sort(triples); // ???
         for (int i = 0; i < length - 2; i++)
             triples.addAll(calipers(a, i, Triple::sum));
+
         return triples.stream().distinct().toArray(Triple[]::new);
     }
 
@@ -52,9 +55,26 @@ public class ThreeSumQuadraticWithCalipers implements ThreeSum {
      */
     public static List<Triple> calipers(int[] a, int i, Function<Triple, Integer> function) {
         List<Triple> triples = new ArrayList<>();
-        // TO BE IMPLEMENTED  : use function to qualify triples and to navigate otherwise.
-         return null;
-        // END SOLUTION
+        int left = i+1;
+        int right = a.length-1;
+        while (left<right) {
+            int sum = a[left] + a[i] + a[right];
+            if (sum > 0) {
+                right -= 1;
+            }
+            else if (sum < 0) {
+                left += 1;
+            }
+            else {
+                triples.add(new Triple(a[i], a[left ], a[right]));
+                left++;
+                right--;
+                while (left < i && left > 0 && a[left] == a[left - 1]) left++;
+                while (right > i && right < a.length - 1 && a[right] == a[right + 1]) right--;
+            }
+
+        }
+        return triples;
     }
 
     private final int[] a;
