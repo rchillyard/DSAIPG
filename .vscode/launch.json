@@ -1,0 +1,296 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "MySet",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.adt.bqs.MySet",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "ShuntingYard",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.adt.bqs.ShuntingYard",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "PriorityQueue",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.adt.pq.PriorityQueue",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "BSTBenchmark",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.adt.symbolTable.tree.BSTBenchmark",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "ThreeSumBenchmark",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.adt.threesum.ThreeSumBenchmark",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "TwoSumBenchmark",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.adt.threesum.TwoSumBenchmark",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "HuffmanCoding",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.compression.HuffmanCoding",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "CoinChange",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.graphs.dynamicProgramming.coins.CoinChange",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "Tunnels_Boruvka",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.graphs.tunnels.Tunnels_Boruvka",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "Tunnels_Kruskal",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.graphs.tunnels.Tunnels_Kruskal",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "Tunnels_Prim",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.graphs.tunnels.Tunnels_Prim",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "BinarySearch",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.misc.BinarySearch",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "CallByValue",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.misc.CallByValue",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "Counter",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.misc.Counter",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "Mystery",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.misc.Mystery",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "NewtonApproximation",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.misc.NewtonApproximation",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "RecursionAndIteration",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.misc.RecursionAndIteration",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "CodeLength",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.misc.codelength.CodeLength",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "CouplingNone",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.misc.coupling.CouplingNone",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "CouplingTight",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.misc.coupling.CouplingTight",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "Newton",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.misc.functions.Newton",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "RandomWalk",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.misc.randomwalk.RandomWalk",
+            "projectName": "INFO6205",
+            "args": "500 10"
+        },
+        {
+            "type": "java",
+            "name": "RunLength",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.misc.runLengthEncoding.RunLength",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "Game",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.projects.life.base.Game",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "MCTS",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.projects.mcts.tictactoe.MCTS",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "TicTacToe",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.projects.mcts.tictactoe.TicTacToe",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "SelectBenchmark",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.select.SelectBenchmark",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "BubbleSort",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.sort.elementary.BubbleSort",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "ShellSort",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.sort.elementary.ShellSort",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "Solution",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.sort.elementary.Solution",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "MergeSortDecisionTree",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.sort.linearithmic.MergeSortDecisionTree",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.sort.par.Main",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "FastInverseSquareRoot",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.util.FastInverseSquareRoot",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "Iteration",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.util.Iteration",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "Matrix",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.util.Matrix",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "OperationsBenchmark",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.util.OperationsBenchmark",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "PQBenchmark",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.util.PQBenchmark",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "SortBenchmark",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.util.SortBenchmark",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "SymbolTableBenchmark",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.util.SymbolTableBenchmark",
+            "projectName": "INFO6205"
+        },
+        {
+            "type": "java",
+            "name": "VLA2",
+            "request": "launch",
+            "mainClass": "com.phasmidsoftware.dsaipg.util.VLA2",
+            "projectName": "INFO6205"
+        }
+    ]
+}
