@@ -100,4 +100,23 @@ public class ThreeSumTest {
         assertEquals(4, triples.length);
         assertEquals(4, new ThreeSumCubic(ints).getTriples().length);
     }
+
+
+    @Test
+    public void testGetTriplesLargeArray() {
+        Supplier<int[]> intsSupplier = new Source(500, 500, 4L).intsSupplier(500);
+        int[] ints = intsSupplier.get();
+        long start = System.currentTimeMillis();
+        Triple[] triples = new ThreeSumQuadratic(ints).getTriples();
+        long end = System.currentTimeMillis();
+        System.out.println("Time used for ThreeSumQuadratic: " + (end - start) + " ms");
+        start = System.currentTimeMillis();
+        Triple[] triples2 = new ThreeSumCubic(ints).getTriples();
+        end = System.currentTimeMillis();
+        System.out.println("Time used for ThreeSumCubic: " + (end - start) + " ms");
+        start = System.currentTimeMillis();
+        Triple[] triples3 = new ThreeSumQuadrithmic(ints).getTriples();
+        end = System.currentTimeMillis();
+        System.out.println("Time used for ThreeSumQuadrithmic: " + (end - start) + " ms");
+    }
 }
