@@ -122,7 +122,10 @@ public class ThreeSumBenchmark {
         averageTime =  averageTime / runs;
 
 
-        System.out.println("Benchmarking: " + description + " time=" + averageTime + "ms");
+        for (TimeLogger t: timeLoggers) {
+            t.log("time", averageTime, n);
+        }
+//        System.out.println("Benchmarking: " + description + " time=" + averageTime + "ms");
         if (averageTime < 0) {
             throw new RuntimeException("implementation missing");
         }
