@@ -8,7 +8,7 @@ public class ThreeSumTiming {
 
     public static void main(String[] args) {
         int initialN = 3200;
-        int iterations = 6; // e.g., for 125, 250, 500, 1000, 2000, 4000
+        int iterations = 6; 
         
         System.out.println("N, Cubic(ms), Quadratic(ms), Quadrithmic(ms)");
 
