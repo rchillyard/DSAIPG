@@ -104,34 +104,34 @@ public class ThreeSumBenchmark {
      */
     private void benchmarkThreeSum(final String description, final Consumer<int[]> function, int n, final TimeLogger[] timeLoggers) {
         if (description.equals("ThreeSumCubic") && n > 4000) return;
-        // Supplier to generate random arrays of size n
+
         Supplier<int[]> supplier = () -> new Random().ints(n, -10000, 10000).toArray();
 
-        int runs = 10; // Number of times the benchmark should be run
+        int runs = 10;
 
-        // Create a Benchmark_Timer instance to measure the execution time
+
         Benchmark_Timer<int[]> timer = new Benchmark_Timer<>(
                 description,
-                function // The ThreeSum algorithm function
+                function
         );
 
-        // Run the benchmark and compute the average execution time
+
         double time = timer.runFromSupplier(supplier, runs);
 
-        // Measure execution time manually
+
         long start = System.nanoTime();
-        function.accept(supplier.get()); // Execute the ThreeSum function
+        function.accept(supplier.get());
         long end = System.nanoTime();
         long executionTime = end - start;
 
         System.out.println(description + " Execution time: " + executionTime + " nanoseconds");
 
-        // Convert execution time to milliseconds for raw time
-        double rawTime = executionTime / 1_000_000.0; // Convert to milliseconds
 
-        // Log the execution times using the provided TimeLogger instances (raw time only)
+        double rawTime = executionTime / 1_000_000.0;
+
+
         for (TimeLogger timeLogger : timeLoggers) {
-            timeLogger.log(description, rawTime, n); // Update this to match the method signature
+            timeLogger.log(description, rawTime, n);
         }
     }
 
