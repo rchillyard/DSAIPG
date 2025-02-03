@@ -32,8 +32,6 @@ public class ThreeSumTime {
             quadrithmic.getTriples();
             end = System.nanoTime();
             System.out.printf("Quadrithmic: %.3f seconds\n", (end - start) / 1e9);
-
-            System.out.println("-------------------------------");
         }
     }
 
