@@ -7,6 +7,7 @@ package com.phasmidsoftware.dsaipg.adt.threesum;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * Implementation of ThreeSum which follows the approach of dividing the solution-space into
@@ -49,8 +50,26 @@ public class ThreeSumQuadratic implements ThreeSum {
      */
      List<Triple> getTriples(int j) {
          List<Triple> triples = new ArrayList<>();
-        // TO BE IMPLEMENTED  : for each candidate, test if a[i] + a[j] + a[k] = 0.
-throw new RuntimeException("implementation missing");
+         int left = 0;
+         int right = length - 1;
+         long target = -a[j];
+         while(left<j&&right>j){
+             long sum = a[left] + a[right];
+             if(sum==target){
+                 triples.add(new Triple(a[left], a[j], a[right]));
+                 left++;
+                 right--;
+                 while (left < right && a[left] == a[left - 1]) left++;
+                 while (left < right && a[right] == a[right + 1]) right--;
+             }
+             else if(sum<target){
+                 left++;
+             }
+             else if(sum>target){
+                 right--;
+             }
+         }
+        return triples;
     }
 
     private final int[] a;

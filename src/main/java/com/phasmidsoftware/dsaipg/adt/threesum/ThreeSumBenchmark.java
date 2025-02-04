@@ -11,6 +11,7 @@ import com.phasmidsoftware.dsaipg.util.Utilities;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.Arrays;
 
 /**
  * The ThreeSumBenchmark class provides a framework for evaluating and comparing
@@ -101,9 +102,37 @@ public class ThreeSumBenchmark {
      *                     results of the benchmark.
      */
     private void benchmarkThreeSum(final String description, final Consumer<int[]> function, int n, final TimeLogger[] timeLoggers) {
-        if (description.equals("ThreeSumCubic") && n > 4000) return;
+       // if (description.equals("ThreeSumCubic") && n > 4000) return;
         // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+    long totalNs = 0L;
+    for (int i = 0; i < runs; i++) {
+        // 从 supplier 获得一个随机数组
+        int[] arr = supplier.get();
+        // 需要排序才能让三数之和算法(二分/双指针)正确工作
+        Arrays.sort(arr);
+        long startNs = System.nanoTime();
+        // 执行 3Sum 方法
+        function.accept(arr);
+        long endNs = System.nanoTime();
+
+        totalNs += (endNs - startNs);
+    }
+
+    // 求平均耗时(纳秒)
+    double averageNs = (double) totalNs / runs;
+    // 转换为毫秒
+    double averageMs = averageNs / 1e6;
+
+    // 打印结果
+    System.out.printf("%s: N=%d, runs=%d => %.3f ms%n", description, n, runs, averageMs);
+
+    // 使用 timeLoggers 记录(原始时间 & 归一化)
+    for (TimeLogger logger : timeLoggers) {
+        logger.log(description, averageMs,n);
+    }
+
+        
+        
     }
 
     /**
