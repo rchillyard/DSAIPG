@@ -1,47 +1,44 @@
-package com.phasmidsoftware.dsaipg.adt.threesum;
+package com.phasmidsoftware.dsaipg.adt.threesum; 
 
-import java.util.Random;
-import java.util.Arrays;
+import com.phasmidsoftware.dsaipg.util.Stopwatch;
+import com.phasmidsoftware.dsaipg.adt.threesum.ThreeSumCubic;
+import com.phasmidsoftware.dsaipg.adt.threesum.ThreeSumQuadratic;
+import com.phasmidsoftware.dsaipg.adt.threesum.ThreeSumQuadrithmic;
 
 public class ThreeSumTime {
-
-    public static void main(String[] args) {
-        int[] sizes = {100, 200, 400, 800, 1600}; // using the doubling method for at least five values of N
+     public static void main(String[] args) {
+        int[] sizes = {400, 800, 1600, 3200, 6400};     
         for (int N : sizes) {
-            int[] data = generateRandomArray(N);
-
+            int[] inputArray = generateRandomArray(N);
             System.out.println("N = " + N);
-
-            // ThreeSumCubic
-            long start = System.nanoTime();
-            ThreeSumCubic cubic = new ThreeSumCubic(data);
-            cubic.getTriples();
-            long end = System.nanoTime();
-            System.out.printf("Cubic: %.3f seconds\n", (end - start) / 1e9);
-
-            // ThreeSumQuadratic
-            start = System.nanoTime();
-            ThreeSumQuadratic quadratic = new ThreeSumQuadratic(data);
-            quadratic.getTriples();
-            end = System.nanoTime();
-            System.out.printf("Quadratic: %.3f seconds\n", (end - start) / 1e9);
-
-            // ThreeSumQuadrithmic
-            start = System.nanoTime();
-            ThreeSumQuadrithmic quadrithmic = new ThreeSumQuadrithmic(data);
-            quadrithmic.getTriples();
-            end = System.nanoTime();
-            System.out.printf("Quadrithmic: %.3f seconds\n", (end - start) / 1e9);
+             
+            // Measure time for Cubic
+            Stopwatch timer = new Stopwatch();
+            new ThreeSumCubic(inputArray).getTriples();
+            double cubicTime = timer.lap();
+            System.out.println("Cubic time: " + cubicTime + " milli-seconds");
+            
+            // Measure time for Quadratic
+            timer = new Stopwatch();
+            new ThreeSumQuadratic(inputArray).getTriples();
+            double quadraticTime = timer.lap();
+            System.out.println("Quadratic time: " + quadraticTime + " milliseconds");
+            
+            // Measure time for Quadrithmic
+            timer = new Stopwatch();
+            new ThreeSumQuadrithmic(inputArray).getTriples();
+            double quadrithmicTime = timer.lap();
+            System.out.println("Quadrithmic time: " + quadrithmicTime + " milliseconds");
+            
+            System.out.println("-----------------------------------");
         }
     }
-
+    
     private static int[] generateRandomArray(int N) {
-        Random rand = new Random();
-        int[] array = new int[N];
+        int[] arr = new int[N];
         for (int i = 0; i < N; i++) {
-            array[i] = rand.nextInt(200) - 100;
+            arr[i] = (int) (Math.random() * 2000) - 1000; // Random numbers from -1000 to 1000
+            }
+            return arr;
         }
-        Arrays.sort(array);
-        return array;
     }
-}
