@@ -60,5 +60,5 @@ public class TimeLogger {
             NumberFormat.getNumberInstance(locale);
 
     private final String prefix;
-    private final Function<Integer, Double> minimumComparisons;
+    public final Function<Integer, Double> minimumComparisons;
 }

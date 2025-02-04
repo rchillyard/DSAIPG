@@ -8,9 +8,12 @@ import com.phasmidsoftware.dsaipg.util.Benchmark_Timer;
 import com.phasmidsoftware.dsaipg.util.TimeLogger;
 import com.phasmidsoftware.dsaipg.util.Utilities;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.function.Function;
 
 /**
  * The ThreeSumBenchmark class provides a framework for evaluating and comparing
@@ -24,6 +27,8 @@ import java.util.function.UnaryOperator;
  * interpretability.
  */
 public class ThreeSumBenchmark {
+    private static StringBuilder timeLog = new StringBuilder();
+
     /**
      * Constructs a ThreeSumBenchmark instance to facilitate the performance evaluation
      * of different implementations of the Three-Sum algorithm.
@@ -85,6 +90,8 @@ public class ThreeSumBenchmark {
         new ThreeSumBenchmark(5, 4000, 4000).runBenchmarks();
         new ThreeSumBenchmark(3, 8000, 8000).runBenchmarks();
         new ThreeSumBenchmark(2, 16000, 16000).runBenchmarks();
+
+        saveResultsToCSV();
     }
 
     /**
@@ -102,9 +109,36 @@ public class ThreeSumBenchmark {
      */
     private void benchmarkThreeSum(final String description, final Consumer<int[]> function, int n, final TimeLogger[] timeLoggers) {
         if (description.equals("ThreeSumCubic") && n > 4000) return;
-        // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+        int[] array = supplier.get();
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.start();  
+        function.accept(array); 
+        stopwatch.stop();
+        long elapsedTime = stopwatch.getElapsedTime();
+
+        Function<Integer, Double> scalingFunction = timeLoggers[1].minimumComparisons;
+
+        timeLog.append(description).append(",")
+        .append(n).append(",")
+        .append(elapsedTime).append(",")
+        .append(elapsedTime / scalingFunction.apply(n)).append("\n");
+   
+        timeLoggers[0].log(description, elapsedTime / 1_000_000.0, n); 
+        timeLoggers[1].log(description, elapsedTime / (1_000_000.0 * scalingFunction.apply(n)), n); 
+      
+// throw new RuntimeException("implementation missing");
     }
+    public static void saveResultsToCSV() {
+        try (FileWriter writer = new FileWriter("ThreeSumBenchmarkResults.csv")) {
+            writer.append("Algorithm,N,Raw Time (ms),Normalized Time\n");
+            writer.append(timeLog.toString());
+            System.out.println("Results saved to ThreeSumBenchmarkResults.csv");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    
 
     /**
      * An array of {@link TimeLogger} instances used for benchmarking the cubic implementation

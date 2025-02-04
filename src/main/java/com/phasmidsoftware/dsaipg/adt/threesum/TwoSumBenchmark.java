@@ -91,7 +91,20 @@ public class TwoSumBenchmark {
     private void benchmarkTwoSum(final String description, final Consumer<int[]> function, int n, final TimeLogger[] timeLoggers) {
         if (n > 8000) return;
         // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+        int[] array = supplier.get();
+        System.out.println("Array for " + description + ": " + java.util.Arrays.toString(array));
+
+        System.gc();
+        long startTime = System.nanoTime();
+        function.accept(array); 
+        long endTime = System.nanoTime();
+        long elapsedTime = endTime - startTime;
+    
+        System.out.println("Execution time for " + description + ": " + elapsedTime + " nanoseconds");
+
+    timeLoggers[0].log(description, (double) elapsedTime / 1_000_000, n); 
+    timeLoggers[1].log(description, elapsedTime / (1_000_000.0 * Math.pow(n, 2)), n); 
+// throw new RuntimeException("implementation missing");
     }
 
     /**
