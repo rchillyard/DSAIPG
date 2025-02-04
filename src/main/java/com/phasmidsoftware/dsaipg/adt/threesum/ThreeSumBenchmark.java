@@ -11,6 +11,10 @@ import com.phasmidsoftware.dsaipg.util.Utilities;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import com.phasmidsoftware.dsaipg.util.Stopwatch;
+import java.util.Set;
+import java.util.HashSet;
+
 
 /**
  * The ThreeSumBenchmark class provides a framework for evaluating and comparing
@@ -102,8 +106,23 @@ public class ThreeSumBenchmark {
      */
     private void benchmarkThreeSum(final String description, final Consumer<int[]> function, int n, final TimeLogger[] timeLoggers) {
         if (description.equals("ThreeSumCubic") && n > 4000) return;
-        // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+
+        int[] inputArray = supplier.get();
+        Stopwatch stopwatch = new Stopwatch();
+        function.accept(inputArray);
+        double elapsedTime = (double) stopwatch.lap();  // Convert to double
+    
+        // Prevent duplicate logging
+        Set<String> loggedDescriptions = new HashSet<>();
+    
+        for (TimeLogger timeLogger : timeLoggers) {
+            String logKey = description + timeLogger.toString();  // Unique key per logger
+            if (!loggedDescriptions.contains(logKey)) {
+                timeLogger.log(description, elapsedTime, n);
+                loggedDescriptions.add(logKey);  // Prevent future duplicates
+            }
+        }
+
     }
 
     /**
