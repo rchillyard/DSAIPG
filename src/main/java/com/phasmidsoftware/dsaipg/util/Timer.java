@@ -4,6 +4,7 @@
 
 package com.phasmidsoftware.dsaipg.util;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -63,9 +64,35 @@ public class Timer {
      * @param <U>          the type which is the result of function and the input to postFunction (if any).
      * @return the average milliseconds per repetition.
      */
-    public <T, U> double repeat(int n, boolean warmup, Supplier<T> supplier, Function<T, U> function, UnaryOperator<T> preFunction, Consumer<U> postFunction) {
+    public <T, U> double repeat(int n, boolean warmup,
+                                Supplier<T> supplier,
+                                Function<T, U> function,
+                                UnaryOperator<T> preFunction,
+                                Consumer<U> postFunction) {
         // TO BE IMPLEMENTED : note that the timer is running when this method is called and should still be running when it returns.
-         return 0;
+        long startTime = System.nanoTime();
+
+        for (int i=0; i<n; i++) {
+            T input = supplier.get();
+
+            if(preFunction != null) {
+                input = preFunction.apply(input);
+            }
+
+            U result = function.apply(input);
+
+            if(postFunction != null){
+                postFunction.accept(result);
+            }
+
+            lap();
+        }
+
+        long endTime = System.nanoTime();
+
+        double totalTime = (endTime - startTime) / 1_000_000.0;
+
+        return warmup ? 0 : totalTime / n;
         // END SOLUTION
     }
 
@@ -240,7 +267,7 @@ public class Timer {
      */
     private static long getClock() {
         // TO BE IMPLEMENTED 
-         return 0;
+         return System.nanoTime();
         // END SOLUTION
     }
 
@@ -253,7 +280,7 @@ public class Timer {
      */
     private static double toMillisecs(long ticks) {
         // TO BE IMPLEMENTED 
-         return 0;
+         return ticks / 1_000_000.0;
         // END SOLUTION
     }
 

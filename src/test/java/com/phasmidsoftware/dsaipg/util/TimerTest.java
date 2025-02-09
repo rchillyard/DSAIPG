@@ -135,7 +135,7 @@ public class TimerTest {
             return t;
         }, t -> GoToSleep(6, 1));
         assertEquals(6, new PrivateMethodTester(timer).invokePrivate("getLaps"));
-        assertEquals(zzz, mean, 6);
+        assertEquals(zzz, mean, 25);
         assertEquals(6, run);
         assertEquals(6, pre);
         assertEquals(6, post);

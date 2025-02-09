@@ -64,9 +64,15 @@ public class InsertionSortComparator<X> extends SortWithHelper<X> {
      */
     public void sort(X[] xs, int from, int to) {
         final Helper<X> helper = getHelper();
+        for (int i = from; i < to; i++) {
+            for (int j = i; j > from && ((Comparable) xs[j-1]).compareTo(xs[j]) > 0; j--) {
+                if(helper.swapStableConditional(xs, j)) {
 
-        // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+                }else {
+                    break;
+                }
+            }
+        }
     }
 
     public static final String DESCRIPTION = "Insertion sort";
@@ -112,6 +118,10 @@ throw new RuntimeException("implementation missing");
             sorter.sort(ts, true);
             return helper.getFixes();
         }
+    }
+
+    public static void main(String args[]) {
+
     }
 
 }
