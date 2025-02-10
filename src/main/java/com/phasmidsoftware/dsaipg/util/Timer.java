@@ -64,10 +64,38 @@ public class Timer {
      * @return the average milliseconds per repetition.
      */
     public <T, U> double repeat(int n, boolean warmup, Supplier<T> supplier, Function<T, U> function, UnaryOperator<T> preFunction, Consumer<U> postFunction) {
-        // TO BE IMPLEMENTED : note that the timer is running when this method is called and should still be running when it returns.
-         return 0;
-        // END SOLUTION
+        pause();  // Pause the timer before running laps
+
+        for (int i = 0; i < n; i++) {
+            T input = supplier.get(); // Generate input
+
+            // Apply preFunction if available (not timed)
+            if (preFunction != null) {
+                input = preFunction.apply(input);
+            }
+
+            // Start timing
+            long startTime = getClock();
+
+            U output = function.apply(input); // Execute function
+
+            // Stop timing
+            long endTime = getClock();
+            ticks += (endTime - startTime);
+            laps++; // Increment lap count
+
+            // Apply postFunction if available (not timed)
+            if (postFunction != null) {
+                postFunction.accept(output);
+            }
+        }
+
+        double meanTime = meanLapTime(); // Compute mean lap time
+
+        resume(); // Resume the timer before returning
+        return meanTime;
     }
+
 
     /**
      * Updates the status display by printing progress markers or a decrement value based on the input parameters.
@@ -239,9 +267,7 @@ public class Timer {
      * @return the number of ticks for the system clock. Currently defined as nano time.
      */
     private static long getClock() {
-        // TO BE IMPLEMENTED 
-         return 0;
-        // END SOLUTION
+        return System.nanoTime(); // Returns the current value of the system timer in nanoseconds.
     }
 
     /**
@@ -252,9 +278,7 @@ public class Timer {
      * @return the corresponding number of milliseconds.
      */
     private static double toMillisecs(long ticks) {
-        // TO BE IMPLEMENTED 
-         return 0;
-        // END SOLUTION
+        return ticks / 1e6; // Convert nanoseconds to milliseconds.
     }
 
     final static LazyLogger logger = new LazyLogger(Timer.class);
