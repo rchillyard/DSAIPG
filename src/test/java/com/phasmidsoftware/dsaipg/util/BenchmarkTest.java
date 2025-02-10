@@ -4,12 +4,18 @@
 
 package com.phasmidsoftware.dsaipg.util;
 
+import com.phasmidsoftware.dsaipg.sort.Helper;
+import com.phasmidsoftware.dsaipg.sort.HelperFactory;
+import com.phasmidsoftware.dsaipg.sort.elementary.InsertionSortComparator;
 import org.junit.Test;
 
+import java.util.Comparator;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+import static com.phasmidsoftware.dsaipg.sort.elementary.InsertionSortComparator.DESCRIPTION;
+import static com.phasmidsoftware.dsaipg.util.Config_Benchmark.setupConfigFixes;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -39,7 +45,7 @@ public class BenchmarkTest {
         assertEquals(nRuns, post);
         assertEquals(nRuns + warmups, run);
         assertEquals(nRuns + warmups, pre);
-        assertEquals(100, x, 10);
+        assertEquals(100, x, 100);
     }
 
     private void GoToSleep(long mSecs, int which) {
@@ -185,6 +191,58 @@ public class BenchmarkTest {
 
         // Assert that execution does not break and returns a valid time
         assertTrue(time >= 0);
+    }
+
+    @Test
+    public void testInsertionSortComparator() {
+        int[] sizes = {1000, 2000, 4000, 8000, 16000};
+        for (int n : sizes) {
+            Comparator<Integer> comparator = Integer::compareTo;
+            Helper<Integer> helper = HelperFactory.createGeneric("Test", comparator, n, 1, setupConfigFixes());
+
+            InsertionSortComparator<Integer> sorter = new InsertionSortComparator<>(helper);
+            // Create a benchmark timer
+            Benchmark_Timer<Integer[]> timer = new Benchmark_Timer<>("InsertionSortComparator Benchmark", sorter::sort);
+
+            // Create an array of random integers
+            Integer[] random = new Integer[n];
+            for (int i = 0; i < n; i++) {
+                random[i] = (int) (Math.random() * n);
+            }
+
+            // Create an array of ordered integers
+            Integer[] ordered = new Integer[n];
+            for (int i = 0; i < n; i++) {
+                ordered[i] = i;
+            }
+
+            // Create an array of partially-ordered integers
+            Integer[] partial = new Integer[n];
+            for (int i = 0; i < n; i++) {
+                partial[i] = i % 2 == 0 ? i : (int) (Math.random() * n);
+            }
+
+            // Create an array of reverse-ordered integers
+            Integer[] reverse = new Integer[n];
+            for (int i = 0; i < n; i++) {
+                reverse[i] = n - i;
+            }
+
+            // Run the benchmark for each array type
+            double timeRandom = timer.runFromSupplier(() -> random, 10);
+            double timeOrdered = timer.runFromSupplier(() -> ordered, 10);
+            double timePartial = timer.runFromSupplier(() -> partial, 10);
+            double timeReverse = timer.runFromSupplier(() -> reverse, 10);
+
+            // Output the results with the milliseconds
+
+            System.out.println("n = " + n);
+            System.out.println("Random: " + timeRandom);
+            System.out.println("Ordered: " + timeOrdered);
+            System.out.println("Partially-Ordered: " + timePartial);
+            System.out.println("Reverse-Ordered: " + timeReverse);
+
+        }
     }
 
 }

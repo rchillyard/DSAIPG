@@ -62,11 +62,15 @@ public class InsertionSortComparator<X> extends SortWithHelper<X> {
      * @param from the index of the first element to sort
      * @param to   the index of the first element not to sort
      */
+    //use the helper.swapStableConditional method
     public void sort(X[] xs, int from, int to) {
-        final Helper<X> helper = getHelper();
-
-        // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+        for (int i = from + 1; i < to; i++) {
+            for (int j = i; j > from; j--) {
+                if (!helper.swapStableConditional(xs, j)) {
+                    break;
+                }
+            }
+        }
     }
 
     public static final String DESCRIPTION = "Insertion sort";
