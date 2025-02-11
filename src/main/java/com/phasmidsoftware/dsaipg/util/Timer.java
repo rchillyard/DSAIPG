@@ -50,6 +50,9 @@ public class Timer {
         return repeat(n, false, supplier, function, null, null);
     }
 
+
+
+
     /**
      * Pause (without counting a lap); run the given functions n times while being timed, i.e., once per "lap", and finally return the result of calling meanLapTime().
      *
@@ -65,9 +68,40 @@ public class Timer {
      */
     public <T, U> double repeat(int n, boolean warmup, Supplier<T> supplier, Function<T, U> function, UnaryOperator<T> preFunction, Consumer<U> postFunction) {
         // TO BE IMPLEMENTED : note that the timer is running when this method is called and should still be running when it returns.
-         return 0;
-        // END SOLUTION
+        if (warmup) {
+            for (int i = 0; i < 100; i++) {
+                T item = supplier.get();
+                if (preFunction != null) item = preFunction.apply(item);
+                function.apply(item);  // assuming result isn't needed during warmup
+            }
+        }
+
+        // Ensure the timer is running
+        if (!running) resume();
+
+        long totalTime = 0;
+        int effectiveLaps = 0;
+
+        for (int i = 0; i < n; i++) {
+            T item = supplier.get();
+            if (preFunction != null) item = preFunction.apply(item);
+
+            long startTime = getClock();
+            U result = function.apply(item);
+            long endTime = getClock();
+
+            if (postFunction != null) postFunction.accept(result);
+
+            totalTime += (endTime - startTime);
+            effectiveLaps++;
+            lap(); // Update lap count for each iteration
+        }
+
+        pause(); // Stop the timer
+        return effectiveLaps > 0 ? toMillisecs(totalTime) / effectiveLaps : 0;
+
     }
+
 
     /**
      * Updates the status display by printing progress markers or a decrement value based on the input parameters.
@@ -85,6 +119,16 @@ public class Timer {
                 System.out.print(".");
         }
         return x;
+    }
+
+    protected long getCurrentTime() {
+        return System.nanoTime();
+    }
+
+    // Starts the timer
+    public void start() {
+        start = getCurrentTime();
+        running = true;
     }
 
     /**
@@ -117,10 +161,11 @@ public class Timer {
      * @throws TimerException if this Timer is not running.
      */
     public void pauseAndLap() {
-        lap();
-        ticks += getClock();
+        if (!running) throw new TimerException("Timer not running.");
+        long now = getClock();
+        ticks += (now - start);  // Accumulate elapsed time
+        laps++;
         running = false;
-        doTrace(() -> "pause timer and lap after millisecs: " + ticks * 1.0E-6);
     }
 
     /**
@@ -129,11 +174,11 @@ public class Timer {
      * @throws TimerException if this Timer is already running.
      */
     public void resume() {
-        if (running) throw new TimerException();
-        ticks -= getClock();
-        doTrace(() -> "resume timer");
+        if (running) throw new TimerException("Timer already running.");
+        start = getClock();
         running = true;
     }
+
 
     /**
      * Increment the lap counter without pausing.
@@ -199,6 +244,7 @@ public class Timer {
     private long ticks = 0L;
     private int laps = 0;
     private boolean running = false;
+    private long start = 0;
 
     /**
      * Retrieves the current number of ticks recorded by the Timer.
@@ -240,8 +286,7 @@ public class Timer {
      */
     private static long getClock() {
         // TO BE IMPLEMENTED 
-         return 0;
-        // END SOLUTION
+        return System.nanoTime();
     }
 
     /**
@@ -253,8 +298,7 @@ public class Timer {
      */
     private static double toMillisecs(long ticks) {
         // TO BE IMPLEMENTED 
-         return 0;
-        // END SOLUTION
+        return ticks / 1_000_000.0;
     }
 
     final static LazyLogger logger = new LazyLogger(Timer.class);
