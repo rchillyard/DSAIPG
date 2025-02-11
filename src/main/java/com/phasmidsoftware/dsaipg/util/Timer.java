@@ -14,6 +14,11 @@ import java.util.function.UnaryOperator;
  */
 public class Timer {
 
+    private int pre = 0;
+private int run = 0;
+private int post = 0;
+
+
     /**
      * Run the given function n times, once per "lap" and then return the result of calling meanLapTime().
      * The clock will be running when the method is invoked and when it is quit.
@@ -65,7 +70,50 @@ public class Timer {
      */
     public <T, U> double repeat(int n, boolean warmup, Supplier<T> supplier, Function<T, U> function, UnaryOperator<T> preFunction, Consumer<U> postFunction) {
         // TO BE IMPLEMENTED : note that the timer is running when this method is called and should still be running when it returns.
-         return 0;
+        long totalElapsedTime = 0;
+        int laps = 0;
+
+        if (n == 0) {
+        return 0;
+        }
+   
+        if (warmup) {
+        for (int i = 0; i < n; i++) {
+            T input = supplier.get();
+            if (preFunction != null) {
+                input = preFunction.apply(input);
+            }
+            function.apply(input); 
+            if (postFunction != null) {
+                postFunction.accept(function.apply(input));
+            }
+        }
+    } else {
+        
+        for (int i = 0; i < n; i++) {
+            T input = supplier.get();
+            if (preFunction != null) {
+                input = preFunction.apply(input);
+            }
+            
+            long startTime = System.nanoTime();  
+            U result = function.apply(input);
+            long elapsedTime = System.nanoTime() - startTime;  
+            totalElapsedTime += elapsedTime;
+
+            if (postFunction != null) {
+                postFunction.accept(result);
+            }
+
+            lap();  
+            laps++;
+        }
+    }
+   
+        double averageTime = (totalElapsedTime / 1_000_000.0) / n;
+        System.out.println("Total laps: " + laps);  
+        return averageTime;
+    
         // END SOLUTION
     }
 
@@ -240,7 +288,7 @@ public class Timer {
      */
     private static long getClock() {
         // TO BE IMPLEMENTED 
-         return 0;
+        return System.nanoTime();
         // END SOLUTION
     }
 
@@ -253,7 +301,7 @@ public class Timer {
      */
     private static double toMillisecs(long ticks) {
         // TO BE IMPLEMENTED 
-         return 0;
+        return ticks / 1_000_000.0;
         // END SOLUTION
     }
 

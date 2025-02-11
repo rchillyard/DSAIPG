@@ -8,6 +8,7 @@ import com.phasmidsoftware.dsaipg.sort.Sort;
 import com.phasmidsoftware.dsaipg.sort.SortWithHelper;
 import com.phasmidsoftware.dsaipg.util.Config;
 import com.phasmidsoftware.dsaipg.util.Config_Benchmark;
+import com.phasmidsoftware.dsaipg.util.Timer;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -64,9 +65,25 @@ public class InsertionSortComparator<X> extends SortWithHelper<X> {
      */
     public void sort(X[] xs, int from, int to) {
         final Helper<X> helper = getHelper();
+        
+    
+        for (int i = from + 1; i < to; i++) {
+            X current = xs[i];
+            int j = i - 1;
 
+        
+            while (j >= from && helper.compare(xs[j], current) > 0) {
+            xs[j + 1] = xs[j]; 
+            j--; 
+        }
+
+      
+        xs[j + 1] = current;
+    }
+    
+        
         // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+// throw new RuntimeException("implementation missing");
     }
 
     public static final String DESCRIPTION = "Insertion sort";
@@ -113,5 +130,87 @@ throw new RuntimeException("implementation missing");
             return helper.getFixes();
         }
     }
+
+    public static void main(String[] args) {
+
+        int[] sizes = {100, 200, 400, 800, 1600}; 
+        String[] arrayTypes = {"Random", "Ordered", "PartiallyOrdered", "ReverseOrdered"};
+    
+  
+        for (int size : sizes) {
+            System.out.println("Array size: " + size);
+    
+      
+            for (String type : arrayTypes) {
+                Integer[] array = generateArray(type, size); 
+                System.out.println("Testing " + type + " array:");
+    
+            
+                Timer timer = new Timer();
+                double time = timer.repeat(10, () -> { 
+               
+                    Integer[] arrayToSort = generateArray(type, size); 
+                    InsertionSortComparator.sort(arrayToSort);
+                    return null; 
+                });
+                System.out.println(type + " array took " + time + " ms for " + size + " elements.");
+            }
+        }
+    }
+    
+    
+
+public static Integer[] generateRandomArray(int size) {
+    Integer[] array = new Integer[size];
+    for (int i = 0; i < size; i++) {
+        array[i] = (int) (Math.random() * 1000); 
+    }
+    return array;
+}
+
+
+public static Integer[] generateOrderedArray(int size) {
+    Integer[] array = new Integer[size];
+    for (int i = 0; i < size; i++) {
+        array[i] = i; 
+    }
+    return array;
+}
+
+
+public static Integer[] generatePartiallyOrderedArray(int size) {
+    Integer[] array = generateRandomArray(size);
+    for (int i = 0; i < size / 2; i++) {
+        array[i] = i; 
+    }
+    return array;
+}
+
+
+public static Integer[] generateReverseOrderedArray(int size) {
+    Integer[] array = new Integer[size];
+    for (int i = 0; i < size; i++) {
+        array[i] = size - i - 1; 
+    }
+    return array;
+}
+
+
+public static Integer[] generateArray(String type, int size) {
+    switch (type) {
+        case "Random":
+            return generateRandomArray(size);
+        case "Ordered":
+            return generateOrderedArray(size);
+        case "PartiallyOrdered":
+            return generatePartiallyOrderedArray(size);
+        case "ReverseOrdered":
+            return generateReverseOrderedArray(size);
+        default:
+            throw new IllegalArgumentException("Unknown array type: " + type);
+    }
+}
+
+
 
 }

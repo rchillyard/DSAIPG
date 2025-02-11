@@ -95,6 +95,23 @@ public class SortBenchmark {
      * @param N the size of the dataset to be sorted, must not exceed {@link Integer#MAX_VALUE}.
      *          Throws a {@link SortException} if the size exceeds this limit.
      */
+
+    //  public void runIntegerQuickSort(long N, Integer[] array) {
+    //     QuickSort_DualPivot<Integer> sorter = new QuickSort_DualPivot<>(N, 10, config); 
+    //     sorter.sort(array);
+    // } 
+
+    // public void runIntegerShellSort(long N, Integer[] array) {
+    //     ShellSort<Integer> sorter = new ShellSort<>(4, (int) N, 10, config);
+    //     sorter.sort(array);
+    // }
+
+    // public void runIntegerBucketSort(long N, Integer[] array) {
+    //     int bucketSize = 16;
+    //     BucketSort<Integer> sorter = new BucketSort<>(null, (int) (N / bucketSize), (int) N, config);
+    //     sorter.sort(array);
+    // }
+
     void runIntegerSorts(long N) {
         if (N > Integer.MAX_VALUE) throw new SortException("number of elements is too large");
         double totalWork = getTotalWork(N, config, "benchmarkintegersorters");
@@ -104,8 +121,67 @@ public class SortBenchmark {
             runIntegerBucketSort((int) N, estimateRuns(totalWork * 2, N));
         if (isConfigBenchmarkIntegerSorter("quicksort"))
             runIntegerQuickSort((int) N, 10 * estimateRuns(totalWork, Math.log(N) * N));
+
+        // testSorts(N, generateRandomArray(N));
+        // testSorts(N, generateOrderedArray(N));
+        // testSorts(N, generatePartiallyOrderedArray(N));
+        // testSorts(N, generateReverseOrderedArray(N));
     }
 
+    // private void testSorts(long N, Integer[] array) {
+    //     System.out.println("Testing N = " + N + " with array type: " + array.getClass().getSimpleName());
+
+    //     long startTime = System.nanoTime();
+    //     runIntegerQuickSort(N, array);
+    //     long endTime = System.nanoTime();
+    //     System.out.println("QuickSort time: " + (endTime - startTime) + " ns");
+
+    //     startTime = System.nanoTime();
+    //     runIntegerShellSort(N, array);
+    //     endTime = System.nanoTime();
+    //     System.out.println("ShellSort time: " + (endTime - startTime) + " ns");
+
+    //     startTime = System.nanoTime();
+    //     runIntegerBucketSort(N, array);
+    //     endTime = System.nanoTime();
+    //     System.out.println("BucketSort time: " + (endTime - startTime) + " ns");
+    // }
+
+    // private Integer[] generateRandomArray(long N) {
+    //     Random rand = new Random();
+    //     Integer[] array = new Integer[(int) N];
+    //     for (int i = 0; i < N; i++) {
+    //         array[i] = rand.nextInt(1000); 
+    //     }
+    //     return array;
+    // }
+
+    // private Integer[] generateOrderedArray(long N) {
+    //     Integer[] array = new Integer[(int) N];
+    //     for (int i = 0; i < N; i++) {
+    //         array[i] = i; 
+    //     }
+    //     return array;
+    // }
+
+    // private Integer[] generatePartiallyOrderedArray(long N) {
+    //     Integer[] array = generateOrderedArray(N);
+    //     Random rand = new Random();
+    
+    //     for (int i = 0; i < N / 10; i++) {
+    //         array[rand.nextInt((int) N)] = rand.nextInt(1000);
+    //     }
+    //     return array;
+    // }
+
+    // private Integer[] generateReverseOrderedArray(long N) {
+    //     Integer[] array = new Integer[(int) N];
+    //     for (int i = 0; i < N; i++) {
+    //         array[i] = (int) N - i - 1; 
+    //     }
+    //     return array;
+    // }
+    
     /**
      * Method to benchmark local date time sorts.
      * <p>
@@ -238,7 +314,7 @@ public class SortBenchmark {
                     runStringSortBenchmark(words, nWords, nRunsSubQuadratic, sorter, timeLoggersSubQuadratic);
                 }
         }
-
+ 
         // Quadratic sorts.
         if (isConfigBenchmarkStringSorter("insertionsort") || isConfigBenchmarkStringSorter("insertionsortopt") || isConfigBenchmarkStringSorter("bubblesort")) {
             double inversions = meanInversions(nWords);
