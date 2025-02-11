@@ -64,36 +64,30 @@ public class Timer {
      * @return the average milliseconds per repetition.
      */
     public <T, U> double repeat(int n, boolean warmup, Supplier<T> supplier, Function<T, U> function, UnaryOperator<T> preFunction, Consumer<U> postFunction) {
-        pause();  // Pause the timer before running laps
+        pause();
 
-        for (int i = 0; i < n; i++) {
-            T input = supplier.get(); // Generate input
+        for (int index = 0; index < n; index++) {
+            T element = supplier.get();
 
-            // Apply preFunction if available (not timed)
             if (preFunction != null) {
-                input = preFunction.apply(input);
+                element = preFunction.apply(element);
             }
 
-            // Start timing
-            long startTime = getClock();
+            long startTick = getClock();
 
-            U output = function.apply(input); // Execute function
+            U result = function.apply(element);
 
-            // Stop timing
-            long endTime = getClock();
-            ticks += (endTime - startTime);
-            laps++; // Increment lap count
+            long endTick = getClock();
+            ticks += (endTick - startTick);
+            laps++;
 
-            // Apply postFunction if available (not timed)
             if (postFunction != null) {
-                postFunction.accept(output);
+                postFunction.accept(result);
             }
         }
-
-        double meanTime = meanLapTime(); // Compute mean lap time
-
-        resume(); // Resume the timer before returning
-        return meanTime;
+        double avgTime = meanLapTime();
+        resume();
+        return avgTime;
     }
 
 

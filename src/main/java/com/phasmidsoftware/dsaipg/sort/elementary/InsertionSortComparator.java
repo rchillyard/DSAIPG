@@ -63,11 +63,16 @@ public class InsertionSortComparator<X> extends SortWithHelper<X> {
      * @param to   the index of the first element not to sort
      */
     public void sort(X[] xs, int from, int to) {
-        final Helper<X> helper = getHelper();
-
-        // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+        final Helper<X> helperInstance = getHelper();
+        for (int currentPos = from + 1; currentPos < to; currentPos++) {
+            int comparisonPos = currentPos;
+            while (comparisonPos > from && helperInstance.compare(xs[comparisonPos - 1], xs[comparisonPos]) > 0) {
+                helperInstance.swap(xs, comparisonPos - 1, comparisonPos);
+                comparisonPos--;
+            }
+        }
     }
+
 
     public static final String DESCRIPTION = "Insertion sort";
 

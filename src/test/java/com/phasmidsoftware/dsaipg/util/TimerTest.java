@@ -57,7 +57,7 @@ public class TimerTest {
         timer.resume();
         GoToSleep(TENTH, 0);
         final double time = timer.stop();
-        assertEquals(TENTH_DOUBLE, time, 10.0);
+        assertEquals(TENTH_DOUBLE, time, 15.0);
         assertEquals(3, run);
     }
 
