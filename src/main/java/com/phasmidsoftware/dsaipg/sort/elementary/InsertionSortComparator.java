@@ -8,9 +8,13 @@ import com.phasmidsoftware.dsaipg.sort.Sort;
 import com.phasmidsoftware.dsaipg.sort.SortWithHelper;
 import com.phasmidsoftware.dsaipg.util.Config;
 import com.phasmidsoftware.dsaipg.util.Config_Benchmark;
+import com.phasmidsoftware.dsaipg.util.Timer;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Random;
+
 
 import static com.phasmidsoftware.dsaipg.sort.InstrumentedComparatorHelper.getRunsConfig;
 
@@ -64,9 +68,30 @@ public class InsertionSortComparator<X> extends SortWithHelper<X> {
      */
     public void sort(X[] xs, int from, int to) {
         final Helper<X> helper = getHelper();
+        for(int i = from+1;i<to;i++){
+            X a = helper.get(xs, i);
+            int j = i - 1;
+            while (j >= from && helper.compare(xs, j ,a)>0) {
+                helper.swap(xs, j, j+1);
+                j--;
+            }
+        }
+        
+    
+    }
+    public static Integer[] sort(Integer[] array) {
+        int n = array.length;
+        for (int i = 1; i < n; i++) {
+            int key = array[i];
+            int j = i - 1;
 
-        // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+            while (j >= 0 && array[j] > key) {
+                array[j + 1] = array[j];
+                j = j - 1;
+            }
+            array[j + 1] = key;
+        }
+        return array; 
     }
 
     public static final String DESCRIPTION = "Insertion sort";
@@ -112,6 +137,70 @@ throw new RuntimeException("implementation missing");
             sorter.sort(ts, true);
             return helper.getFixes();
         }
+    }
+
+    public static void main(String[] args) {
+        int[] sizes = {1000, 2000, 4000, 8000, 16000}; 
+        Random random = new Random();
+
+        for (int n:sizes) {
+            Integer[] randomArray = generateRandomArray(n, random);
+            Integer[] orderedArray = generateOrderedArray(n);
+            Integer[] partiallyOrderedArray = generatePartiallyOrderedArray(n, random);
+            Integer[] reverseOrderedArray = generateReverseOrderedArray(n);
+
+            System.out.println("\nInsertion Sort Benchmark for n = " + n);
+
+            benchmarkSort("Random Array", randomArray);
+            benchmarkSort("Ordered Array", orderedArray);
+            benchmarkSort("Partially Ordered Array", partiallyOrderedArray);
+            benchmarkSort("Reverse Ordered Array", reverseOrderedArray);
+        }
+    }
+
+
+    private static void benchmarkSort(String description, Integer[] array) {
+        Timer timer = new Timer();
+       double time = timer.repeat(10, () -> Arrays.copyOf(array, array.length), InsertionSortComparator::sort);
+        System.out.printf("%-25s : %.6f ms\n", description, time);
+    }
+
+
+
+    private static Integer[] generateRandomArray(int n, Random random) {
+        Integer[] array = new Integer[n];
+        Arrays.setAll(array, i -> random.nextInt(n));
+        return array;
+    }
+
+
+    private static Integer[] generateOrderedArray(int n) {
+        Integer[] array = new Integer[n];
+        for (int i = 0; i < n; i++) {
+            array[i] = i;
+        }
+        return array;
+    }
+ 
+    private static Integer[] generatePartiallyOrderedArray(int n, Random random) {
+    Integer[] array = new Integer[n];
+
+    int orderedSize = (int) (n * 0.7); // 70% 有序
+    for (int i = 0; i < orderedSize; i++) {
+        array[i] = i;
+    }
+
+    for (int i = orderedSize; i < n; i++) {
+        array[i] = random.nextInt(n);
+    }
+    return array;
+    }
+    private static Integer[] generateReverseOrderedArray(int n) {
+        Integer[] array = new Integer[n];
+        for (int i = 0; i < n; i++) {
+            array[i] = n - i;
+        }
+        return array;
     }
 
 }

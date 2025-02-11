@@ -101,6 +101,7 @@ public class TimerTest {
             GoToSleep(HUNDREDTH, 0);
             return null;
         });
+
         assertEquals(10, new PrivateMethodTester(timer).invokePrivate("getLaps"));
         assertEquals(TENTH_DOUBLE / 10, mean, 6);
         assertEquals(10, run);
