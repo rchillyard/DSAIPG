@@ -5,7 +5,7 @@
 package com.phasmidsoftware.dsaipg.adt.pq;
 
 public class PQException extends Exception {
-    public PQException(String msg) {
-        super(msg);
+    public PQException(String message) {
+        super(message);
     }
 }

@@ -4,7 +4,11 @@
 
 package com.phasmidsoftware.dsaipg.adt.pq;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
@@ -25,7 +29,7 @@ import java.util.function.Consumer;
  *
  * @param <K>
  */
-public class PriorityQueue<K> implements Iterable<K> {
+public class PriorityQueue<K> implements PriorityQueueInterface<K>, Iterable<K> {
 
     /**
      * Primary constructor that takes the max value, an actual array of elements, and a comparator.
@@ -243,7 +247,7 @@ public class PriorityQueue<K> implements Iterable<K> {
     /**
      * Get the index of the parent of the element at index k
      */
-    private int parent(int k) {
+    protected int parent(int k) {
         return (k + 1 - first) / 2 + first - 1;
     }
 
@@ -251,7 +255,7 @@ public class PriorityQueue<K> implements Iterable<K> {
      * Get the index of the first child of the element at index k.
      * The index of the second child will be one greater than the result.
      */
-    private int firstChild(int k) {
+    protected int firstChild(int k) {
         return (k + 1 - first) * 2 + first - 1;
     }
 
