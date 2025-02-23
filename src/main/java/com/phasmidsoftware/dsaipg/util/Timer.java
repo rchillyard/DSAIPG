@@ -72,6 +72,7 @@ public class Timer {
             if (postFunction != null) postFunction.accept(u);
             lap();
         }
+
         pause();
         final double result = meanLapTime();
         if (!warmup) resume();
