@@ -295,9 +295,9 @@ public class PriorityQueueTest {
 
     @Test
     public void benchmark() {
-        int M = 4095;
-        int insertions = 16000;
-        int deletions = 4000;
+        int M = 500000;
+        int insertions = 20000000;
+        int deletions = 500000;
 
         Consumer<FourAryPriorityQueue<Integer>> testLogic = pq -> {
             Random random = new Random();
@@ -308,8 +308,14 @@ public class PriorityQueueTest {
                 if (pq.size() < M) {
                     pq.give(value);
                 } else {
-                    if (value > spilledMax) {
-                        spilledMax = value;
+                    try {
+                        int va= pq.take();
+                        if (va > spilledMax) {
+                            spilledMax = va;
+                        }
+                        pq.give(value);
+                    } catch (PQException e) {
+                        throw new RuntimeException(e);
                     }
                 }
             }
@@ -334,8 +340,14 @@ public class PriorityQueueTest {
                 if (pq.size() < M) {
                     pq.give(value);
                 } else {
-                    if (value > spilledMax) {
-                        spilledMax = value;
+                    try {
+                        int va= pq.take();
+                        if (va > spilledMax) {
+                            spilledMax = va;
+                        }
+                        pq.give(value);
+                    } catch (PQException e) {
+                        throw new RuntimeException(e);
                     }
                 }
             }
@@ -360,8 +372,14 @@ public class PriorityQueueTest {
                 if (pq.size() < M) {
                     pq.give(value);
                 } else {
-                    if (value > spilledMax) {
-                        spilledMax = value;
+                    try {
+                        int va= pq.take();
+                        if (va > spilledMax) {
+                            spilledMax = va;
+                        }
+                        pq.give(value);
+                    } catch (PQException e) {
+                        throw new RuntimeException(e);
                     }
                 }
             }
@@ -377,6 +395,7 @@ public class PriorityQueueTest {
             //System.out.println("Highest priority spilled element: " + spilledMax);
         };
 
+        int MM=10;
         Comparator<Integer> comparator = Integer::compare;
 
         Benchmark_Timer<FourAryPriorityQueue<Integer>> benchmarkTimer = new Benchmark_Timer<>(
@@ -384,11 +403,11 @@ public class PriorityQueueTest {
                 testLogic
         );
         FourAryPriorityQueue<Integer> heap = new FourAryPriorityQueue<>(M, comparator);
-        double time = benchmarkTimer.runFromSupplier(() -> heap, 1000);
+        double time = benchmarkTimer.runFromSupplier(() -> heap, MM);
         System.out.println("FourAry Heap Benchmark completed in " + time + " ms");
 
         FourAryPriorityQueue<Integer> heapf = new FourAryPriorityQueue<>(M,true, comparator, true);
-        time = benchmarkTimer.runFromSupplier(() -> heapf, 1000);
+        time = benchmarkTimer.runFromSupplier(() -> heapf, MM);
         System.out.println("FourAry Heap with Floyd's trick Benchmark completed in " + time + " ms");
 
         Benchmark_Timer<PriorityQueue<Integer>> bibenchmarkTimer = new Benchmark_Timer<>(
@@ -396,11 +415,11 @@ public class PriorityQueueTest {
                 bitestLogic
         );
         PriorityQueue<Integer> biheap = new PriorityQueue<>(M, comparator);
-        time = bibenchmarkTimer.runFromSupplier(() -> biheap, 1000);
+        time = bibenchmarkTimer.runFromSupplier(() -> biheap, MM);
         System.out.println("Binary Heap Benchmark completed in " + time + " ms");
 
         PriorityQueue<Integer> biheapf = new PriorityQueue<>(M,true, comparator, true);
-        time = bibenchmarkTimer.runFromSupplier(() -> biheapf, 1000);
+        time = bibenchmarkTimer.runFromSupplier(() -> biheapf, MM);
         System.out.println("Binary Heap with Floyd's trick Benchmark completed in " + time + " ms");
 
         FabPriorityQueue<Integer> fabheap = new FabPriorityQueue<>(comparator);
@@ -409,7 +428,7 @@ public class PriorityQueueTest {
                 fabtestLogic
         );
 
-        time = fabbenchmarkTimer.runFromSupplier(() -> fabheap, 1000);
+        time = fabbenchmarkTimer.runFromSupplier(() -> fabheap, MM);
         System.out.println("Benchmark completed in " + time + " ms");
 
     }
