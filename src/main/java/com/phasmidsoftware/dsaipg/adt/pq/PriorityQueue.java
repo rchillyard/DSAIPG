@@ -276,6 +276,197 @@ public class PriorityQueue<K> implements Iterable<K> {
     private int last; // number of elements in the binary heap
     private final boolean floyd; //Determine whether floyd's snake method is on or off inside the take method
 
+    // 4-ary Heap Implementation
+    public static class FourAryHeap<T extends Comparable<T>> {
+        private List<T> heap;
+        public int size;
+
+        public FourAryHeap() {
+            heap = new ArrayList<>();
+        }
+
+        public void insert(T value) {
+            heap.add(value);
+            heapifyUp(heap.size() - 1);
+        }
+
+        public T removeMin() {
+            if (heap.isEmpty()) {
+                return null; 
+            }
+            T min = heap.get(0);
+            if (heap.size() == 1) {
+                heap.remove(0);
+            } else {
+                heap.set(0, heap.remove(heap.size() - 1)); 
+                heapifyDown(0);
+            }
+            return min;
+        }
+        
+
+        private void heapifyUp(int index) {
+            while (index > 0) {
+                int parent = (index - 1) / 4;
+                if (heap.get(index).compareTo(heap.get(parent)) >= 0) break;
+                Collections.swap(heap, index, parent);
+                index = parent;
+            }
+        }
+
+        public void heapifyDown(int index) {
+            int size = heap.size();
+            
+            while (4 * index + 1 < size) { 
+                int minChild = 4 * index + 1;
+                int bestIndex = index;
+    
+                for (int i = 0; i < 4; i++) {
+                    int childIndex = 4 * index + 1 + i;
+                    if (childIndex < size && heap.get(childIndex).compareTo(heap.get(minChild)) < 0) {
+                        minChild = childIndex;
+                    }
+                }
+
+                if (heap.get(bestIndex).compareTo(heap.get(minChild)) <= 0) break;
+        
+                bestIndex = minChild;
+                Collections.swap(heap, index, bestIndex);
+                index = bestIndex;
+            }
+        }
+        
+        
+
+        public int getSize() {
+            return heap.size();
+        }
+    
+        public boolean isEmpty() {
+            return heap.isEmpty();
+        }
+    }
+
+    // Fibonacci Heap Implementation
+    public static class FibonacciHeap<T extends Comparable<T>> {
+        private static class Node<T> {
+            T key;
+            Node<T> parent, child, left, right;
+            int degree;
+            boolean mark;
+
+            Node(T key) {
+                this.key = key;
+                this.right = this;
+                this.left = this;
+            }
+        }
+
+        private Node<T> minNode;
+        public int size;
+
+        public void insert(T key) {
+            Node<T> newNode = new Node<>(key);
+            minNode = mergeLists(minNode, newNode);
+            size++;
+        }
+
+        public T removeMin() {
+            if (minNode == null) {
+                return null;
+            }
+            T minKey = minNode.key;
+            if (minNode.child != null) {
+                Node<T> child = minNode.child;
+                Node<T> firstChild = child; 
+                do {
+                    child.parent = null;
+                    child = child.right;
+        
+                    if (child == firstChild) break;  
+                } while (child != minNode.child);
+            }
+            removeFromList(minNode);
+            size--;
+            if (size == 0) {
+                minNode = null;
+            } else {
+                minNode = minNode.right;
+                consolidate();
+            }
+            return minKey;
+        }
+        
+        private void consolidate() {
+            Map<Integer, Node<T>> degreeTable = new HashMap<>();
+            List<Node<T>> nodes = new ArrayList<>();
+            Node<T> current = minNode;
+            do {
+                nodes.add(current);
+                current = current.right;
+            } while (current != minNode);
+            for (Node<T> node : nodes) {
+                int degree = node.degree;
+                while (degreeTable.containsKey(degree)) {
+                    Node<T> other = degreeTable.get(degree);
+                    if (node.key.compareTo(other.key) > 0) {
+                        Node<T> temp = node;
+                        node = other;
+                        other = temp;
+                    }
+                    link(other, node);
+                    degreeTable.remove(degree);
+                    degree++;
+                }
+                degreeTable.put(degree, node);
+            }
+        
+            minNode = null;
+            for (Node<T> node : degreeTable.values()) {
+                minNode = mergeLists(minNode, node);
+            }
+        }
+        
+        private void link(Node<T> child, Node<T> parent) {
+            removeFromList(child);
+            child.parent = parent;
+            child.mark = false;
+        
+            if (parent.child == null) {
+                parent.child = child;
+                child.right = child;
+                child.left = child;
+            } else {
+                Node<T> first = parent.child;
+                child.right = first;
+                child.left = first.left;
+                first.left.right = child;
+                first.left = child;
+            }
+        
+            parent.degree++;
+        }
+        private Node<T> mergeLists(Node<T> a, Node<T> b) {
+            if (a == null) return b;
+            if (b == null) return a;
+            Node<T> temp = a.right;
+            a.right = b.right;
+            a.right.left = a;
+            b.right = temp;
+            b.right.left = b;
+            return a.key.compareTo(b.key) < 0 ? a : b;
+        }
+
+        private void removeFromList(Node<T> node) {
+            node.left.right = node.right;
+            node.right.left = node.left;
+        }
+
+        public boolean isEmpty() {
+            return size == 0;
+        }   
+    }
+
     public static void main(String[] args) {
         doMain();
     }
