@@ -257,16 +257,13 @@ public class Benchmark_Timer<T> implements Benchmark<T> {
         List<Integer> elements = new ArrayList<>();
         Integer highestSpilled = null;
     
-        // 1️⃣ 生成随机数据
         for (int i = 0; i < numInsertions; i++) {
             elements.add(random.nextInt(1000000));
         }
     
-        // 2️⃣ 直接用 Floyd’s Trick 一次性建堆
         heap = new PriorityQueue<>(elements.size(), Comparator.naturalOrder()); 
-        heap.addAll(elements);  // 一次性添加所有元素，构造堆
+        heap.addAll(elements); 
     
-        // 3️⃣ 移除超出 M 的元素，记录最高优先级溢出元素
         while (heap.size() > 4095) {
             int removed = heap.poll();
             if (highestSpilled == null || removed > highestSpilled) {
@@ -274,11 +271,9 @@ public class Benchmark_Timer<T> implements Benchmark<T> {
             }
         }
     
-        // 4️⃣ 执行删除操作
         for (int i = 0; i < numDeletions && !heap.isEmpty(); i++) {
             heap.poll();
         }
-    
         System.out.println("Highest priority spilled element: " + highestSpilled);
     }
     
