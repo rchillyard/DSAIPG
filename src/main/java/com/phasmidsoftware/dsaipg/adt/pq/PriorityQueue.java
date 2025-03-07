@@ -121,7 +121,8 @@ public class PriorityQueue<K> implements Iterable<K> {
             last--; // if we are already at capacity, then we arbitrarily trash the least eligible element
         // (even if it's more eligible than key).
         binHeap[++last + first - 1] = key; // insert the key into the binary heap just after the last element
-        swimUp(last + first - 1); // reorder the binary heap
+        swimUp(last + first - 1); // reorder the binary heap*/
+        
     }
 
     /**
