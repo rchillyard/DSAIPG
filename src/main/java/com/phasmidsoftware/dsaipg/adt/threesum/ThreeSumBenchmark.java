@@ -79,12 +79,12 @@ public class ThreeSumBenchmark {
      */
     public static void main(String[] args) {
         new ThreeSumBenchmark(100, 250, 250).runBenchmarks();
-        new ThreeSumBenchmark(50, 500, 500).runBenchmarks();
-        new ThreeSumBenchmark(20, 1000, 1000).runBenchmarks();
-        new ThreeSumBenchmark(10, 2000, 2000).runBenchmarks();
-        new ThreeSumBenchmark(5, 4000, 4000).runBenchmarks();
-        new ThreeSumBenchmark(3, 8000, 8000).runBenchmarks();
-        new ThreeSumBenchmark(2, 16000, 16000).runBenchmarks();
+//        new ThreeSumBenchmark(50, 500, 500).runBenchmarks();
+//        new ThreeSumBenchmark(20, 1000, 1000).runBenchmarks();
+//        new ThreeSumBenchmark(10, 2000, 2000).runBenchmarks();
+//        new ThreeSumBenchmark(5, 4000, 4000).runBenchmarks();
+//        new ThreeSumBenchmark(3, 8000, 8000).runBenchmarks();
+//        new ThreeSumBenchmark(2, 16000, 16000).runBenchmarks();
     }
 
     /**
@@ -101,10 +101,20 @@ public class ThreeSumBenchmark {
      *                     results of the benchmark.
      */
     private void benchmarkThreeSum(final String description, final Consumer<int[]> function, int n, final TimeLogger[] timeLoggers) {
-        if (description.equals("ThreeSumCubic") && n > 4000) return;
-        // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+        if (description.equals("ThreeSumCubic") && n > 4000) return; // Skip cubic for large N
+
+        Benchmark_Timer<int[]> benchmark = new Benchmark_Timer<>(description, function);
+        double time = benchmark.runFromSupplier(supplier, runs); // Run the benchmark
+
+        System.out.println(description + " took " + time + " ms (average over " + runs + " runs)");
+        //System.out.println(n + "," + runs + "," + time + "," + (n * n * Utilities.lg(n))); // for Quadrithmic
+
+
+        for (TimeLogger timeLogger : timeLoggers) {
+            timeLogger.log(description,time, n);
+        }
     }
+
 
     /**
      * An array of {@link TimeLogger} instances used for benchmarking the cubic implementation
