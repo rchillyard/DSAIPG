@@ -26,6 +26,8 @@ final class ParSort {
      * the advantages of parallelism.
      */
     public static int cutoff = 1000;
+    static int idealThreads = 164;
+    static int maxDepth = (int) (Math.log(idealThreads) / Math.log(2));
 
     /**
      * Sorts the specified portion of the input array using a parallel sorting algorithm.
@@ -39,16 +41,18 @@ final class ParSort {
      * @param to    the ending index (exclusive) of the portion of the array to be sorted
      */
     public static void sort(int[] array, int from, int to) {
-        if (to - from >= cutoff) {
-            CompletableFuture<int[]> completableFuture1 = null;
-            CompletableFuture<int[]> completableFuture2 = null;
-            // TO BE IMPLEMENTED 
-            // END SOLUTION
-            CompletableFuture<int[]> completableFuture = completableFuture1.thenCombine(completableFuture2, ParSort::doMerge);
-            completableFuture.whenComplete((result, throwable) -> System.arraycopy(result, 0, array, from, result.length));
-            completableFuture.join();
-        } else
-            Arrays.sort(array, from, to);
+
+            if (to - from >= cutoff) {
+                int mid = (from + to) / 2;
+                CompletableFuture<int[]> completableFuture1 = asyncSort(array, from, mid);
+                CompletableFuture<int[]> completableFuture2 = asyncSort(array, mid, to);
+                CompletableFuture<int[]> completableFuture = completableFuture1.thenCombine(completableFuture2, ParSort::doMerge);
+                completableFuture.whenComplete((result, throwable) ->
+                System.arraycopy(result, 0, array, from, result.length));
+                completableFuture.join();
+            } else {
+                Arrays.sort(array, from, to);
+            }
     }
 
     /**
@@ -62,11 +66,23 @@ final class ParSort {
      * @return a new sorted array containing the elements from the specified range of the input array
      */
     static int[] sortRecursive(int[] array, int from, int to) {
-        int[] result = new int[to - from];
-        // TO BE IMPLEMENTED 
-         // NOTE you need to do something here so that result is the sorted version of array.
-        // END SOLUTION
-        return result;
+
+                return sortRecursiveWithDepth(array, from, to, 0); 
+            
+    }
+    private static int[] sortRecursiveWithDepth(int[] array, int from, int to, int depth) {
+        if (to - from < cutoff || depth >= maxDepth) {
+            int[] result = Arrays.copyOfRange(array, from, to);
+            Arrays.sort(result);
+            return result;
+        } else {
+            int mid = from + (to - from) / 2;
+            CompletableFuture<int[]> leftFuture = CompletableFuture.supplyAsync(
+                    () -> sortRecursiveWithDepth(array, from, mid, depth + 1));
+            CompletableFuture<int[]> rightFuture = CompletableFuture.supplyAsync(
+                    () -> sortRecursiveWithDepth(array, mid, to, depth + 1));
+            return leftFuture.thenCombine(rightFuture, ParSort::doMerge).join();
+        }
     }
 
     /**
@@ -90,6 +106,7 @@ final class ParSort {
         }
         return result;
     }
+
 
     /**
      * Asynchronously sorts the specified portion of the input array using a parallel sorting algorithm.
