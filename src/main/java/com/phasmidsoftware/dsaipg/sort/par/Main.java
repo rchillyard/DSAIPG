@@ -21,45 +21,44 @@ import java.util.concurrent.ForkJoinPool;
 public class Main {
 
     public static void main(String[] args) {
-        processArgs(args);
-        System.out.println("Degree of parallelism: " + ForkJoinPool.getCommonPoolParallelism());
-        Random random = new Random();
-        int[] array = new int[2000000];
-        ArrayList<Long> timeList = new ArrayList<>();
-        for (int j = 50; j < 100; j++) {
-            ParSort.cutoff = 10000 * (j + 1);
-            // for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
-            long time;
-            long startTime = System.currentTimeMillis();
-            for (int t = 0; t < 10; t++) {
-                for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
-                ParSort.sort(array, 0, array.length);
+        int[] arraySizes = {500000, 1000000, 2000000, 5000000};
+        int[] threadCounts = {2, 4, 8}; // Controlling parallelism
+        String outputFile = "./src/result.csv";
+
+        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile)))) {
+            bw.write("ArraySize,Cutoff,Threads,Time(ms)\n"); // CSV Header
+
+            for (int size : arraySizes) {
+                for (int threads : threadCounts) {
+                    ForkJoinPool customPool = new ForkJoinPool(threads);
+                    int[] array = new int[size];
+                    Random random = new Random();
+
+                    for (int cutoffFactor = 1; cutoffFactor <= 10; cutoffFactor++) {
+                        int cutoff = Math.min(size / 2, 10000 * cutoffFactor);
+                        ParSort.cutoff = cutoff;
+                        long totalTime = 0;
+
+                        for (int t = 0; t < 5; t++) { // Average over 5 runs
+                            for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
+                            long startTime = System.currentTimeMillis();
+                            customPool.submit(() -> ParSort.sort(array, 0, array.length)).join();
+                            long endTime = System.currentTimeMillis();
+                            totalTime += (endTime - startTime);
+                        }
+
+                        long avgTime = totalTime / 5;
+                        bw.write(size + "," + cutoff + "," + threads + "," + avgTime + "\n");
+                        System.out.println("Size: " + size + ", Cutoff: " + cutoff + ", Threads: " + threads + " -> Time: " + avgTime + " ms");
+                    }
+                    customPool.shutdown();
+                }
             }
-            long endTime = System.currentTimeMillis();
-            time = (endTime - startTime);
-            timeList.add(time);
-
-
-            System.out.println("cutoff：" + (ParSort.cutoff) + "\t\t10times Time:" + time + "ms");
-
-        }
-        try {
-            FileOutputStream fis = new FileOutputStream("./src/result.csv");
-            OutputStreamWriter isr = new OutputStreamWriter(fis);
-            BufferedWriter bw = new BufferedWriter(isr);
-            int j = 0;
-            for (long i : timeList) {
-                String content = (double) 10000 * (j + 1) / 2000000 + "," + (double) i / 10 + "\n";
-                j++;
-                bw.write(content);
-                bw.flush();
-            }
-            bw.close();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     private static void processArgs(String[] args) {
         String[] xs = args;
