@@ -146,7 +146,8 @@ public class PriorityQueue<K> implements Iterable<K> {
      * @param f a consumer function that manipulates the root index to maintain the heap order.
      * @return the root element of the priority queue before reorganization.
      */
-    K doTake(Consumer<Integer> f) {
+    //Changed access modifier to protected
+    protected K doTake(Consumer<Integer> f) {
         K result = binHeap[first]; // get the root element (the largest or smallest, according to field max)
         swap(first, last-- + first - 1); // swap the root element with the last element
         f.accept(first); // invoke the function f so that it is ordered again
@@ -157,7 +158,8 @@ public class PriorityQueue<K> implements Iterable<K> {
     /**
      * Sink the element at index k down
      */
-    void sink(@SuppressWarnings("SameParameterValue") int k) {
+    //Changed access modifier to protected
+    protected void sink(@SuppressWarnings("SameParameterValue") int k) {
         doHeapify(k, (a, b) -> !unordered(a, b));
     }
 
@@ -166,14 +168,16 @@ public class PriorityQueue<K> implements Iterable<K> {
      *
      * @param k the starting index of the element in the heap to be adjusted.
      */
-    void snake(@SuppressWarnings("SameParameterValue") int k) {
+    //Changed access modifier to protected
+    protected void snake(@SuppressWarnings("SameParameterValue") int k) {
         swimUp(doHeapify(k, (a, b) -> !unordered(a, b)));
     }
 
     /**
      * Swim the element at index k up
      */
-    void swimUp(int k) {
+    //Changed access modifier to protected
+    protected void swimUp(int k) {
         int i = k;
         while (i > first && unordered(parent(i), i)) {
             swap(i, parent(i));
@@ -190,7 +194,8 @@ public class PriorityQueue<K> implements Iterable<K> {
      * @param j the higher index, numerically
      * @return true if the values are out of order.
      */
-    boolean unordered(int i, int j) {
+    //Changed access modifier to protected
+    protected boolean unordered(int i, int j) {
         return (comparator.compare(binHeap[i], binHeap[j]) > 0) ^ max;
     }
 
@@ -234,7 +239,8 @@ public class PriorityQueue<K> implements Iterable<K> {
     /**
      * Exchange the values at indices i and j
      */
-    private void swap(int i, int j) {
+    //Changed access modifier to protected
+    protected void swap(int i, int j) {
         K tmp = binHeap[i];
         binHeap[i] = binHeap[j];
         binHeap[j] = tmp;
@@ -243,7 +249,8 @@ public class PriorityQueue<K> implements Iterable<K> {
     /**
      * Get the index of the parent of the element at index k
      */
-    private int parent(int k) {
+    //Changed access modifier to protected
+    protected int parent(int k) {
         return (k + 1 - first) / 2 + first - 1;
     }
 
@@ -251,7 +258,8 @@ public class PriorityQueue<K> implements Iterable<K> {
      * Get the index of the first child of the element at index k.
      * The index of the second child will be one greater than the result.
      */
-    private int firstChild(int k) {
+    //Changed access modifier to protected
+    protected int firstChild(int k) {
         return (k + 1 - first) * 2 + first - 1;
     }
 
