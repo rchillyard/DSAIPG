@@ -148,6 +148,28 @@ public class HeapSortTest {
         final int hits = (int) statPack.getStatistics(HITS).mean();
         assertEquals(2 * compares + 2 * swaps + 1162, hits); // Why this difference?
     }
+    @Test
+    public void testp(){
+        int[] sizes = {10000,20000,40000,80000,160000};
+        for (int size : sizes) {
+            final Config config = setupConfig("true", "false", "0", "1", "", "");
+            int n = size;
+            Helper<Integer> helper = HelperFactory.create("HeapSort", n, config);
+            helper.init(n);
+            final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
+            final StatPack statPack = (StatPack) privateMethodTester.invokePrivate("getStatPack");
+            Integer[] xs = helper.random(Integer.class, r -> r.nextInt(1000));
+            SortWithHelper<Integer> sorter = new HeapSort<Integer>(helper);
+            sorter.preProcess(xs);
+            Integer[] ys = sorter.sort(xs);
+            assertTrue(helper.isSorted(ys));
+            sorter.postProcess(ys);
+            final int compares = (int) statPack.getStatistics(COMPARES).mean();
+            final int swaps = (int) statPack.getStatistics(SWAPS).mean();
+            final int hits = (int) statPack.getStatistics(HITS).mean();
+            System.out.println("n = " + n + ", compares = " + compares + ", swaps/copies = " + swaps + ", hits = " + hits);
+        }
+    }
 
     @Test
     public void sort3() throws Exception {

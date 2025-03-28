@@ -118,6 +118,13 @@ public class SortBenchmarkTest {
         assertTrue(true);
     }
 
+    @Test
+    public void testp() throws IOException{
+        Stream<Long> wordCounts = Stream.of(10000L, 20000L, 40000L, 80000L, 160000L);
+        Config config = Config.load(SortBenchmark.class);
+        SortBenchmark sortBenchmark = new SortBenchmark(config);
+        sortBenchmark.sortIntegers(wordCounts);
+    }
     // Assertion placeholder: Handle gracefully without throwing exceptions
     public void testMinComparisons() {
         assertEquals(8769, minComparisons(1024), 0.1);

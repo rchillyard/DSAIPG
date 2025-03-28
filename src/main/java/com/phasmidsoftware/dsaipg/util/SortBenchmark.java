@@ -103,7 +103,11 @@ public class SortBenchmark {
         if (isConfigBenchmarkIntegerSorter("bucketsort"))
             runIntegerBucketSort((int) N, estimateRuns(totalWork * 2, N));
         if (isConfigBenchmarkIntegerSorter("quicksort"))
-            runIntegerQuickSort((int) N, 10 * estimateRuns(totalWork, Math.log(N) * N));
+            runIntegerQuickSort((int) N, 10);
+        if (isConfigBenchmarkIntegerSorter("heapsort"))
+            runIntegerHeapSort((int) N, 10);
+        if (isConfigBenchmarkIntegerSorter("mergesort"))
+            runIntegerMergeSort((int) N, 10 );
     }
 
     /**
@@ -356,6 +360,18 @@ public class SortBenchmark {
      */
     private void runIntegerQuickSort(int N, final int runs) {
         SortWithHelper<Integer> sorter = new QuickSort_DualPivot<>(N, runs, config);
+        Integer[] numbers = sorter.getHelper().random(Integer.class, Random::nextInt);
+        runIntegerSortBenchmark(numbers, N, runs, sorter, sorter::preProcess, timeLoggersLinearithmic);
+    }
+
+    private void runIntegerHeapSort(int N, final int runs){
+        SortWithHelper<Integer> sorter = new HeapSort<>(N, runs, config);
+        Integer[] numbers = sorter.getHelper().random(Integer.class, Random::nextInt);
+        runIntegerSortBenchmark(numbers, N, runs, sorter, sorter::preProcess, timeLoggersLinearithmic);
+    }
+
+    private void runIntegerMergeSort(int N, final int runs){
+        SortWithHelper<Integer> sorter = new MergeSort<>(N, runs, config);
         Integer[] numbers = sorter.getHelper().random(Integer.class, Random::nextInt);
         runIntegerSortBenchmark(numbers, N, runs, sorter, sorter::preProcess, timeLoggersLinearithmic);
     }

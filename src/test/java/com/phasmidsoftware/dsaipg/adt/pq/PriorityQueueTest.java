@@ -295,8 +295,8 @@ public class PriorityQueueTest {
 
     @Test
     public void benchmark() {
-        int M = 4095;
-        int insertions = 16000;
+        int M = 10000;
+        int insertions = 1960000;
         int deletions = 4000;
 
         Consumer<FourAryPriorityQueue<Integer>> testLogic = pq -> {

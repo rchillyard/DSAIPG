@@ -306,6 +306,23 @@ public class QuickSortDualPivotTest {
         assertEquals(0, helper.inversions(xs));
         assertEquals(11L, privateMethodTester.invokePrivate("getSwaps"));
     }
+    @Test
+    public void testp(){
+        int[] sizes = {10000,20000,40000,80000,160000};
+        for (int size : sizes) {
+            final Config config = setupConfig("true", "true", "0", "1", "", "");
+            final Helper<Integer> helper = HelperFactory.create("quick sort dual pivot", size, config);
+            Sort<Integer> sorter = new QuickSort_DualPivot<>(helper);
+            sorter.init(size);
+            Integer[] xs = helper.random(Integer.class, r -> r.nextInt(10000));
+            helper.preProcess(xs);
+            Integer[] ys = sorter.sort(xs);
+            helper.postProcess(ys);
+            final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
+            final StatPack statPack = (StatPack) privateMethodTester.invokePrivate("getStatPack");
+            System.out.println("size: " + size + ", compares: " + statPack.getStatistics(COMPARES).mean() + ", swaps/copies: " + statPack.getStatistics(SWAPS).mean() + ", hits: " + statPack.getStatistics(HITS).mean());
+        }
+    }
 
     private static String[] setupWords(final int n) {
         if (n > 36) throw new RuntimeException("cannot have n > 36");
