@@ -26,7 +26,7 @@ public class Main {
         Random random = new Random();
         int[] array = new int[5000000];
         Collection<Long> timeList = new ArrayList<>();
-        for (int j = 0; j < 10; j+=2) {
+        for (int j = 0; j < 129; j+=2) {
             ParSort.cutoff = 110000;
             ParSort.maxDepth = j;
             // for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);

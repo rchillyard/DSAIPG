@@ -22,7 +22,7 @@ final class ParSort {
      * the advantages of parallelism.
      */
     public static int cutoff = 1000;
-    public static int maxDepth = 8;
+    public static int maxDepth = 0;
 
     /**
      * Sorts the specified portion of the input array using a parallel sorting algorithm.
