@@ -6,7 +6,6 @@ package com.phasmidsoftware.dsaipg.adt.hashtable;
 
 import com.phasmidsoftware.dsaipg.adt.symbolTable.hashtable.FrequencyCounter;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,6 +23,5 @@ public class FrequencyCounterFuncTest {
         }
         assertEquals((long) Integer.MAX_VALUE / 2, fc.get(key).intValue());
     }
-    ///
-    /// ///
+   
 }
