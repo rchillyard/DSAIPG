@@ -1,5 +1,6 @@
 package com.phasmidsoftware.dsaipg.sort.linearithmic;
 
+import com.phasmidsoftware.dsaipg.sort.elementary.InsertionSort;
 import com.phasmidsoftware.dsaipg.sort.generic.SortException;
 import com.phasmidsoftware.dsaipg.sort.helper.Helper;
 import com.phasmidsoftware.dsaipg.util.config.Config;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.phasmidsoftware.dsaipg.sort.helper.InstrumentedComparatorHelper.getRunsConfig;
+import static com.phasmidsoftware.dsaipg.sort.linearithmic.MergeSort.getConfigString;
 
 /**
  * Class QuickSort_DualPivot which extends QuickSort.
@@ -168,5 +170,11 @@ public class QuickSort_DualPivot<X extends Comparable<X>> extends QuickSort<X> {
         }
 
         private final Helper<X> helper;
+    }
+
+    public QuickSort_DualPivot(Config config) {
+        // For example, default to N=0, nRuns=1 (or read them from config)
+        super(DESCRIPTION + getConfigString(config), 0, 1, config);
+        InsertionSort<X> insertionSort = setupInsertionSort(getHelper());
     }
 }

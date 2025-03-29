@@ -4,6 +4,8 @@ import com.phasmidsoftware.dsaipg.sort.generic.SortWithComparableHelper;
 import com.phasmidsoftware.dsaipg.sort.helper.Helper;
 import com.phasmidsoftware.dsaipg.util.config.Config;
 
+import static com.phasmidsoftware.dsaipg.sort.linearithmic.MergeSort.getConfigString;
+
 /**
  * Implementation of the Heap Sort algorithm for sorting an array of elements that implement the Comparable interface.
  * Heap Sort is an in-place, comparison-based sorting algorithm that uses a binary heap data structure.
@@ -22,6 +24,8 @@ import com.phasmidsoftware.dsaipg.util.config.Config;
  */
 public class HeapSort<X extends Comparable<X>> extends SortWithComparableHelper<X> {
 
+    private static final int nWords = 0;
+
     /**
      * Constructor for the HeapSort class.
      * Initializes the HeapSort algorithm with a helper instance.
@@ -30,8 +34,9 @@ public class HeapSort<X extends Comparable<X>> extends SortWithComparableHelper<
      *               during the sorting process. The helper is typically a utility class that
      *               provides additional methods to facilitate sorting logic.
      */
-    public HeapSort(Helper<X> helper) {
+    public HeapSort(Helper<X> helper, InsertionSort<X> insertionSort) {
         super(helper);
+        this.insertionSort = insertionSort;
     }
 
     /**
@@ -39,11 +44,11 @@ public class HeapSort<X extends Comparable<X>> extends SortWithComparableHelper<
      * This constructor allows configuring the HeapSort with specific parameters such as the number
      * of words and other configuration options provided in the Config object.
      *
-     * @param nWords The number of words to be used for the sorting algorithm configuration.
      * @param config The configuration object that specifies settings and parameters for the HeapSort algorithm.
      */
-    public HeapSort(int nWords, Config config) {
+    public HeapSort(Config config) {
         super(DESCRIPTION, nWords, 1, config);
+        this.insertionSort = insertionSort;
     }
 
     /**
@@ -54,8 +59,9 @@ public class HeapSort<X extends Comparable<X>> extends SortWithComparableHelper<
      * @param nRuns  The number of sorting runs or iterations to be managed by the algorithm.
      * @param config The configuration object that specifies settings and parameters for the HeapSort algorithm.
      */
-    public HeapSort(int nWords, int nRuns, Config config) {
+    public HeapSort(int nWords, int nRuns, Config config, InsertionSort<X> insertionSort) {
         super(DESCRIPTION, nWords, nRuns, config);
+        this.insertionSort = insertionSort;
     }
 
     /**
@@ -126,5 +132,18 @@ public class HeapSort<X extends Comparable<X>> extends SortWithComparableHelper<
     }
 
     public static final String DESCRIPTION = "Heap Sort";
+
+    private InsertionSort<X> insertionSort = null;
+
+//    private InsertionSort<X> setupInsertionSort(final Helper<X> helper) {
+//        return new InsertionSort<>(helper.clone("HeapSort: insertion sort"));
+//    }
+
+//    public HeapSort(Config config, InsertionSort<X> insertionSort) {
+//        super(DESCRIPTION + getConfigString(config), 0, 1, config);
+//        // If you need insertionSort fallback, define or remove this:
+//        // insertionSort = setupInsertionSort(getHelper());
+//        this.insertionSort = insertionSort;
+//    }
 
 }

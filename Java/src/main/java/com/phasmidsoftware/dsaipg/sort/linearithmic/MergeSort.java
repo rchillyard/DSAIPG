@@ -195,7 +195,7 @@ throw new RuntimeException("implementation missing");
      * @param config the configuration object used to determine the settings for the string.
      * @return a string representing the configuration settings.
      */
-    private static String getConfigString(Config config) {
+    public static String getConfigString(Config config) {
         StringBuilder stringBuilder = new StringBuilder();
         if (config.getBoolean(MERGESORT, INSURANCE)) stringBuilder.append(" with insurance comparison");
         if (config.getBoolean(MERGESORT, NOCOPY)) stringBuilder.append(" with no copy");
@@ -211,4 +211,11 @@ throw new RuntimeException("implementation missing");
     private int arrayMemory = -1;
     private int additionalMemory;
     private int maxMemory;
+
+
+    public MergeSort(Config config) {
+        // For example, default to N=0, nRuns=1 (or read them from config)
+        super(DESCRIPTION + getConfigString(config), 0, 1, config);
+        insertionSort = setupInsertionSort(getHelper());
+    }
 }

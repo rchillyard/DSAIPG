@@ -311,4 +311,19 @@ public class Config {
     private static final Map<String, Boolean> logged = new HashMap<>();
 
     private final Ini ini;
+
+    public void setInstrument(boolean b) {
+        String value = b ? "true" : "false";
+        // Ensure the [helper] section exists
+        Profile.Section helper = ini.get("helper");
+        if (helper == null) {
+            ini.add("helper");
+            helper = ini.get("helper");
+        }
+        helper.put("instrument", value);
+    }
+
+    public boolean isInstrument() {
+        return getBoolean("helper", "instrument");
+    }
 }

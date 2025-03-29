@@ -3,6 +3,12 @@ package com.phasmidsoftware.dsaipg.util.benchmark;
 import com.phasmidsoftware.dsaipg.sort.generic.SortWithHelper;
 import com.phasmidsoftware.dsaipg.util.logging.LazyLogger;
 
+import com.phasmidsoftware.dsaipg.sort.elementary.HeapSort;
+import com.phasmidsoftware.dsaipg.sort.linearithmic.MergeSort;
+import com.phasmidsoftware.dsaipg.sort.linearithmic.QuickSort_DualPivot;
+import com.phasmidsoftware.dsaipg.sort.generic.SortWithHelper;
+import com.phasmidsoftware.dsaipg.util.config.Config;
+
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
@@ -113,93 +119,76 @@ public class SorterBenchmark<T extends Comparable<T>> extends Benchmark_Timer<T[
     private final Class<T> tClass;
 
 
-    public static void main(String[] args) {
-        // 1. Define the array sizes you want to test
-        int[] sizes = {10000, 20000, 40000, 80000, 160000, 256000};
+    // public static void main(String[] args) {
+    //     // Create a list to store the results
+    //     List<BenchmarkResult> allResults = new ArrayList<>();
 
-        // 2. We'll store all the results in this list
-        List<BenchmarkResult> allResults = new ArrayList<>();
+    //     // Example array sizes
+    //     int[] sizes = {10000, 20000, 40000, 80000, 160000, 256000};
+    //     // Example algorithms
+    //     String[] algorithms = {"MergeSort", "QuickSortDualPivot", "HeapSort"};
 
-        // 3. Define which algorithms you want to test (as strings or references)
-        String[] algorithms = {"MergeSort", "QuickSortDualPivot", "HeapSort"};
+    //     for (String algorithm : algorithms) {
+    //         for (int size : sizes) {
+    //             // 1) Instrumentation Run
+    //             Config.getInstance().setInstrument(true);
 
-        // 4. For each algorithm and each array size, do:
-        //    - Instrumentation run (to collect compares, swaps, copies, hits)
-        //    - Timing run (with instrumentation off)
-        for (String algorithm : algorithms) {
-            for (int size : sizes) {
-                // -------------------
-                // INSTRUMENTATION RUN
-                // -------------------
-                Config.getInstance().setInstrument(true);  // turn on instrumentation
+    //             SortWithHelper<Integer> sorterInstr = createSorter(algorithm, Config.getInstance());
+    //             Integer[] arrayInstr = sorterInstr.getHelper().random(Integer.class, size, 0L);
 
-                // Create a new sorter for the chosen algorithm
-                SortWithHelper<Integer> sorterInstr = createSorter(algorithm, Config.getInstance());
-                // Generate a random array
-                Integer[] arrayInstr = sorterInstr.getHelper().random(Integer.class, size, 0L);
+    //             // Run the sort (collect instrumentation data)
+    //             sorterInstr.mutatingSort(arrayInstr);
 
-                // Run the sort (this triggers instrumentation)
-                sorterInstr.mutatingSort(arrayInstr);
+    //             // Retrieve instrumentation counts
+    //             long comparisons = sorterInstr.getHelper().getCompares();
+    //             long swaps = sorterInstr.getHelper().getSwaps();
+    //             long copies = sorterInstr.getHelper().getCopies();
+    //             long hits = sorterInstr.getHelper().getHits();
 
-                // Retrieve instrumentation counts
-                long comparisons = sorterInstr.getHelper().getCompares();
-                long swaps = sorterInstr.getHelper().getSwaps();
-                long copies = sorterInstr.getHelper().getCopies();
-                long hits = sorterInstr.getHelper().getHits();
+    //             // 2) Timing Run
+    //             Config.getInstance().setInstrument(false);
 
-                // -------------------
-                // TIMING RUN
-                // -------------------
-                Config.getInstance().setInstrument(false); // turn off instrumentation
+    //             SortWithHelper<Integer> sorterTime = createSorter(algorithm, Config.getInstance());
+    //             Integer[] arrayTime = sorterTime.getHelper().random(Integer.class, size, 0L);
 
-                // Create a new sorter (no instrumentation)
-                SortWithHelper<Integer> sorterTime = createSorter(algorithm, Config.getInstance());
-                // Generate a random array
-                Integer[] arrayTime = sorterTime.getHelper().random(Integer.class, size, 0L);
+    //             long start = System.nanoTime();
+    //             sorterTime.mutatingSort(arrayTime);
+    //             long end = System.nanoTime();
+    //             long timeMs = (end - start) / 1_000_000;
 
-                // Time the sort in nanoseconds
-                long start = System.nanoTime();
-                sorterTime.mutatingSort(arrayTime);
-                long end = System.nanoTime();
-                long timeMs = (end - start) / 1_000_000; // convert ns to ms
+    //             // Combine everything into a BenchmarkResult
+    //             BenchmarkResult br = new BenchmarkResult(
+    //                     algorithm,
+    //                     size,
+    //                     comparisons,
+    //                     swaps,
+    //                     copies,
+    //                     hits,
+    //                     timeMs
+    //             );
+    //             allResults.add(br);
 
-                // Combine data into a BenchmarkResult object
-                BenchmarkResult result = new BenchmarkResult(
-                        algorithm,
-                        size,
-                        comparisons,
-                        swaps,
-                        copies,
-                        hits,
-                        timeMs
-                );
-                allResults.add(result);
+    //             // Optional: reset counters if you want
+    //             sorterInstr.getHelper().reset();
+    //             sorterTime.getHelper().reset();
+    //         }
+    //     }
 
-                // Optional: reset instrumentation counters if you reuse the same helper
-                sorterInstr.getHelper().reset();
-                sorterTime.getHelper().reset();
-            }
-        }
+    //     // Export all results to CSV
+    //     CsvExporter.exportResults(allResults, "benchmark_results.csv");
+    // }
 
-        // 5. Export all results to a CSV file
-        CsvExporter.exportResults(allResults, "benchmark_results.csv");
-    }
-
-    /**
-     * Utility method to create a sorter based on the algorithm name.
-     * Adjust package names and constructors as needed for your code.
-     */
-    private static SortWithHelper<Integer> createSorter(String algorithm, Config config) {
-        switch (algorithm) {
-            case "MergeSort":
-                return new MergeSort<>(config);
-            case "QuickSortDualPivot":
-                return new QuickSortDualPivot<>(config);
-            case "HeapSort":
-                return new HeapSort<>(config);
-            default:
-                throw new IllegalArgumentException("Unknown algorithm: " + algorithm);
-        }
-    }
-
+    // // Utility method to create a sorter
+    // private static SortWithHelper<Integer> createSorter(String algorithm, Config config) {
+    //     switch (algorithm) {
+    //         case "MergeSort":
+    //             return new MergeSort<>(config);
+    //         case "QuickSortDualPivot":
+    //             return new QuickSortDualPivot<>(config);
+    //         case "HeapSort":
+    //             return new HeapSort<>(config);
+    //         default:
+    //             throw new IllegalArgumentException("Unknown algorithm: " + algorithm);
+    //     }
+    // }
 }

@@ -171,7 +171,7 @@ public abstract class QuickSort<X extends Comparable<X>> extends SortWithCompara
      * @param helper the Helper instance, which provides necessary utilities and configurations for sorting.
      * @return an InsertionSort instance initialized with a cloned helper specific for insertion sort.
      */
-    private InsertionSort<X> setupInsertionSort(final Helper<X> helper) {
+    InsertionSort<X> setupInsertionSort(final Helper<X> helper) {
         return new InsertionSort<>(helper.clone("Quicksort: insertion sort"));
     }
 

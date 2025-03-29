@@ -38,4 +38,5 @@ public abstract class SortWithComparableHelper<X extends Comparable<X>> extends 
         this(HelperFactory.create(description, N, getSeed(config), nRuns, config));
         closeHelper = true;
     }
+
 }

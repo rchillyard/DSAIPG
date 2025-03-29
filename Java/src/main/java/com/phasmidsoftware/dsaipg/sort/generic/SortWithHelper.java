@@ -14,6 +14,7 @@ import java.util.Comparator;
  */
 public abstract class SortWithHelper<X> implements ProcessingSort<X> {
 
+
     /**
      * Get the Helper associated with this Sort.
      * CONSIDER: now that we have made helper protected, let's replace getHelper() with helper in subclasses.

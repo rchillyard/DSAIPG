@@ -63,43 +63,83 @@ public class SortBenchmark {
         logger.info("SortBenchmark.main: version " + config.get("sortbenchmark", "version") + " with word counts: " + Arrays.toString(args));
         if (args.length == 0) logger.warn("No word counts specified on the command line");
         new SortBenchmark(config).doMain(args);
-
-        List<BenchmarkResult> results = new ArrayList<>();
-    // Assume you have an array of sizes and a list of algorithms to test.
-    int[] sizes = {10000, 20000, 40000, 80000, 160000, 256000};
-    String[] algorithms = {"MergeSort", "QuickSort_DualPivot", "HeapSort"};
-
-    for (String algorithm : algorithms) {
-        for (int size : sizes) {
-            // --- Instrumentation Run ---
-            // Enable instrumentation (set a flag in your Config or Helper)
-            Config config = Config.getInstance();
-            config.setInstrument(true);  // (Assume this method toggles instrumentation)
-            // Run the sort and get instrumentation counts.
-            InstrumentationResult instrResult = runSortAndCollectInstrumentation(algorithm, size);
-            // InstrumentationResult could be a custom object holding counts for comparisons, swaps, copies, hits.
-
-            // --- Timing Run ---
-            // Disable instrumentation for accurate timing
-            config.setInstrument(false);
-            long time = runSortAndMeasureTime(algorithm, size);
-
-            // --- Combine the Data ---
-            BenchmarkResult br = new BenchmarkResult(
-                algorithm,
-                size,
-                instrResult.getComparisons(),
-                instrResult.getSwaps(),
-                instrResult.getCopies(),
-                instrResult.getHits(),
-                time
-            );
-            results.add(br);
-        }
     }
-    // Export all results to CSV (see next section)
-    CsvExporter.exportResults(results, "benchmark_results.csv");
-    }
+
+
+//        try {
+//            config = Config.load(); // e.g., from resources or the classpath
+//        } catch (IOException e) {
+//            throw new RuntimeException("Could not load config.ini", e);
+//        }
+//
+//        // Prepare a list for your benchmark results
+//        List<BenchmarkResult> allResults = new ArrayList<>();
+//
+//        // Example sizes and algorithms
+//        int[] sizes = {10000, 20000, 40000, 80000, 160000, 256000};
+//        String[] algorithms = {"MergeSort", "QuickSortDualPivot", "HeapSort"};
+//
+//        // Loop over each algorithm and array size
+//        for (String algorithm : algorithms) {
+//            for (int size : sizes) {
+//                // -----------------------------
+//                // INSTRUMENTATION RUN
+//                // -----------------------------
+//                config.setInstrument(true);  // <---- Turn instrumentation ON
+//
+//                SortWithHelper<Integer> sorterInstr = createSorter(algorithm, config);
+//                Integer[] arrayInstr = sorterInstr.getHelper().random(Integer.class, size);
+//
+//                // Perform the sort -> instrumentation counters are recorded
+//                sorterInstr.mutatingSort(arrayInstr);
+//
+//                // Retrieve instrumentation data
+//                long comparisons = sorterInstr.getHelper().getCompares();
+//                long swaps = sorterInstr.getHelper().getSwaps();
+//                long copies = sorterInstr.getHelper().getCopies();
+//                long hits = sorterInstr.getHelper().getHits();
+//
+//                // -----------------------------
+//                // TIMING RUN
+//                // -----------------------------
+//                config.setInstrument(false); // <---- Turn instrumentation OFF
+//
+//                SortWithHelper<Integer> sorterTime = createSorter(algorithm, config);
+//                Integer[] arrayTime = sorterTime.getHelper().random(Integer.class, size);
+//
+//                long start = System.nanoTime();
+//                sorterTime.mutatingSort(arrayTime);
+//                long end = System.nanoTime();
+//                long timeMs = (end - start) / 1_000_000; // convert ns to ms
+//
+//                // Create a BenchmarkResult for this experiment
+//                BenchmarkResult br = new BenchmarkResult(
+//                        algorithm, size,
+//                        comparisons, swaps, copies, hits,
+//                        timeMs
+//                );
+//                allResults.add(br);
+//
+//            }
+//        }
+//        CsvExporter.exportResults(allResults, "benchmark_results.csv");
+//    }
+//
+//    // Utility method to create a sorter
+//    private static SortWithHelper<Integer> createSorter(String algorithm, Config config) {
+//        // Adapt this to your actual sort classes
+//        switch (algorithm) {
+//            case "MergeSort":
+//                return new MergeSort<>(config);
+//            case "QuickSortDualPivot":
+//                return new QuickSort_DualPivot<>(config);
+//            case "HeapSort":
+//                return new HeapSort(config);
+//            default:
+//                throw new IllegalArgumentException("Unknown algorithm: " + algorithm);
+//        }
+//    }
+
 
     /**
      * Extracts words from the given input line based on the Leipzig regex pattern: {@link SortBenchmarkHelper#regexLeipzig}.
@@ -257,7 +297,7 @@ public class SortBenchmark {
             }
 
         if (isConfigBenchmarkStringSorter("heapsort") && nRunsLinearithmic > 0) {
-            try (SortWithHelper<String> sorter = new HeapSort<>(nWords, nRunsLinearithmic, config)) {
+            try (SortWithHelper<String> sorter = new HeapSort<>(nRunsLinearithmic)) {
                 runStringSortBenchmark(words, nWords, nRunsLinearithmic * 3, sorter, timeLoggersLinearithmic);
             }
         }
@@ -749,4 +789,8 @@ public class SortBenchmark {
     public static final String BENCHMARKINTEGERSORTERS = "benchmarkintegersorters";
 
     private final Config config;
+
+
+
+
 }
