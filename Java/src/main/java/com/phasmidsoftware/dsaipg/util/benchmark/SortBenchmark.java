@@ -421,7 +421,7 @@ public class SortBenchmark {
         int x = (int) N;
         logger.info("############################### " + x + " words ###############################");
 //        String resource = "eng-uk_web_2002_" + (x < 50000 ? "10K" : x < 200000 ? "100K" : "1M") + "-sentences.txt";
-        String resource = "eng-uk_web_2002_" + (x < 50000 ? "10K" : "100K") + "-sentences.txt";
+        String resource = "/eng-uk_web_2002_" + (x < 50000 ? "10K" : "100K") + "-sentences.txt";
         try {
             benchmarkStringSorters(getWords(resource, SortBenchmark::getLeipzigWords), x);
         } catch (FileNotFoundException e) {

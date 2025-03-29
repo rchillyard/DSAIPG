@@ -4,10 +4,9 @@ package com.phasmidsoftware.dsaipg.util.benchmark;
 import com.phasmidsoftware.dsaipg.sort.generic.SortException;
 import com.phasmidsoftware.dsaipg.util.logging.LazyLogger;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -64,21 +63,26 @@ public class SortBenchmarkHelper {
      * @throws FileNotFoundException if the specified resource file cannot be found
      */
     // TEST
-    public static String[] getWords(String resource, Function<String, Collection<String>> getStrings) throws FileNotFoundException {
-        List<String> words = new ArrayList<>();
-        final FileReader fr = new FileReader(getFile(resource, SortBenchmarkHelper.class));
-        for (Object line : new BufferedReader(fr).lines().toArray()) words.addAll(getStrings.apply((String) line));
-        words = words.stream().distinct().filter(new Predicate<>() {
-            private static final int MINIMUM_LENGTH = 2;
+    public static String[] getWords(final String resource, Function<String, Collection<String>> getStrings) throws FileNotFoundException {
+        try (InputStream inputStream = SortBenchmarkHelper.class.getResourceAsStream(resource)) {
+            if (inputStream == null) throw new FileNotFoundException(resource);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+            List<String> words = new ArrayList<>();
+            for (Object line : bufferedReader.lines().toArray()) words.addAll(getStrings.apply((String) line));
+            words = words.stream().distinct().filter(new Predicate<>() {
+                private static final int MINIMUM_LENGTH = 2;
 
-            public boolean test(String s) {
-                return s.length() >= MINIMUM_LENGTH;
-            }
-        }).collect(Collectors.toList());
-        logger.info("Testing with words: " + formatWhole(words.size()) + " from " + resource);
-        String[] result = new String[words.size()];
-        result = words.toArray(result);
-        return result;
+                public boolean test(String s) {
+                    return s.length() >= MINIMUM_LENGTH;
+                }
+            }).collect(Collectors.toList());
+            logger.info("Testing with words: " + formatWhole(words.size()) + " from " + resource);
+            String[] result = new String[words.size()];
+            result = words.toArray(result);
+            return result;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
