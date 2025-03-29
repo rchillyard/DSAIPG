@@ -40,15 +40,19 @@ final class ParSort {
      */
     public static void sort(int[] array, int from, int to) {
         if (to - from >= cutoff) {
-            CompletableFuture<int[]> completableFuture1 = null;
-            CompletableFuture<int[]> completableFuture2 = null;
-            // TO BE IMPLEMENTED 
-            // END SOLUTION
+            int mid = (from + to) / 2;
+
+            // TODO
+            CompletableFuture<int[]> completableFuture1 = asyncSort(array, from, mid);
+            CompletableFuture<int[]> completableFuture2 = asyncSort(array, mid, to);
+
             CompletableFuture<int[]> completableFuture = completableFuture1.thenCombine(completableFuture2, ParSort::doMerge);
             completableFuture.whenComplete((result, throwable) -> System.arraycopy(result, 0, array, from, result.length));
             completableFuture.join();
-        } else
+            // END SOLUTION
+        } else {
             Arrays.sort(array, from, to);
+        }
     }
 
     /**
@@ -63,9 +67,20 @@ final class ParSort {
      */
     static int[] sortRecursive(int[] array, int from, int to) {
         int[] result = new int[to - from];
-        // TO BE IMPLEMENTED 
-         // NOTE you need to do something here so that result is the sorted version of array.
+
+        // TODO
+        if (to - from < cutoff) {
+            System.arraycopy(array, from, result, 0, result.length);
+            Arrays.sort(result);
+        } else {
+            int mid = (from + to) / 2;
+            CompletableFuture<int[]> leftFuture = asyncSort(array, from, mid);
+            CompletableFuture<int[]> rightFuture = asyncSort(array, mid, to);
+
+            result = leftFuture.thenCombine(rightFuture, ParSort::doMerge).join();
+        }
         // END SOLUTION
+
         return result;
     }
 

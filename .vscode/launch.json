@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "java",
+        "name": "Run SortBenchmark with Args",
+        "request": "launch",
+        "mainClass": "com.phasmidsoftware.dsaipg.util.SortBenchmark",
+        "args": "10000 20000 40000 80000 160000 256000"
+      }
+    ]
+  }
+  

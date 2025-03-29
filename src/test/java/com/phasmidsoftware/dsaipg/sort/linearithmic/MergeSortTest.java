@@ -105,11 +105,13 @@ public class MergeSortTest {
         SortWithHelper<Integer> s = new MergeSort<>(xs.length, 1, config);
         Helper<Integer> helper = s.getHelper();
         assertArrayEquals(expected, s.sort(xs));
+        System.out.println("copies = " + helper.getCopies());
         assertEquals(15, helper.getSwaps());
         assertEquals(51, helper.getCompares());
         assertEquals(68, helper.getCopies());
         assertEquals(192, helper.getHits());
         assertEquals(102, helper.getLookups());
+
     }
 
     @Test
