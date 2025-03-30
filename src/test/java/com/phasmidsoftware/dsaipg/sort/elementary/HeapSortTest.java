@@ -38,7 +38,7 @@ public class HeapSortTest {
         assertTrue(helper.isSorted(xs));
     }
 
-    @Test
+    @Test  
     public void sortWithEmptyArray() throws Exception {
         Integer[] xs = new Integer[0];
         Helper<Integer> helper = new NonInstrumentingComparableHelper<>("HeapSort", xs.length, Config.load(HeapSortTest.class));

@@ -220,6 +220,12 @@ public class SortBenchmark {
                 runStringSortBenchmark(words, nWords, nRunsLinearithmic * 3, sorter, timeLoggersLinearithmic);
             }
         }
+        
+        if (isConfigBenchmarkStringSorter("heapsort")) {
+            Helper<String> helper = HelperFactory.create("Heapsort", nWords, config);
+            runStringSortBenchmark(words, nWords, nRuns, new HeapSort<>(helper), timeLoggersLinearithmic);
+        }
+        
 
         if (isConfigBenchmarkStringSorter("introsort") && nRunsLinearithmic > 0)
             try (SortWithHelper<String> sorter = new IntroSort<>(nWords, nRunsLinearithmic, config)) {
@@ -511,6 +517,7 @@ public class SortBenchmark {
         double lgN = Utilities.lg(n);
         return n * (lgN - LgE) + lgN / 2 + 1.33;
     }
+    
 
     /**
      * This is the mean number of inversions in a randomly ordered set of n elements.

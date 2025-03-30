@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2024. Robin Hillyard
- */
-
 package com.phasmidsoftware.dsaipg.sort.elementary;
 
 import com.phasmidsoftware.dsaipg.sort.Helper;
@@ -74,15 +70,14 @@ public class HeapSort<X extends Comparable<X>> extends SortWithComparableHelper<
     public void sort(X[] array, int from, int to) {
         if (array == null || array.length <= 1) return;
 
-        // XXX construction phase
+        // Construction phase: Build a max heap
         buildMaxHeap(array);
 
-        // XXX sort-down phase
+        // Sort-down phase: Move the largest element to the end, and restore the heap
         Helper<X> helper = getHelper();
-        // TODO we over-count hits in the swap operation -- fix it.
         for (int i = array.length - 1; i >= 1; i--) {
-            helper.swap(array, 0, i);
-            heapify(array, i, 0);
+            helper.swap(array, 0, i); // Swap the root (max element) with the last element
+            heapify(array, i, 0); // Restore the heap property for the reduced heap
         }
     }
 
@@ -96,8 +91,10 @@ public class HeapSort<X extends Comparable<X>> extends SortWithComparableHelper<
      *              should support comparison.
      */
     private void buildMaxHeap(X[] array) {
-        int half = array.length / 2;
-        for (int i = half; i >= 0; i--) heapify(array, array.length, i);
+        int half = array.length / 2; // Start with the last parent node
+        for (int i = half; i >= 0; i--) {
+            heapify(array, array.length, i); // Ensure max-heap property for each subtree
+        }
     }
 
     /**
@@ -113,16 +110,21 @@ public class HeapSort<X extends Comparable<X>> extends SortWithComparableHelper<
      *                 subtree rooted at this index satisfies the max-heap property upon completion.
      */
     private void heapify(X[] array, int heapSize, int index) {
-        // TODO we over-count hits in the swap operation -- fix it.
         Helper<X> helper = getHelper();
         final int left = index * 2 + 1;
         final int right = index * 2 + 2;
         int largest = index;
+
+        // Check if left child exists and is larger than root
         if (left < heapSize && helper.compare(array, largest, left) < 0) largest = left;
+
+        // Check if right child exists and is larger than root (or left child)
         if (right < heapSize && helper.compare(array, largest, right) < 0) largest = right;
+
+        // If the largest is not the current index, swap and continue heapifying
         if (index != largest) {
             helper.swap(array, index, largest);
-            heapify(array, heapSize, largest);
+            heapify(array, heapSize, largest); // Recursively heapify the affected subtree
         }
     }
 
