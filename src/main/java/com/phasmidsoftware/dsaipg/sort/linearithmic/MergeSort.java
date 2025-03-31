@@ -69,16 +69,50 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
     }
 
     private void sort(X[] a, X[] aux, int from, int to) {
-        Config config = helper.getConfig();
+        /*Config config = helper.getConfig();
         boolean insurance = config.getBoolean(MERGESORT, INSURANCE);
         boolean noCopy = config.getBoolean(MERGESORT, NOCOPY);
         if (to <= from + helper.cutoff()) { // XXX check that a cutoff value of 1 effectively stops the cutoff mechanism.
             insertionSort.sort(a, from, to);
             return;
+        }*/
+        Config config = helper.getConfig();
+        boolean insurance = config.getBoolean(MERGESORT, INSURANCE);
+        boolean noCopy = config.getBoolean(MERGESORT, NOCOPY);
+    
+        // 当子数组大小小于等于 cutoff 时，直接调用插入排序
+        if (to - from <= helper.cutoff()) {
+            insertionSort.sort(a, from, to);
+            return;
+        }
+    
+        // 递归分割数组
+        int mid = from + (to - from) / 2;
+        sort(a, aux, from, mid);
+        sort(a, aux, mid, to);
+    
+        // 保险优化：如果左侧最后一个元素不大于右侧第一个元素，
+        // 表示该区间已整体有序，若未启用无复制优化，则复制到辅助数组中
+        if (insurance && !helper.less(a[mid], a[mid - 1])) {
+            if (!noCopy) {
+                for (int i = from; i < to; i++) {
+                    aux[i] = a[i];
+                }
+            }
+            return;
+        }
+    
+        // 合并两个有序子数组，将结果存入辅助数组 aux 中
+        merge(a, aux, from, mid, to);
+    
+        // 如果未启用无复制优化，则将辅助数组 aux 中的合并结果复制回原数组 a
+        if (!noCopy) {
+            for (int i = from; i < to; i++) {
+                a[i] = aux[i];
+            }
         }
 
-        // TO BE IMPLEMENTED  : implement merge sort with insurance and no-copy optimizations
-throw new RuntimeException("implementation missing");
+
     }
 
     // CONSIDER combine with MergeSortBasic, perhaps.
