@@ -65,7 +65,8 @@ public class Position {
         int[][] matrix = copyGrid();
         if (matrix[x][y] < 0) {
             // TO BE IMPLEMENTED 
-             return null;
+            matrix[x][y] = player;
+            return new Position(matrix, count + 1, player);
             // END SOLUTION
         }
         throw new RuntimeException("Position is occupied: " + x + ", " + y);
@@ -82,7 +83,8 @@ public class Position {
         for (int i = 0; i < gridSize; i++)
             for (int j = 0; j < gridSize; j++)
                 if (grid[i][j] < 0)
-                    // TO BE IMPLEMENTED 
+                    // TO BE IMPLEMENTED
+                    result.add(new int[]{i, j});
          ;
         // END SOLUTION
         return result;
@@ -145,7 +147,19 @@ public class Position {
      */
     boolean threeInARow() {
         // TO BE IMPLEMENTED 
-         return false;
+        for (int i = 0; i < gridSize; i++) {
+            if (Arrays.equals(projectRow(i), xxx)) {
+                return true;
+            }
+            if (Arrays.equals(projectCol(i), xxx)) {
+                return true;
+            }
+        }
+        
+        boolean mainDiagonal = Arrays.equals(projectDiag(true), xxx);
+        boolean antiDiagonal = Arrays.equals(projectDiag(false), xxx);
+    
+        return mainDiagonal || antiDiagonal;
         // END SOLUTION
     }
 
