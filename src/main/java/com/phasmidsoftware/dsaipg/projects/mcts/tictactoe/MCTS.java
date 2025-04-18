@@ -14,7 +14,7 @@ public class MCTS {
     public static void main(String[] args) {
         MCTS mcts = new MCTS(new TicTacToeNode(new TicTacToe().new TicTacToeState()));
         Node<TicTacToe> root = mcts.root;
-
+        
         // This is where you process the MCTS to try to win the game.
     }
 
@@ -24,3 +24,4 @@ public class MCTS {
 
     private final Node<TicTacToe> root;
 }
+
