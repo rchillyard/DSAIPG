@@ -87,10 +87,11 @@ public class Main {
 */
 
 package com.phasmidsoftware.dsaipg.projects.mcts.gomoku;
-import com.phasmidsoftware.dsaipg.projects.mcts.core.Move;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
+
+import com.phasmidsoftware.dsaipg.projects.mcts.core.Move;
 
 public class Main {
     // 白／黑两个 AI 的模拟次数
