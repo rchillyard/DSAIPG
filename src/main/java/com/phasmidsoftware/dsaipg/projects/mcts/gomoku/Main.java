@@ -1,6 +1,7 @@
 package com.phasmidsoftware.dsaipg.projects.mcts.gomoku;
-import com.phasmidsoftware.dsaipg.projects.mcts.core.Move;
 import java.util.Optional;
+
+import com.phasmidsoftware.dsaipg.projects.mcts.core.Move;
 
 public class Main {
     private static final int WHITE_ITERS = 10000;

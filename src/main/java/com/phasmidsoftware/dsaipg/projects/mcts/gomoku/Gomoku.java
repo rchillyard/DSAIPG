@@ -14,6 +14,6 @@ public class Gomoku implements Game<Gomoku> {
 
     @Override
     public int opener() {
-        return 0;  // 白先手
+        return 1;  // black first
     }
 }

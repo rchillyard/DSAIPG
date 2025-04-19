@@ -1,10 +1,13 @@
 package com.phasmidsoftware.dsaipg.projects.mcts.gomoku;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import com.phasmidsoftware.dsaipg.projects.mcts.core.Move;
 import com.phasmidsoftware.dsaipg.projects.mcts.core.Node;
 import com.phasmidsoftware.dsaipg.projects.mcts.core.State;
-import com.phasmidsoftware.dsaipg.projects.mcts.core.Move;
-
-import java.util.*;
 
 public class GomokuNode implements Node<Gomoku> {
 
@@ -21,6 +24,10 @@ public class GomokuNode implements Node<Gomoku> {
         this.state  = state;
         this.move   = move;
         this.parent = parent;
+    }
+    
+    public GomokuNode getParent() {
+        return parent;
     }
 
     @Override public boolean isLeaf()           { return children.isEmpty(); }
