@@ -1,12 +1,12 @@
 package com.phasmidsoftware.dsaipg.projects.mcts.tictactoe;
 
-import com.phasmidsoftware.dsaipg.projects.mcts.core.State;
-import org.junit.Test;
-
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import org.junit.Test;
+
+import com.phasmidsoftware.dsaipg.projects.mcts.core.State;
 
 public class TicTacToeTest {
 
