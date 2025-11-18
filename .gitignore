@@ -29,5 +29,6 @@ Java/src/test/java/edu/neu/coe/info6205/admin/TicketTest.java
 *.pyo
 **/.venv/
 **/.pytest_cache/
+**/.ruff_cache
 
 .DS_Store

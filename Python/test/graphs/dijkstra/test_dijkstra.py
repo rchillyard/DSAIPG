@@ -2,7 +2,6 @@ from pytest import approx, raises
 
 from src.graphs.dijkstra.edge_weighted_digraph import EdgeWeightedDigraph
 from src.graphs.dijkstra.dijkstra import Dijkstra
-from src.graphs.dijkstra.edge_weighted_digraph import EdgeWeightedDigraph
 from src.graphs.dijkstra.directed_edge import DirectedEdge
 
 
@@ -56,7 +55,6 @@ def test1():
 
 
 def test2():
-
     g = EdgeWeightedDigraph(8)
     e = DirectedEdge(0, 4, 0.38)
     e1 = DirectedEdge(6, 4, 0.93)
@@ -148,7 +146,6 @@ def test3():
 
 
 def test4():
-
     g = EdgeWeightedDigraph(7)
     e = DirectedEdge(0, 1, 2)
     e1 = DirectedEdge(0, 2, 6)

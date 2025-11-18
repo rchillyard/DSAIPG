@@ -1,7 +1,6 @@
 import pytest
 
 from src.graphs.union_find.uf_hwqupc import UF_HWQUPC
-from src.graphs.union_find.connections import Connections
 
 
 def test_to_string():
