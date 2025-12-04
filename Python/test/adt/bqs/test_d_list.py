@@ -9,6 +9,6 @@ class TestDList:
         assert d.size() == 0
 
     def test_init_with_item(self):
-        # Since add_before_element is not implemented, this might raise RuntimeError
-        with pytest.raises(RuntimeError, match="implementation missing"):
+        # Since add_before_element is not implemented, this might raise NotImplementedError
+        with pytest.raises(NotImplementedError, match="TO BE IMPLEMENTED"):
             DList[int](1)

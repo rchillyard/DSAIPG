@@ -81,29 +81,29 @@ class DList(Generic[Item], Iterable[Item]):
         Add an item immediately before the given element
         """
         # TO BE IMPLEMENTED
-        raise RuntimeError("implementation missing")
+        raise NotImplementedError("TO BE IMPLEMENTED")
 
     def add_after_element(self, item: Item, prev_element: DElement[Item]) -> None:
         """
         Add an item immediately after the given element
         """
         # TO BE IMPLEMENTED
-        raise RuntimeError("implementation missing")
+        raise NotImplementedError("TO BE IMPLEMENTED")
 
     def remove_element(self, element: DElement[Item]) -> None:
         """
         Remove the element given from this DList
         """
         # TO BE IMPLEMENTED
-        raise RuntimeError("implementation missing")
+        raise NotImplementedError("TO BE IMPLEMENTED")
 
     def find_first(self, item: Item) -> Optional[DElement[Item]]:
         # TO BE IMPLEMENTED
-        return None
+        raise NotImplementedError("TO BE IMPLEMENTED")
 
     def find_last(self, item: Item) -> Optional[DElement[Item]]:
         # TO BE IMPLEMENTED
-        return None
+        raise NotImplementedError("TO BE IMPLEMENTED")
 
     def is_empty(self) -> bool:
         return self.head is None

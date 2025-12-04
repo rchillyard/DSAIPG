@@ -25,7 +25,7 @@ class QueueElements(Queue[Item]):
         Adds the specified item to the end of the queue.
         """
         # TO BE IMPLEMENTED
-        pass
+        raise NotImplementedError("TO BE IMPLEMENTED")
 
     def poll(self) -> Optional[Item]:
         """
@@ -36,7 +36,7 @@ class QueueElements(Queue[Item]):
             return None
         else:
             # TO BE IMPLEMENTED
-            return None
+            raise NotImplementedError("TO BE IMPLEMENTED")
 
     def is_empty(self) -> bool:
         """
