@@ -55,7 +55,7 @@ class BSTOptimisedDeletion(BST[K, V]):
         def delete(self, k: K) -> Optional['BSTOptimisedDeletion._Node']:
             # CONSIDER using navigate
             # TO BE IMPLEMENTED
-            return None
+            raise NotImplementedError("TO BE IMPLEMENTED")
 
         def reduce_depth(self) -> 'BSTOptimisedDeletion._Node':
             self.depth -= 1
@@ -112,7 +112,7 @@ class BSTOptimisedDeletion(BST[K, V]):
 
     def keys(self) -> Iterable[K]:
         # TODO: Implement properly
-        return []
+        raise NotImplementedError("TO BE IMPLEMENTED")
 
     def depth(self, key: Optional[K] = None) -> int:
         if key is None:

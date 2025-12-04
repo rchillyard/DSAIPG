@@ -87,7 +87,7 @@ class BSTSimple(BST[K, V]):
 
     def mean_depth(self) -> float:
         # TODO: Implement me
-        return 0.0
+        raise NotImplementedError("TO BE IMPLEMENTED")
 
     # --- Helper Methods ---
 
@@ -137,7 +137,7 @@ class BSTSimple(BST[K, V]):
 
     def _hibbard_deletion(self, x: _Node) -> _Node:
         # TO BE IMPLEMENTED
-        return x
+        raise NotImplementedError("TO BE IMPLEMENTED")
 
     def _delete_min(self, x: _Node) -> Optional[_Node]:
         if not x.smaller:

@@ -37,13 +37,9 @@ class Node:
         branch: Optional[int]
     ) -> None:
         """Perform depth-first traversal of the tree."""
-        new_depth = depth_function(depth_indicator, branch)
-        consumer(self, new_depth)
-        
-        if self.zero is not None:
-            self.zero.dfs(depth_function, consumer, new_depth, 0)
-        if self.one is not None:
-            self.one.dfs(depth_function, consumer, new_depth, 1)
+        # TO BE IMPLEMENTED
+        raise NotImplementedError("TO BE IMPLEMENTED")
+        # END SOLUTION
 
 
 @dataclass(frozen=True)
@@ -116,18 +112,9 @@ class HuffmanEncoder:
     def _build_codebook(self, node: Node) -> Dict[str, Code]:
         """Build the encoding dictionary by traversing the tree."""
         codebook = {}
-        
-        def traverse(n: Node, code: Code) -> None:
-            if n.is_leaf():
-                codebook[n.symbol] = code
-            else:
-                if n.zero is not None:
-                    traverse(n.zero, Code((code.value << 1) | 0, code.length + 1))
-                if n.one is not None:
-                    traverse(n.one, Code((code.value << 1) | 1, code.length + 1))
-        
-        traverse(node, Code(0, 0))
-        return codebook
+        # TO BE IMPLEMENTED
+        raise NotImplementedError("TO BE IMPLEMENTED")
+        # END SOLUTION
     
     def encode(self, symbols: List[Optional[str]]) -> List[int]:
         """Encode a sequence of symbols into a list of 64-bit integers."""
@@ -188,22 +175,9 @@ class HuffmanDecoder:
         value: int
     ) -> Optional[Node]:
         """Decode a single 64-bit value."""
-        # Process each bit from MSB to LSB
-        for i in range(63, -1, -1):
-            bit = (value >> i) & 1
-            state = state.one if bit else state.zero
-            
-            if state is None:
-                return None
-            
-            if state.is_leaf():
-                if state.symbol is None:
-                    # Null symbol indicates end of data
-                    return None
-                symbols.append(state.symbol)
-                state = self._root
-        
-        return state
+        # TO BE IMPLEMENTED
+        raise NotImplementedError("TO BE IMPLEMENTED")
+        # END SOLUTION
 
 
 class HuffmanCoding:
