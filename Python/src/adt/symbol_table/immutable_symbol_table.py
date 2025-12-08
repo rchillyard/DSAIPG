@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, Set, Optional, Callable, Any
+from typing import TypeVar, Generic, Set, Optional, Callable
 
 Key = TypeVar('Key')
 Value = TypeVar('Value')

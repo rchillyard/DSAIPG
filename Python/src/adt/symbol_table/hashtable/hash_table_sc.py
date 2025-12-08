@@ -1,4 +1,4 @@
-from typing import TypeVar, Optional, Set, List, Any, Iterator
+from typing import TypeVar, Optional, Set, List, Iterator
 from .hash_table import HashTable
 
 Key = TypeVar('Key')

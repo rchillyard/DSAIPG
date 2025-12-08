@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, List, Optional, Callable, Iterable, Iterator
+from typing import TypeVar, List, Optional, Callable, Iterable, Iterator
 from .priority_queue import PriorityQueue
 from .pq_exception import PQException
 

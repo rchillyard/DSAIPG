@@ -1,7 +1,6 @@
 import time
 import random
-import math
-from typing import TypeVar, Generic, Optional, List, Callable, Any
+from typing import TypeVar, List, Callable
 from src.adt.symbol_table.tree.bst_opt_del import BSTOptimisedDeletion
 from src.adt.symbol_table.tree.bst import BST
 

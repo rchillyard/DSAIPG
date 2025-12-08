@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, List, Optional, Iterable, Iterator, Any, Union
+from typing import TypeVar, Generic, List, Iterable, Iterator
 import bisect
 
 T = TypeVar('T')

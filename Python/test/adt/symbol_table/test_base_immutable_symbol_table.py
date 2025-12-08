@@ -1,5 +1,5 @@
 import pytest
-from typing import TypeVar, Optional, Set, Callable, Dict, Any
+from typing import TypeVar, Optional, Set, Callable, Dict
 from src.adt.symbol_table.st import ST
 from src.adt.symbol_table.base_immutable_symbol_table import BaseImmutableSymbolTable
 
