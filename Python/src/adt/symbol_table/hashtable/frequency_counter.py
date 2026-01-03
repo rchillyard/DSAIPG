@@ -21,7 +21,7 @@ class FrequencyCounter(BaseImmutableSymbolTable[Key, int]):
         """
         self.validate_key(key)
         # TO BE IMPLEMENTED
-        raise NotImplementedError("implementation missing")
+        raise NotImplementedError("TO BE IMPLEMENTED")
 
     def relative_frequency(self, key: Key) -> float:
         if self._total == 0:
