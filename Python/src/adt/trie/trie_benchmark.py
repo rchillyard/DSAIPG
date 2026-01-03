@@ -1,5 +1,4 @@
 import time
-from typing import List
 from .trie import Trie
 import os
 
