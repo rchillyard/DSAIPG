@@ -8,8 +8,10 @@ def main():
     Benchmark the Trie implementation against linear search and measure performance of operations.
     """
     # Path to the dictionary file in the Java resources directory
-    # Based on user workspace structure
-    resource_path = "/Users/ashishnevan/Documents/DSAIPG/Java/src/main/resources/3000-common-words.txt"
+    # Determine path relative to this script: .../Python/src/adt/trie/trie_benchmark.py
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.abspath(os.path.join(current_dir, "../../../../"))
+    resource_path = os.path.join(project_root, "Java/src/main/resources/3000-common-words.txt")
     
     if not os.path.exists(resource_path):
         print(f"Error: Dictionary file not found at {resource_path}")
