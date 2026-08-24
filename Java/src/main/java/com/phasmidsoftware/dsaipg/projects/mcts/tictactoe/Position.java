@@ -77,7 +77,7 @@ public class Position {
         for (int i = 0; i < gridSize; i++)
             for (int j = 0; j < gridSize; j++)
                 if (grid[i][j] < 0)
-                    // TO BE IMPLEMENTED 
+        // TO BE IMPLEMENTED 
          throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         // END SOLUTION
         return result;

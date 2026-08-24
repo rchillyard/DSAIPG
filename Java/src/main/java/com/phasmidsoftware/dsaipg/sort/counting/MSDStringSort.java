@@ -150,6 +150,11 @@ public class MSDStringSort extends SortWithHelperAndAdditionalMemory<String> {
         // Copy back.
         helper.copyBlock(aux, 0, xs, from, n);
 
+        // Release the memory accounting before recursing. aux is dead once it has
+        // been copied back, so that part is exact; count is still read by the loop
+        // below, so its share is given back a little early.
+        additionalMemory(-(n + mapper.range + 1));
+
         // Recursively sort on the next character position in each String.
         // TO BE IMPLEMENTED 
                 throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
