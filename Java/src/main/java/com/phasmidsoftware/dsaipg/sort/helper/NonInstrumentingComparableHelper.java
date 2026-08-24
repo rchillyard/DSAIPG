@@ -60,11 +60,12 @@ public class NonInstrumentingComparableHelper<X extends Comparable<X>> extends B
     /**
      * Creates a new instance of {@code NonInstrumentingComparableHelper} based on the given description and size.
      *
-     * @param description a brief description for the helper instance being cloned.
-     * @param N           the number of elements relevant to the helper instance.
+     * @param description       a brief description for the helper instance being cloned.
+     * @param N                 the number of elements relevant to the helper instance.
+     * @param shareInstrumenter
      * @return a cloned instance of {@code Helper<X>}, specifically a {@code NonInstrumentingComparableHelper}.
      */
-    public Helper<X> clone(String description, int N) {
+    public Helper<X> clone(String description, int N, boolean shareInstrumenter) {
         return new NonInstrumentingComparableHelper<>(description, N, config);
     }
 

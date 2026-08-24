@@ -143,7 +143,7 @@ public class MergeSortBasic<X extends Comparable<X>> extends SortWithComparableH
      */
     public MergeSortBasic(int N, Config config) {
         super(DESCRIPTION + ":" + getConfigString(config), N, 1, config);
-        // TODO use impersonat (like in MergeSort)
+        // TODO use impersonate (like in MergeSort)
         insertionSort = new InsertionSort<>(getHelper());
     }
 
@@ -188,3 +188,4 @@ public class MergeSortBasic<X extends Comparable<X>> extends SortWithComparableH
     private int additionalMemory;
     private int maxMemory;
 }
+

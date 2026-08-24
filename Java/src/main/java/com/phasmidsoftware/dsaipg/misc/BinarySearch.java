@@ -23,6 +23,10 @@ public class BinarySearch {
     /**
      * Method to do binary search.
      *
+     * TODO this needs generalizing
+     * TODO this returns the wrong result when the key is not found
+     * NOTE a corrected version of can be found in the HuskySort repository
+     *
      * @param a    the ordered array.
      * @param from the first index on interest.
      * @param to   the first subsequent index that is NOT of interest.

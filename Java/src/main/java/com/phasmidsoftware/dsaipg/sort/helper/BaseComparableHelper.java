@@ -29,13 +29,14 @@ public abstract class BaseComparableHelper<X extends Comparable<X>> extends Base
     /**
      * Creates a new instance of Helper with the specified parameters.
      *
-     * @param description the description of the Helper for identification purposes.
-     * @param comparator  the Comparator used for comparing elements of type X.
-     * @param N           the expected number of elements to be handled by the Helper.
+     * @param description       the description of the Helper for identification purposes.
+     * @param comparator        the Comparator used for comparing elements of type X.
+     * @param N                 the expected number of elements to be handled by the Helper.
+     * @param shareInstrumenter
      * @return a new Helper instance configured with the specified description, comparator, and size.
      * @throws SortException if the method is not implementable.
      */
-    public Helper<X> clone(String description, Comparator<X> comparator, int N) {
+    public Helper<X> clone(String description, Comparator<X> comparator, int N, boolean shareInstrumenter) {
         throw new SortException("not implementable");
     }
 

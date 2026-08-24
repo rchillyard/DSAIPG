@@ -102,7 +102,7 @@ public class BucketSortTest {
         assertEquals(2L * N, helper.getCopies());
         assertEquals(261_328L, helper.getCompares());
         assertEquals(803_991L, helper.getHits());
-        assertEquals(281_329L, helper.getLookups());
+        assertEquals(20_000L, helper.getLookups());
         long inversions = helper.getFixes();
         assertEquals((long) N * N / 4 / nBuckets, inversions, (long) N);
         assertEquals(inversions, helper.getFixes());

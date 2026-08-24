@@ -44,8 +44,9 @@ This will make it easy to see where you have to write code.
 ## Building and Testing (Java)
 If you have cloned (or forked) the repository into IDEA, it should build the Java project
 for you without much intervention on your part.
-You will need at least Java 17 as your SDK.
-Recommended: Oracle OpenJDK 18.0.2
+You will need at least Java 21 as your SDK.
+The `pom.xml` sets both the source and target release to 21,
+so an earlier JDK will not build the project.
 
 To test the installation, run all the tests in `src/test/java`.
 There are about a thousand active tests, of which two-thirds should run green.

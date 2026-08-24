@@ -85,3 +85,4 @@ public class Point {
      */
     final int y;
 }
+

@@ -122,24 +122,26 @@ public class ClassicHelper<X> implements NonComparableHelper<X> {
      * Creates a new cloned instance of {@code Helper<X>} with the specified description and number of elements,
      * incorporating the original comparator for comparison logic.
      *
-     * @param description the description for the cloned helper instance.
-     * @param N the number of elements to initialize in the cloned helper instance.
+     * @param description       the description for the cloned helper instance.
+     * @param N                 the number of elements to initialize in the cloned helper instance.
+     * @param shareInstrumenter
      * @return a new {@code Helper<X>} instance that is a clone of the current object with the given description and element count.
      */
-    public Helper<X> clone(String description, int N) {
-        return clone(description, comparator, N);
+    public Helper<X> clone(String description, int N, boolean shareInstrumenter) {
+        return clone(description, comparator, N, shareInstrumenter);
     }
 
     /**
      * Creates and returns a new instance of ClassicHelper with the specified parameters.
      *
-     * @param description a description of the helper instance, primarily for identification or documentation purposes.
-     * @param comparator  a Comparator used to compare objects of type X within this helper instance.
-     * @param N           the number of elements or value expected to be managed by the helper instance.
+     * @param description       a description of the helper instance, primarily for identification or documentation purposes.
+     * @param comparator        a Comparator used to compare objects of type X within this helper instance.
+     * @param N                 the number of elements or value expected to be managed by the helper instance.
+     * @param shareInstrumenter
      * @return a new instance of ClassicHelper initialized with the given description, comparator, and N value.
      */
 
-    public Helper<X> clone(String description, Comparator<X> comparator, int N) {
+    public Helper<X> clone(String description, Comparator<X> comparator, int N, boolean shareInstrumenter) {
         return new ClassicHelper<>(description, comparator, N, random, config);
     }
 

@@ -97,6 +97,8 @@ public class QuickSort_DualPivot<X extends Comparable<X>> extends QuickSort<X> {
          * @return a list of partitions, whose length depends on the sorting method being used.
          */
         public List<Partition<X>> partition(Partition<X> partition) {
+            int loops = 0;
+            int[] cases = new int[3];
             int n = partition.to - partition.from;
             if (n < 3) throw new SortException("cannot use DualPivot partitioning when size is less than 3");
             final X[] xs = partition.xs;
@@ -113,26 +115,32 @@ public class QuickSort_DualPivot<X extends Comparable<X>> extends QuickSort<X> {
             if (helper.instrumented()) {
                 X xlt = helper.get(xs, lt);
                 X xgt = helper.get(xs, gt);
-                X x = xs[i]; // no hit since i = lt
+                X xi = xlt;
                 while (i <= gt) {
-                    // Each time around the loop, we invoke: 2, 1, or 1 hits; 1, 2, or 2 lookups
-                    if (helper.compare(x, v1) < 0) { // no hits, one lookup
-                        helper.swapVW(xlt, x, xs, lt++, i++); // no hits or lookups
-                        x = helper.get(xs, i); // one hit
-                        xlt = helper.get(xs, lt); // one hit (CONSIDER is this correct?)
-                        if (i == gt) xgt = x;
-                    } else if (helper.compare(x, v2) > 0) { // no hits, one lookup (but it's already in cache)
-                        helper.swapVW(x, xgt, xs, i, gt--); // no hits or lookups
+                    loops++;
+                    // Each time around the loop, we invoke:
+                    // 1 lookup;
+                    // 1.5 compares (we assume that half the time, the
+                    // and 3 (usually 4) hits if there's a swap, otherwise 1 hit
+                    if (helper.compare(helper.lookup(xi), v1) < 0) { // no hits, one lookup
+                        cases[0]++;
+                        helper.swapVW(xlt, xi, xs, lt++, i++); // two hits (the assignments)
+                        xi = helper.get(xs, i); // one hit
+                        if (lt != i) xlt = helper.get(xs, lt); else xlt = xi; // usually one hit (but maybe zero)
+                    } else if (helper.compare(xi, v2) > 0) { // no hits, no lookups
+                        cases[1]++;
+                        helper.swapVW(xi, xgt, xs, i, gt--); // two hits (the assignments)
                         if (i == lt) xlt = xgt;
-                        x = xgt;
+                        xi = xgt;
                         xgt = helper.get(xs, gt); // one hit
                     } else {
+                        cases[2]++;
                         i++;
-                        x = helper.get(xs, i); // one hit
+                        xi = helper.get(xs, i); // one hit
                     }
                 }
-                if (p1 != lt - 1) helper.swap(xs, p1, --lt);
-                if (p2 != gt + 1) helper.swap(xs, p2, ++gt);
+                helper.swap(xs, p1, --lt);
+                helper.swap(xs, p2, ++gt);
             } else {
                 while (i <= gt) {
                     X x = xs[i];
@@ -150,6 +158,9 @@ public class QuickSort_DualPivot<X extends Comparable<X>> extends QuickSort<X> {
             partitions.add(new Partition<>(xs, p1, lt));
             partitions.add(new Partition<>(xs, lt + 1, gt));
             partitions.add(new Partition<>(xs, gt + 1, p2 + 1));
+//            System.out.println("partitioning: pivots: ("+v1+","+v2+") partitions: "+ partitions);
+//            System.out.println("loops: "+loops);
+//            System.out.println("cases: " + cases[0] + ", " + cases[1] + ", " + cases[2]);
             return partitions;
         }
 
@@ -170,3 +181,4 @@ public class QuickSort_DualPivot<X extends Comparable<X>> extends QuickSort<X> {
         private final Helper<X> helper;
     }
 }
+

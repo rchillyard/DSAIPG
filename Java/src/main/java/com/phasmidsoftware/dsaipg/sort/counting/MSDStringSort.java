@@ -110,7 +110,7 @@ public class MSDStringSort extends SortWithHelperAndAdditionalMemory<String> {
      */
     private void cutToQuicksort(String[] xs, int from, int to, int d, int n) {
         SuffixComparator suffixComparator = new SuffixComparator(helper.getComparator(), d);
-        Helper<String> cloned = helper.clone("MSD 3-way quicksort", suffixComparator, n);
+        Helper<String> cloned = helper.clone("MSD 3-way quicksort", suffixComparator, n, true);
         try (Sort<String> sorter = new QuickSort_3way<>(cloned)) {
             sorter.sort(xs, from, to);
         }

@@ -17,7 +17,7 @@ import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.*;
  *
  * @param <X> the type of elements managed by this helper.
  */
-public abstract class BaseHelper<X> {
+public abstract class BaseHelper<X> implements Helper<X> {
     /**
      * Determines if instrumentation is enabled for this helper.
      *
@@ -263,6 +263,10 @@ public abstract class BaseHelper<X> {
     public String toString() {
         // CONSIDER swapping order of description and Helper for... (see also overrides)
         return "Helper for " + description + " with " + n + " elements" + (instrumented() ? " instrumented" : "");
+    }
+
+    public String showInterimStats(String context) {
+        return description + "/" + context + ": " + instrumenter.toString();
     }
 
     /**

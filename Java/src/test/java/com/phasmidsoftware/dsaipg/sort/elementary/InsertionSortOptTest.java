@@ -38,6 +38,7 @@ public class InsertionSortOptTest {
         list.add(3);
         list.add(4);
         Integer[] xs = list.toArray(new Integer[0]);
+        int n = xs.length;
         final int inversions = 0;
         final Config config = setupConfig("true", "false", "0", "1", "", "");
         Helper<Integer> helper = HelperFactory.create("InsertionSortOpt", list.size(), config);
@@ -50,11 +51,11 @@ public class InsertionSortOptTest {
         assertTrue(helper.isSorted(ys));
         sorter.postProcess(ys);
         final int hits = (int) statPack.getStatistics(HITS).mean();
-        assertEquals(8, hits);
+        assertEquals(2 * n, hits);
         final int compares = (int) statPack.getStatistics(COMPARES).mean();
         assertEquals(5, compares);
         final int lookups = (int) statPack.getStatistics(LOOKUPS).mean();
-        assertEquals(8, lookups); // XXX should be Omega(n-1)
+        assertEquals(n, lookups); // CONSIDER this might be too optimistic in real life.
         final int inversionsFound = (int) statPack.getStatistics(INVERSIONS).mean();
         assertEquals(0L, inversionsFound);
         final int fixes = (int) statPack.getStatistics(FIXES).mean();
@@ -69,6 +70,7 @@ public class InsertionSortOptTest {
         list.add(2);
         list.add(1);
         Integer[] xs = list.toArray(new Integer[0]);
+        int n = xs.length;
         final Config config = setupConfig("true", "false", "0", "1", "", "");
         Helper<Integer> helper = HelperFactory.create("InsertionSortOpt", list.size(), config);
         long inversions = helper.inversions(xs);
@@ -81,9 +83,9 @@ public class InsertionSortOptTest {
         final int hits = (int) statPack.getStatistics(HITS).mean();
         assertEquals(16, hits);
         final int compares = (int) statPack.getStatistics(COMPARES).mean();
-        assertEquals(4, compares);
+        assertEquals(n, compares);
         final int lookups = (int) statPack.getStatistics(LOOKUPS).mean();
-        assertEquals(7, lookups);
+        assertEquals(n, lookups);
         final int inversionsFound = (int) statPack.getStatistics(INVERSIONS).mean();
         assertEquals(0L, inversionsFound);
     }

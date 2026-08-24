@@ -12,7 +12,7 @@
     <version>1</version>
     <build>
         <plugins>
-            <plugin>
+            <!-- <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -20,11 +20,16 @@
                     <target>18</target>
                 </configuration>
             </plugin>
+            -->
         </plugins>
     </build>
     <properties>
-        <maven.compiler.source>1.17</maven.compiler.source>
-        <maven.compiler.target>1.18</maven.compiler.target>
+        <!-- NOTE: "21", not "1.21". javac only accepts the 1.x form up to 1.10;
+             anything later must be bare. With the compiler plugin commented out
+             above, these properties are what reach javac, so "1.21" fails the
+             build outright with "invalid target release: 1.21". -->
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -35,6 +40,25 @@
         </repository>
     </repositories>
     <dependencies>
+        <!--
+        <dependency>
+            <groupId>com.phasmidsoftware</groupId>
+            <artifactId>gryphon_3</artifactId>
+            <version>1.3.0</version>
+            <scope>system</scope>
+            <systemPath>${user.home}/.m2/repository/com/phasmidsoftware/gryphon_3/1.3.0/gryphon_3-1.3.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.phasmidsoftware</groupId>
+            <artifactId>visitor_3</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>com.phasmidsoftware</groupId>
+            <artifactId>gryphon_3</artifactId>
+            <version>1.3.0</version>
+        </dependency>
         <dependency>
             <groupId>com.phasmidsoftware</groupId>
             <artifactId>args_2.13</artifactId>
@@ -42,8 +66,8 @@
         </dependency>
         <dependency>
             <groupId>com.phasmidsoftware</groupId>
-            <artifactId>number_2.13</artifactId>
-            <version>1.0.12</version>
+            <artifactId>number_3</artifactId>
+            <version>1.9.3</version>
         </dependency>
       <dependency>
             <groupId>org.apache.logging.log4j</groupId>

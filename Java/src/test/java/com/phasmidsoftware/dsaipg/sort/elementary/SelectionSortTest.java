@@ -122,7 +122,7 @@ public class SelectionSortTest {
         final int hits = (int) statPack.getStatistics(HITS).mean();
         assertEquals(n * (n - 1) / 2 + n - 1 + swaps * 4, hits);
         final int lookups = (int) statPack.getStatistics(LOOKUPS).mean();
-        assertEquals(n * (n - 1) / 2 + n - 1 + swaps * 2, lookups);
+        assertEquals(n, lookups);
         final int inversions = (int) statPack.getStatistics(INVERSIONS).mean();
         final int fixes = (int) statPack.getStatistics(FIXES).mean();
         System.out.println(statPack);

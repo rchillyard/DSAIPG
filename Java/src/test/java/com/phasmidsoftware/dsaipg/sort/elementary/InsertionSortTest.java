@@ -264,7 +264,7 @@ public class InsertionSortTest {
         assertEquals(23, instrumenter.getFixes());
         assertEquals(23, instrumenter.getSwaps());
         assertEquals(78, instrumenter.getHits());
-        assertEquals(32, instrumenter.getLookups());
+        assertEquals(10, instrumenter.getLookups());
     }
 
     final static LazyLogger logger = new LazyLogger(InsertionSort.class);

@@ -133,4 +133,6 @@ public class StatPack {
     private final HashMap<String, Statistics> map;
     private final int n;
 
+    public static final StatPack EMPTY = new StatPack(null, 0, 0);
+
 }

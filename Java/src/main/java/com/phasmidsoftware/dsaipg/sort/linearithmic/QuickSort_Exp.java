@@ -43,7 +43,7 @@ public class QuickSort_Exp<X extends Comparable<X>> extends QuickSort<X> {
     }
 
     /**
-     * Constructor for QuickSort_Basic
+     * Constructor for QuickSort_Classic
      *
      * @param helper an explicit instance of Helper to be used.
      */
@@ -53,7 +53,7 @@ public class QuickSort_Exp<X extends Comparable<X>> extends QuickSort<X> {
     }
 
     /**
-     * Constructor for QuickSort_Basic
+     * Constructor for QuickSort_Classic
      *
      * @param N      the number elements we expect to sort.
      * @param config the configuration.
@@ -63,7 +63,7 @@ public class QuickSort_Exp<X extends Comparable<X>> extends QuickSort<X> {
     }
 
     /**
-     * Constructor for QuickSort_Basic
+     * Constructor for QuickSort_Classic
      *
      * @param config the configuration.
      */
@@ -154,3 +154,4 @@ public class QuickSort_Exp<X extends Comparable<X>> extends QuickSort<X> {
         private final Helper<X> helper;
     }
 }
+

@@ -12,6 +12,11 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
+import static com.phasmidsoftware.dsaipg.sort.helper.Instrument.INSTRUMENTING;
+import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.HELPER;
+import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.INSTRUMENT;
 
 /**
  * Represent a configuration manager that handles reading, writing,
@@ -197,6 +202,28 @@ public class Config {
         return comment;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        Set<String> sections = ini.keySet();
+        sections.stream().toList().forEach(s -> {
+            result.append(sectionToString(s));
+        });
+        return result.toString();
+    }
+
+    public String sectionToString(String sectionName) {
+        if (sectionName.equals("sortbenchmark")) return "";
+        if (sectionName.equals(INSTRUMENTING) && !getBoolean(HELPER, INSTRUMENT)) return "";
+        Profile.Section section = ini.get(sectionName);
+        StringBuilder result = new StringBuilder(sectionName + ": ");
+        section.keySet().forEach(s -> {
+            String value = section.get(s);
+            if (value != null && !value.trim().isEmpty()) result.append(s + "=" + value + ", ");
+        });
+        result.append("\n");
+        return result.toString();
+    }
     /**
      * Retrieves all sections associated with the specified key.
      *

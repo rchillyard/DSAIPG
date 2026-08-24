@@ -86,3 +86,4 @@ public class Tuple extends BaseEquable {
     private final int x;
     private final double y;
 }
+

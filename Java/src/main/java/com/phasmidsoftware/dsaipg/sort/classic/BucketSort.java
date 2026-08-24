@@ -124,7 +124,7 @@ public class BucketSort<X extends Comparable<X>> extends ClassificationSorter<X,
     public BucketSort(Helper<X> helper, Function<X, Integer> classifier, Object[] buckets) {
         super(helper, convertToBiFunction(classifier));
         this.buckets = buckets;
-        Helper<X> insertionSortHelper = helper.clone("insertion sort");
+        Helper<X> insertionSortHelper = helper.clone("insertion sort", true);
         this.sort = new InsertionSort<>(insertionSortHelper);
         for (int i = 0; i < buckets.length; i++) buckets[i] = new ArrayList<>();
         closeHelper = true;

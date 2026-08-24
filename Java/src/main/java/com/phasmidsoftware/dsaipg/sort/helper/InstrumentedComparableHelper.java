@@ -17,11 +17,13 @@ public class InstrumentedComparableHelper<X extends Comparable<X>> extends Instr
     /**
      * Creates a duplicate of the current Helper instance configured with the specified description and number of elements.
      *
-     * @param description the description of the cloned Helper (for humans).
-     * @param N           the number of elements expected to be handled by the cloned Helper.
+     * @param description       the description of the cloned Helper (for humans).
+     * @param N                 the number of elements expected to be handled by the cloned Helper.
+     * @param shareInstrumenter
      * @return a new instance of Helper with the same configuration as the original, but updated with the provided parameters.
      */
-    public Helper<X> clone(String description, int N) {
+    public Helper<X> clone(String description, int N, boolean shareInstrumenter) {
+        Instrument instrumenter = shareInstrumenter ? this.instrumenter : new Instrumenter(config);
         return new InstrumentedComparableHelper<>(description, N, random, nRuns, instrumenter, config);
     }
 

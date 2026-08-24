@@ -39,6 +39,7 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
 
     /**
      * Get the element at xs[i].
+     * NOTE that we do not increment lookups here.
      *
      * @param xs the source array.
      * @param i  the target index.
@@ -46,7 +47,6 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
      */
     public X get(X[] xs, int i) {
         instrumenter.incrementHits(1);
-        instrumenter.incrementLookups(1);
         return xs[i];
     }
 
@@ -84,6 +84,21 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
      */
     public boolean notInverted(X[] xs, int i, int j) {
         return notInverted(xs, get(xs, i), j);
+    }
+
+
+    /**
+     * Compare values xs[i] and xs[j] and return true if xs[i] is less than xs[j], i.e., not inverted.
+     *
+     * @param xs the array.
+     * @param i  the index of the first value.
+     * @param j  the index of the second value.
+     * @return true if v is less than w.
+     */
+    public boolean notInvertedWithLookups(X[] xs, int i, int j, int lookups) {
+        assert lookups >= 0 && lookups <= 2;
+        incrementLookups(lookups);
+        return notInverted(xs, i, j);
     }
 
     /**
@@ -143,7 +158,7 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
         // NOTE that the checkElementConsistency may issue warnings but we only test it if debug is enabled.
         // CONSIDER using assert instead.
         if (debugEnabled) checkElementConsistency(xs, v, i, j, w);
-        instrumenter.incrementHits(2);
+        instrumenter.incrementHits(2); // NOTE these represent the assignments: we should already have counted the accesses.
         super.swapVW(v, w, xs, i, j);
     }
 
@@ -185,7 +200,7 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
      * @return true if there was an inversion (i.e., the order was wrong and had to be fixed).
      */
     public boolean swapConditional(X[] xs, int i, int j) {
-        return swapConditional(xs, get(xs, i), i, j);
+        return swapConditional(xs, lookup(get(xs, i)), i, j);
     }
 
     /**
@@ -198,7 +213,7 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
      * @return true if there was an inversion (i.e., the order was wrong and had to be fixed).
      */
     public boolean swapConditional(X[] xs, int i, int j, X w) {
-        return swapConditional(xs, get(xs, i), i, j, w);
+        return swapConditional(xs, lookup(get(xs, i)), i, j, w);
     }
 
     /**
@@ -211,7 +226,7 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
      * @return true if there was an inversion (i.e., the order was wrong and had to be fixed).
      */
     public boolean swapConditional(X[] xs, X v, int i, int j) {
-        return swapConditional(xs, v, i, j, get(xs, j));
+        return swapConditional(xs, v, i, j, lookup(get(xs, j)));
     }
 
     /**
@@ -240,14 +255,14 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
         if (to == from + 3) {
             X x = get(xs, from);
             X y = get(xs, from + 1);
-            boolean swappedXY = swapConditional(xs, x, from, from + 1, y);
+            boolean swappedXY = swapConditional(xs, lookup(x), from, from + 1, lookup(y));
             if (swappedXY) {
                 X t = x;
                 x = y;
                 y = t;
             }
             X z = get(xs, from + 2);
-            boolean swappedYZ = swapConditional(xs, y, from + 1, from + 2, z);
+            boolean swappedYZ = swapConditional(xs, y, from + 1, from + 2, lookup(z));
             if (!swappedXY && !swappedYZ) return; // xyz
             if (swappedYZ) {
                 X t = z;
@@ -315,7 +330,6 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
         super.distributeBlock(source, from, to, target, f);
         instrumenter.incrementCopies(to - from);
         instrumenter.incrementHits((to - from) * 2L);
-        instrumenter.incrementLookups(to - from);
     }
 
     /**
@@ -505,25 +519,39 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
     }
 
     /**
+     * Displays the statistical information in a formatted string.
+     *
+     * @return A string representation of the statistics, including a description
+     * and the contents of the stat pack provided by the instrumenter.
+     */
+    public String showStats(String context) {
+        return description + "/" + context + ": " + instrumenter.getStatPack().toString();
+    }
+
+    /**
      * Creates and returns a new Helper instance with the given description and parameters.
      *
-     * @param description the description of the Helper instance
-     * @param N           the size parameter for the Helper instance
+     * @param description       the description of the Helper instance
+     * @param N                 the size parameter for the Helper instance
+     * @param shareInstrumenter
      * @return a new Helper instance initialized with the specified parameters
      */
-    public Helper<X> clone(String description, int N) {
+    public Helper<X> clone(String description, int N, boolean shareInstrumenter) {
+        Instrument instrumenter = shareInstrumenter ? this.instrumenter : new Instrumenter(config);
         return new InstrumentedComparatorHelper<>(description, getComparator(), N, random, nRuns, instrumenter, config);
     }
 
     /**
      * Creates and returns a new instance of InstrumentedComparatorHelper with the specified parameters.
      *
-     * @param description a description of the helper being cloned
-     * @param comparator  the comparator used for comparing elements
-     * @param N           the size parameter for the helper
+     * @param description       a description of the helper being cloned
+     * @param comparator        the comparator used for comparing elements
+     * @param N                 the size parameter for the helper
+     * @param shareInstrumenter
      * @return a new instance of InstrumentedComparatorHelper initialized with the specified parameters
      */
-    public Helper<X> clone(String description, Comparator<X> comparator, int N) {
+    public Helper<X> clone(String description, Comparator<X> comparator, int N, boolean shareInstrumenter) {
+        Instrument instrumenter = shareInstrumenter ? this.instrumenter : new Instrumenter(config);
         return new InstrumentedComparatorHelper<>(description, comparator, N, random, nRuns, instrumenter, config);
     }
 

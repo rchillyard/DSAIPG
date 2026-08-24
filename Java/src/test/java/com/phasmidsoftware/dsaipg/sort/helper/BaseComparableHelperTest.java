@@ -68,7 +68,7 @@ public class BaseComparableHelperTest {
             if (!isSorted(xs)) throw new HelperException("Array is not sorted");
         }
 
-        public Helper<X> clone(String description, int N) {
+        public Helper<X> clone(String description, int N, boolean shareInstrumenter) {
             return null;
         }
     }

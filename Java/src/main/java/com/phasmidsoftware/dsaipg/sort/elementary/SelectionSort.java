@@ -36,6 +36,7 @@ public class SelectionSort<X extends Comparable<X>> extends SortWithComparableHe
      */
     public void sort(X[] xs, int from, int to) {
         final Helper<X> helper = getHelper();
+        helper.incrementLookups(to - from); // one lookup per element (maybe this is a bit optimistic in real life)
         for (int i = from; i < to - 1; i++) { // n - 1 iterations
             int min = locateMinimum(xs, i, to, helper);
             // XXX no point in swapping if element i IS the minimum element

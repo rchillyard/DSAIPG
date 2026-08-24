@@ -25,6 +25,7 @@ public interface TailCall<T> extends Supplier<TailCall<T>> {
 
     /**
      * Method to get the result of this TailCall.
+     * This should be overridden by any actual TailCall implementation.
      *
      * @return a value of T.
      */

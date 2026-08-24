@@ -75,7 +75,7 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
         Config config = helper.getConfig();
         boolean noCopy = config.getBoolean(MERGESORT, NOCOPY);
         @SuppressWarnings("unchecked") X[] aux = noCopy ? helper.copyArray(a) : (X[]) new Comparable[a.length];
-        sort(a, aux, from, to);
+        sort(a, aux, from, to, 0);
     }
 
     /**
@@ -123,7 +123,7 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
      * @return an instance of InsertionSort configured with the cloned helper.
      */
     private InsertionSort<X> setupInsertionSort(final Helper<X> helper) {
-        return new InsertionSort<>(helper.clone("MergeSort: insertion sort"));
+        return new InsertionSort<>(helper.clone("MergeSort: insertion sort", true));
     }
 
     /**
@@ -132,13 +132,15 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
      * (but not necessary the entire arrays) will be identical.
      * When called with no-copy false, the secondary array will be undefined.
      *
-     * @param primary    the primary array.
-     *                   If the partition is small, insertion sort will be applied to this array.
-     * @param secondary  the auxiliary array used for intermediate storage during sorting.
-     * @param from the starting index (inclusive) of the range to be sorted.
-     * @param to   the ending index (exclusive) of the range to be sorted.
+     * @param primary   the primary array.
+     *                  If the partition is small, insertion sort will be applied to this array.
+     * @param secondary the auxiliary array used for intermediate storage during sorting.
+     * @param from      the starting index (inclusive) of the range to be sorted.
+     * @param to        the ending index (exclusive) of the range to be sorted.
+     * @param depth
      */
-    private void sort(X[] primary, X[] secondary, int from, int to) {
+    private void sort(X[] primary, X[] secondary, int from, int to, int depth) {
+        getHelper().registerDepth(depth);
         Config config = helper.getConfig();
         boolean noCopy = config.getBoolean(MERGESORT, NOCOPY); // XXX I recommend that you test noCopy before testing insurance.
         boolean insurance = config.getBoolean(MERGESORT, INSURANCE);
@@ -149,7 +151,7 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
         }
 
         // TO BE IMPLEMENTED  : implement merge sort with no-copy and insurance optimizations (use helper.less and helper.copyBlock)
-                throw new RuntimeException("implementation missing");
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**
@@ -167,24 +169,31 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
     private void merge(X[] sorted, X[] result, int from, int mid, int to) {
         int i = from;
         int j = mid;
+        helper.incrementLookups(to - from); // NOTE this is optimistic
+//        System.out.println(((BaseHelper<?>) helper).showInterimStats("merge start: "+from+" "+mid+" "+to));
         X v = helper.get(sorted, i);
         X w = helper.get(sorted, j);
         for (int k = from; k < to; k++) {
             if (i >= mid) {
                 helper.copy(w, result, k);
-                if (++j < to) w = helper.get(sorted, j);
+                if (++j < to)
+                    w = helper.get(sorted, j);
             } else if (j >= to) {
                 helper.copy(v, result, k);
-                if (++i < mid) v = helper.get(sorted, i);
-            } else if (helper.notInverted(w, v)) {
+                if (++i < mid)
+                    v = helper.get(sorted, i);
+            } else if (helper.inverted(v, w)) {
                 helper.incrementFixes(mid - i);
                 helper.copy(w, result, k);
-                if (++j < to) w = helper.get(sorted, j);
+                if (++j < to)
+                    w = helper.get(sorted, j);
             } else {
                 helper.copy(v, result, k);
-                if (++i < mid) v = helper.get(sorted, i);
+                if (++i < mid)
+                    v = helper.get(sorted, i);
             }
         }
+//        System.out.println(((BaseHelper<?>) helper).showInterimStats("merge end: "+from+" "+mid+" "+to));
     }
 
     public static final String MERGESORT = "mergesort";
@@ -216,3 +225,4 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
     private int additionalMemory;
     private int maxMemory;
 }
+

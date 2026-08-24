@@ -64,6 +64,7 @@ public abstract class QuickSort<X extends Comparable<X>> extends SortWithCompara
         if (partitioner == null) throw new RuntimeException("partitioner not set");
         Collection<Partition<X>> partitions = partitioner.partition(partition);
         partitions.forEach(p -> sort(p.xs, p.from, p.to, depth + 1));
+        assert !getHelper().getConfig().getBoolean("quicksort", "verifysortedpartitions") || verifySortedPartitions(partitions);
     }
 
     /**
@@ -124,6 +125,7 @@ public abstract class QuickSort<X extends Comparable<X>> extends SortWithCompara
      */
     public QuickSort(String description, int N, int nRuns, Config config) {
         super(description, N, nRuns, config);
+        System.out.println("QuickSort: " + description);
         insertionSort = setupInsertionSort(getHelper());
     }
 
@@ -172,7 +174,11 @@ public abstract class QuickSort<X extends Comparable<X>> extends SortWithCompara
      * @return an InsertionSort instance initialized with a cloned helper specific for insertion sort.
      */
     private InsertionSort<X> setupInsertionSort(final Helper<X> helper) {
-        return new InsertionSort<>(helper.clone("Quicksort: insertion sort"));
+        return new InsertionSort<>(helper.clone("Quicksort: insertion sort", true));
+    }
+
+    private boolean verifySortedPartitions(Collection<Partition<X>> partitions) {
+        return partitions.stream().allMatch(p -> p.isSorted(getHelper()));
     }
 
     final static LazyLogger logger = new LazyLogger(QuickSort.class);

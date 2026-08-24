@@ -76,7 +76,8 @@ public class InsertionSort<X extends Comparable<X>> extends SortWithComparableHe
      */
     public void sort(X[] xs, int from, int to) {
         final Helper<X> helper = getHelper();
-        X a = helper.get(xs, from);
+        if (to <= from + 1) return;
+        X a = helper.lookup(helper.get(xs, from));
         for (int i = from + 1; i < to; i++) a = doInsert(xs, from, i, a, helper.get(xs, i), helper);
     }
 
@@ -109,7 +110,7 @@ public class InsertionSort<X extends Comparable<X>> extends SortWithComparableHe
      * @return the next element in the sequence after the insertion has been completed
      */
     private static <X extends Comparable<X>> X doInsert(X[] xs, int from, int i, X a, X b, Helper<X> helper) {
-        X aNext = b;
+        X aNext = helper.lookup(b); // NOTE this represents an optimistic view of the lookups.
         int j = i;
         while (true) {
             if (!helper.swapConditional(xs, a, j - 1, j, b)) break;
