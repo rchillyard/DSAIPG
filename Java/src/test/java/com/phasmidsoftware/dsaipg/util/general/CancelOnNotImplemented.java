@@ -1,6 +1,6 @@
 package com.phasmidsoftware.dsaipg.util.general;
 
-import org.junit.Assume;
+import org.junit.AssumptionViolatedException;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -54,7 +54,10 @@ public class CancelOnNotImplemented implements TestRule {
                 } catch (Throwable thrown) {
                     Throwable unimplemented = findUnimplemented(thrown);
                     if (unimplemented == null) throw thrown;
-                    Assume.assumeNoException(unimplemented.getMessage(), unimplemented);
+                    // NOTE thrown directly rather than via Assume.assumeNoException,
+                    // which appends ": got: <the exception>" and buries the location.
+                    // JUnit and Surefire both report this as skipped.
+                    throw new AssumptionViolatedException(unimplemented.getMessage());
                 }
             }
         };

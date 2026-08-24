@@ -21,6 +21,19 @@
                 </configuration>
             </plugin>
             -->
+            <!--
+              Pinned because the version inherited from the super-POM is 2.12.4,
+              which dates from 2012 and reports a skipped test as a bare
+              <skipped/> with no message. CancelOnNotImplemented reports an
+              unwritten exercise as skipped, carrying the location of the work
+              ("You need to implement the code at Bag_Array.java:187"), and that
+              message is the useful part. Surefire 3.x records it.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+            </plugin>
         </plugins>
     </build>
     <properties>
