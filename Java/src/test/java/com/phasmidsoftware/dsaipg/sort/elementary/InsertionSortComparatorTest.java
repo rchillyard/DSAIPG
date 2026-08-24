@@ -8,12 +8,17 @@ import java.util.Comparator;
 
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.setupConfigFixes;
 import static org.junit.Assert.assertArrayEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 /**
  * Test class for InsertionSortComparator.
  * This class tests the `sort` method in the `InsertionSortComparator` class which performs an insertion sort on an array.
  */
 public class InsertionSortComparatorTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testSortWithIntegers() {

@@ -3,8 +3,13 @@ package com.phasmidsoftware.dsaipg.graphs.dynamicProgramming.lucas;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class LucasTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testGet1() {

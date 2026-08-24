@@ -7,8 +7,13 @@ package com.phasmidsoftware.dsaipg.graphs.undirected;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class GraphTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     /**
      * Test method for DAG()

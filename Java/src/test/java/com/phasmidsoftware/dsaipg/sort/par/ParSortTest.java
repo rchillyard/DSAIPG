@@ -5,12 +5,17 @@ import org.junit.Test;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertArrayEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 /**
  * ParSortTest is a test suite for the ParSort class.
  * It contains unit tests to verify the correct functionality of the sort method.
  */
 public class ParSortTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testSortSmallArray() {

@@ -8,8 +8,13 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class QuickRandomTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test(expected = IllegalArgumentException.class)
     public void testBadN() {

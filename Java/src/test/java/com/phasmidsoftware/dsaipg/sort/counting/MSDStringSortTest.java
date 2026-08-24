@@ -28,8 +28,13 @@ import static com.phasmidsoftware.dsaipg.sort.helper.InstrumentedComparatorHelpe
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.HELPER;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.setupConfig;
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class MSDStringSortTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     final String[] input = "she sells seashells by the seashore the shells she sells are surely seashells".split(" ");
     final String[] expected = "are by seashells seashells seashore sells sells she she shells surely the the".split(" ");

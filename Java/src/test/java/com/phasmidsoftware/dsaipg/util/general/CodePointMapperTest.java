@@ -7,8 +7,13 @@ import java.util.Comparator;
 import static com.phasmidsoftware.dsaipg.util.general.CodePointMapper.ASCIIExt;
 import static com.phasmidsoftware.dsaipg.util.general.CodePointMapper.English;
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class CodePointMapperTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testEnglish() {

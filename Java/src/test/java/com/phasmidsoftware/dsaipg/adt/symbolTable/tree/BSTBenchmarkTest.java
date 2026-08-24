@@ -8,6 +8,9 @@ import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 /**
  * A test class for benchmarking the performance of Binary Search Trees (BST) using the
@@ -17,6 +20,8 @@ import static org.junit.Assert.assertTrue;
  * TODO re-implement the commented-out tests.
  */
 public class BSTBenchmarkTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     /**
      * Test class for the BSTBenchmark class and, specifically, its runBenchmark method.

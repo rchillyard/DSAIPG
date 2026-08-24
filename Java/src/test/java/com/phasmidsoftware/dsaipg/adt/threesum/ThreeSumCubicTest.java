@@ -3,8 +3,13 @@ package com.phasmidsoftware.dsaipg.adt.threesum;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class ThreeSumCubicTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     /**
      * Test case for checking when the input array has multiple valid triples

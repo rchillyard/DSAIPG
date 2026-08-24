@@ -14,8 +14,13 @@ import java.util.Iterator;
 import static com.phasmidsoftware.dsaipg.graphs.gis.Boruvka.createEdge;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class BoruvkaTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     static class Route implements Comparable<Route>, Sequenced {
 

@@ -4,8 +4,13 @@ import org.junit.Test;
 
 import static com.phasmidsoftware.dsaipg.util.general.FastInverseSquareRoot.invSqrt;
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class FastInverseSquareRootTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testInvSqrtPi() {

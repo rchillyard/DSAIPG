@@ -3,8 +3,13 @@ package com.phasmidsoftware.dsaipg.sort.elementary;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class InsertionSortBasicTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testSortFull1() {

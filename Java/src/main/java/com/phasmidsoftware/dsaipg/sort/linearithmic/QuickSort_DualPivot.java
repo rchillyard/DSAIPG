@@ -158,8 +158,14 @@ public class QuickSort_DualPivot<X extends Comparable<X>> extends QuickSort<X> {
                         swap(xs, i, gt--);
                     } else i++;
                 }
-                swap(xs, p1, --lt);
-                swap(xs, p2, ++gt);
+                // NOTE guarded to match the instrumented branch above. Nothing
+                // goes wrong here if we do swap an element with itself -- the
+                // private swap has no assertion -- but the two branches must
+                // perform the same work, or the instrumented one stops being a
+                // faithful model of this one and the HITS statistic understates
+                // what the fast path actually costs.
+                if (--lt != p1) swap(xs, p1, lt);
+                if (++gt != p2) swap(xs, p2, gt);
             }
 
             List<Partition<X>> partitions = new ArrayList<>();

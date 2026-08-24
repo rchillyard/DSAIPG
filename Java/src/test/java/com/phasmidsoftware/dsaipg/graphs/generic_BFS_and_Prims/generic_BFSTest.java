@@ -7,8 +7,13 @@ import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.List;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class generic_BFSTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
 
     //Undirected graphs

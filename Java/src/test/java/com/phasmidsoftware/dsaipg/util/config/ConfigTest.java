@@ -10,8 +10,13 @@ import java.io.IOException;
 
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.*;
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class ConfigTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testConfig() throws IOException {

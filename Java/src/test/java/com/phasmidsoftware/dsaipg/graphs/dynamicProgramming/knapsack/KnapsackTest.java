@@ -9,8 +9,13 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class KnapsackTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     final Knapsack.Item itemA = new Knapsack.Item("A", 2, 1);
     final Knapsack.Item itemB = new Knapsack.Item("B", 1, 2);

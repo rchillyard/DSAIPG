@@ -8,8 +8,13 @@ import java.io.StringWriter;
 import static com.phasmidsoftware.dsaipg.compression.HuffmanCoding.showTree;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class HuffmanCodingTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testGenerateCode() {

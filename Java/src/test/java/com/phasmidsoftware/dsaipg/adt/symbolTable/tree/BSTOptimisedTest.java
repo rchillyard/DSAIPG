@@ -8,9 +8,14 @@ import java.util.Map;
 import java.util.Random;
 
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 @SuppressWarnings("unchecked")
 public class BSTOptimisedTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
     @Test
     public void testGet1() {
         Map<String, Integer> map = new HashMap<>();

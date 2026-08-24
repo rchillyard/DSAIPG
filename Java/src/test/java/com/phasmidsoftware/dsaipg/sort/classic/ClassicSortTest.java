@@ -6,8 +6,13 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class ClassicSortTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     static class MyClass implements Classify<MyClass> {
         public MyClass(int value) {

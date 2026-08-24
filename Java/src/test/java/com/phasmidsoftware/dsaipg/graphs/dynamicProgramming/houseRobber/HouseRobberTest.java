@@ -3,8 +3,13 @@ package com.phasmidsoftware.dsaipg.graphs.dynamicProgramming.houseRobber;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class HouseRobberTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
     @Test
     public void test0() {
         double cost = houseRobber.solveHouseRobber(new double[]{});

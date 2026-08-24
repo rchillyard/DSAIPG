@@ -4,8 +4,13 @@ import org.junit.Test;
 
 import static com.phasmidsoftware.dsaipg.graphs.dynamicProgramming.knapsack.BellmanFord.bellmanFordAlgorithm;
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class BellmanFordTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
     @Test
     public void test0() {
         Vertex a = new Vertex("A", 0);

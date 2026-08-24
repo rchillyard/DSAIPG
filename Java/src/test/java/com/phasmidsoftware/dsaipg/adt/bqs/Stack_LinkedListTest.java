@@ -3,8 +3,13 @@ package com.phasmidsoftware.dsaipg.adt.bqs;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class Stack_LinkedListTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     /**
      * Test the push method by pushing a single item to an empty stack,

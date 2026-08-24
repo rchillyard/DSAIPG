@@ -6,8 +6,13 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class PositionTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test(expected = RuntimeException.class)
     public void testMove_2() {

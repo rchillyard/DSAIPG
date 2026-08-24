@@ -12,8 +12,13 @@ import java.util.Random;
 import java.util.Set;
 
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class HashTableLPTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
     @Test
     public void testGetIndex0() {
         assertEquals(2, HashTable_LP.getIndex("Hello0", 2));

@@ -29,9 +29,14 @@ import static com.phasmidsoftware.dsaipg.sort.helper.InstrumentedComparatorHelpe
 import static com.phasmidsoftware.dsaipg.util.config.ConfigTest.INVERSIONS;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.*;
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 @SuppressWarnings("ALL")
 public class MergeSortTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @BeforeClass
     public static void beforeClass() throws IOException {

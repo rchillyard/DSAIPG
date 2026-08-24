@@ -6,8 +6,13 @@ import java.math.BigInteger;
 
 import static com.phasmidsoftware.dsaipg.misc.TailCalls.call;
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class TailCallTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testTailCall0() throws Throwable {

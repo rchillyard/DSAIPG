@@ -7,8 +7,13 @@ import java.util.Arrays;
 import static com.phasmidsoftware.dsaipg.select.Shuffle.calculateNBits;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class ShuffleTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testShuffle0() {

@@ -9,8 +9,13 @@ import java.util.stream.Stream;
 import static com.phasmidsoftware.dsaipg.util.benchmark.SortBenchmark.minComparisons;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class SortBenchmarkTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testParseInt() {
