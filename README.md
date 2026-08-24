@@ -57,3 +57,38 @@ There are also functional tests in the `src/it/java` directory.
 However, these take significantly longer to run and are really not necessary. 
 
 ## Building and Testing (Python)
+The `Python` directory is a self-contained project managed by [uv](https://docs.astral.sh/uv/).
+You will need Python 3.10 or later.
+Everything below is run from inside the `Python` directory.
+
+If you have `uv` installed, that is all you need:
+
+    uv sync
+    uv run pytest
+
+`uv sync` creates a virtual environment and installs the pinned dependencies from `uv.lock`.
+
+If you would rather not use `uv`, a plain virtual environment works just as well:
+
+    python3 -m venv .venv
+    .venv/bin/pip install pytest ruff
+    .venv/bin/python -m pytest
+
+Either way you should see 362 tests, of which 298 run green.
+As with the Java tests, don't worry about the failures.
+Every one of the 64 is a stub raising `NotImplementedError("TO BE IMPLEMENTED")`,
+and each is somewhere you need to write code.
+If you see a failure that is *not* that, something is wrong with your installation.
+
+There is a linter configured, which is worth running before you submit anything:
+
+    uv run ruff check .
+
+It should report no problems on a clean checkout.
+
+Note that the Python tree covers only part of the material in the Java tree.
+At present it mirrors `adt`, `compression`, `graphs` (union-find and Dijkstra only) and `select`.
+There is no Python equivalent yet of `sort`, `util`, `misc`, `adt/threesum` or the team project,
+so Chapters 7 and 8 in particular are Java-only.
+The package names are the Python spelling of the Java ones:
+`adt.symbol_table` for `adt.symbolTable`, `selection` for `select`, and so on.

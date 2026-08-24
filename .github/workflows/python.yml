@@ -1,0 +1,50 @@
+name: Python
+
+on:
+  push:
+    branches: [Fall2026, editionFirst]
+  pull_request:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: Python
+
+jobs:
+  test:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.10 is the floor declared in pyproject.toml; 3.13 guards against
+        # anything that only works on the older interpreter.
+        python-version: ["3.10", "3.13"]
+    env:
+      # NOTE: this must be UV_PYTHON, not `uv sync --python`. The .python-version
+      # file pins 3.10, and `uv run` honours it even after `--python` built the
+      # environment against something else -- so passing the version as a flag
+      # silently tests 3.10 twice. UV_PYTHON takes precedence over the file.
+      UV_PYTHON: ${{ matrix.python-version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Confirm the interpreter under test
+        run: uv run python -V
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Every module under src can be imported
+        run: uv run pytest test/test_imports.py -q
+
+      - name: Tests fail only where an exercise is unwritten
+        run: uv run python tools/check_stub_failures.py
