@@ -38,8 +38,7 @@ public class BinarySearch {
         int hi = to;
         while (hi > lo) {
             // TO BE IMPLEMENTED  : implement binary search
-             return -1;
-            // END SOLUTION
+                        throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         }
         return -1;
     }

@@ -62,7 +62,7 @@ public class InsertionSortBasic<S> {
      */
     void insert(S[] a, int from, int i) {
         // TO BE IMPLEMENTED  : implement inner loop of insertion sort using comparator
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**

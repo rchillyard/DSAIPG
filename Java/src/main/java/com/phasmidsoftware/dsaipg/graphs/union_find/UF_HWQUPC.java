@@ -206,7 +206,7 @@ public class UF_HWQUPC implements UF {
      */
     void mergeComponents(int i, int j) {
         // TO BE IMPLEMENTED  make shorter root point to taller one
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**
@@ -214,7 +214,7 @@ public class UF_HWQUPC implements UF {
      */
     void doPathCompression(int i) {
         // TO BE IMPLEMENTED  update parent to value of grandparent
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**

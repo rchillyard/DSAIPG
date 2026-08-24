@@ -169,8 +169,7 @@ public class HuffmanCoding {
     static class Code {
         public Code add(int x) {
             // TO BE IMPLEMENTED 
-             return null;
-            // END SOLUTION
+                        throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         }
 
         @Override
@@ -398,7 +397,7 @@ public class HuffmanCoding {
          */
         public void dfs(BiFunction<Object, Integer, Object> depthFunction, BiConsumer<Node, Object> consumer, Object depthIndicator, Integer branch) {
             // TO BE IMPLEMENTED 
-            // END SOLUTION
+                        throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         }
 
         /**

@@ -83,9 +83,7 @@ public class Prim<V, X extends Comparable<X> & Sequenced> extends MST<V, X> impl
         int size = graph.vertices().size();
         marked = new boolean[size];
         // TO BE IMPLEMENTED  : finish construction
-         this.pq = null;
-         this.mst = null;
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**
@@ -98,8 +96,7 @@ public class Prim<V, X extends Comparable<X> & Sequenced> extends MST<V, X> impl
      */
     private Iterable<Edge<V, X>> runPrim() throws PQException {
         // TO BE IMPLEMENTED  : finish construction
-         throw new RuntimeException("implementation missing");
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**
