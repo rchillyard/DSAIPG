@@ -139,8 +139,16 @@ public class QuickSort_DualPivot<X extends Comparable<X>> extends QuickSort<X> {
                         xi = helper.get(xs, i); // one hit
                     }
                 }
-                helper.swap(xs, p1, --lt);
-                helper.swap(xs, p2, ++gt);
+                // NOTE these restore the two pivots to their final positions, and
+                // either can be a no-op: lt is still p1 + 1 if nothing was less
+                // than v1, and gt is still p2 - 1 if nothing was greater than v2,
+                // so --lt == p1 or ++gt == p2. That happens readily whenever the
+                // input has many duplicates. The non-instrumented branch below
+                // calls the private swap, which tolerates i == j, but helper.swap
+                // asserts i != j, since counting a self-swap would corrupt the
+                // instrumentation. So skip the swap rather than ask for one.
+                if (--lt != p1) helper.swap(xs, p1, lt);
+                if (++gt != p2) helper.swap(xs, p2, gt);
             } else {
                 while (i <= gt) {
                     X x = xs[i];

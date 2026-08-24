@@ -201,7 +201,11 @@ public class QuickSortDualPivotTest {
         assertEquals(5, (int) statPack.getStatistics(COMPARES).mean());
         assertEquals(3, (int) statPack.getStatistics(SWAPS).mean());
         assertEquals(3, (int) statPack.getStatistics(FIXES).mean());
-        assertEquals(16, (int) statPack.getStatistics(HITS).mean());
+        // NOTE was 16 before Partitioner_DualPivot.partition stopped asking
+        // helper.swap for a self-swap when a pivot is already in place. Those two
+        // array accesses are no longer performed, so 14 is what the code now
+        // costs; the old figure counted work that achieved nothing.
+        assertEquals(14, (int) statPack.getStatistics(HITS).mean());
     }
 
     @Test
