@@ -1,5 +1,8 @@
 from __future__ import annotations
-from typing import TypeVar, Generic, Optional, Iterator, Iterable
+
+from collections.abc import Iterable, Iterator
+from typing import Generic, TypeVar
+
 from .bqs_exception import BQSException
 
 Item = TypeVar("Item")
@@ -18,12 +21,12 @@ class DList(Generic[Item], Iterable[Item]):
         def __init__(
             self,
             x: Item,
-            p: Optional[DList.DElement[Item]] = None,
-            n: Optional[DList.DElement[Item]] = None,
+            p: DList.DElement[Item] | None = None,
+            n: DList.DElement[Item] | None = None,
         ):
             self.item: Item = x
-            self.prev: Optional[DList.DElement[Item]] = p
-            self.next: Optional[DList.DElement[Item]] = n
+            self.prev: DList.DElement[Item] | None = p
+            self.next: DList.DElement[Item] | None = n
 
         def __iter__(self) -> Iterator[Item]:
             cursor = self
@@ -31,17 +34,17 @@ class DList(Generic[Item], Iterable[Item]):
                 yield cursor.item
                 cursor = cursor.next
 
-    def __init__(self, item: Optional[Item] = None):
+    def __init__(self, item: Item | None = None):
         """
         Constructor which creates an empty DList or seeds it with one item.
         """
-        self.head: Optional[DList.DElement[Item]] = None
-        self.tail: Optional[DList.DElement[Item]] = None
+        self.head: DList.DElement[Item] | None = None
+        self.tail: DList.DElement[Item] | None = None
         self.count: int = 0
         if item is not None:
             self.add_before_element(item, None)
 
-    def add_before(self, item: Item, next_item: Optional[Item]) -> None:
+    def add_before(self, item: Item, next_item: Item | None) -> None:
         """
         Add an item immediately before the given element
         """
@@ -75,7 +78,7 @@ class DList(Generic[Item], Iterable[Item]):
             raise BQSException(f"item not found: {item}")
 
     def add_before_element(
-        self, item: Item, next_element: Optional[DElement[Item]]
+        self, item: Item, next_element: DElement[Item] | None
     ) -> None:
         """
         Add an item immediately before the given element
@@ -97,11 +100,11 @@ class DList(Generic[Item], Iterable[Item]):
         # TO BE IMPLEMENTED
         raise NotImplementedError("TO BE IMPLEMENTED")
 
-    def find_first(self, item: Item) -> Optional[DElement[Item]]:
+    def find_first(self, item: Item) -> DElement[Item] | None:
         # TO BE IMPLEMENTED
         raise NotImplementedError("TO BE IMPLEMENTED")
 
-    def find_last(self, item: Item) -> Optional[DElement[Item]]:
+    def find_last(self, item: Item) -> DElement[Item] | None:
         # TO BE IMPLEMENTED
         raise NotImplementedError("TO BE IMPLEMENTED")
 

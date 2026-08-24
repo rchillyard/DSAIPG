@@ -1,7 +1,10 @@
 from __future__ import annotations
-from typing import Generic, TypeVar, Callable, Iterable, List
-from .edge import Edge
+
+from collections.abc import Callable, Iterable
+from typing import Generic, TypeVar
+
 from .abstract_graph import AbstractGraph
+from .edge import Edge
 
 V = TypeVar("V")
 E = TypeVar("E")
@@ -11,7 +14,7 @@ class GraphEdges(Generic[V, E], AbstractGraph[V, Edge[V, E]]):
     __slots__ = ()
 
     def edges(self) -> Iterable[Edge[V, E]]:
-        result: List[Edge[V, E]] = []
+        result: list[Edge[V, E]] = []
         for bag in self._adjacent_edges.values():
             for e in bag:
                 result.append(e)

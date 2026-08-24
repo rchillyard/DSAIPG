@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar, Optional, Iterator
+from collections.abc import Iterator
+from typing import Generic, TypeVar
 
 Item = TypeVar("Item")
 
@@ -29,7 +30,7 @@ class Stack(Generic[Item], ABC):
         pass
 
     @abstractmethod
-    def peek(self) -> Optional[Item]:
+    def peek(self) -> Item | None:
         """
         Take a peek at the item on top of this Stack.
 

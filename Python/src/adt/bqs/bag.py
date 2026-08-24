@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic
 from collections.abc import Iterable, Iterator
+from typing import Generic, TypeVar
 
 Item = TypeVar("Item")
 

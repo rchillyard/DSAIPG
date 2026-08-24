@@ -1,9 +1,12 @@
 # Python/src/graphs/undirected/abstract_graph.py
 from __future__ import annotations
-from typing import Generic, TypeVar, Dict
-from collections.abc import Iterable, Collection
+
+from collections.abc import Collection, Iterable
+from typing import Generic, TypeVar
+
 from src.adt.bqs.bag import Bag
 from src.adt.bqs.bag_array import BagArray
+
 from .graph import Graph
 
 V = TypeVar("V")
@@ -14,7 +17,7 @@ class AbstractGraph(Generic[V, Adj], Graph[V, Adj]):
     __slots__ = ("_adjacent_edges",)
 
     def __init__(self) -> None:
-        self._adjacent_edges: Dict[V, Bag[Adj]] = {}
+        self._adjacent_edges: dict[V, Bag[Adj]] = {}
 
     def add_vertex(self, vertex: V) -> None:
         self._adjacent_edges[vertex] = BagArray()

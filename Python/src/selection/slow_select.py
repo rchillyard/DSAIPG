@@ -1,4 +1,5 @@
-from typing import List, TypeVar, Optional
+from typing import TypeVar
+
 from .select_base import Select
 from .shuffle import Shuffle
 
@@ -16,7 +17,7 @@ class SlowSelect(Select[X]):
         """
         self.k = k
 
-    def select(self, a: List[X], k: int) -> X:
+    def select(self, a: list[X], k: int) -> X:
         """
         Selects the k-th smallest element.
 
@@ -36,7 +37,7 @@ class SlowSelect(Select[X]):
         # However, the logic in Java uses this array to maintain the sorted k elements.
         # Let's try to mimic the logic as closely as possible to the Java implementation.
         
-        k_array: List[Optional[X]] = [None] * k
+        k_array: list[X | None] = [None] * k
         
         for x in a:
             for i in range(k - 1, -1, -1):
@@ -60,5 +61,5 @@ class SlowSelect(Select[X]):
         return result
 
     @staticmethod
-    def shuffle(a: List[object]):
+    def shuffle(a: list[object]):
         Shuffle.shuffle(a)

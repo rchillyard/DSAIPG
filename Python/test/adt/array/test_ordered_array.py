@@ -1,5 +1,7 @@
 import pytest
+
 from src.adt.array.ordered_array import OrderedArray
+
 
 def test_constructor0():
     integers = [3, 1, 4, 2, 0]

@@ -1,5 +1,6 @@
 from .solution import Solution
 
+
 class CodeLength:
     """
     The CodeLength class serves as the entry point for the application.

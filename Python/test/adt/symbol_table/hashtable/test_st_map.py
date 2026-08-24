@@ -1,5 +1,7 @@
 import unittest
+
 from src.adt.symbol_table.hashtable.st_map import STMap
+
 
 class TestSTMap(unittest.TestCase):
 

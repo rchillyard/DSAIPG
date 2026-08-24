@@ -1,8 +1,11 @@
 from __future__ import annotations
-from typing import Optional, Iterator, Any, TypeVar
+
+from collections.abc import Iterator
+from typing import Any, TypeVar
+
+from .bqs_exception import BQSException
 from .element import Element
 from .linked_list import LinkedList
-from .bqs_exception import BQSException
 
 Item = TypeVar("Item")
 
@@ -13,7 +16,7 @@ class LinkedListElements(LinkedList[Item]):
     """
 
     def __init__(self) -> None:
-        self.head: Optional[Element[Item]] = None
+        self.head: Element[Item] | None = None
 
     def add(self, item: Item) -> None:
         """
@@ -32,7 +35,7 @@ class LinkedListElements(LinkedList[Item]):
         self.head = self.head.next
         return result
 
-    def get_head(self) -> Optional[Item]:
+    def get_head(self) -> Item | None:
         """
         Method to get the element at the head of this list without any mutation.
         Equivalent to add(remove()).

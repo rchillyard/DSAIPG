@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar, Optional, Set, Any
+from typing import Any, Generic, TypeVar
 
 K = TypeVar("K")
 V = TypeVar("V")
@@ -18,7 +18,7 @@ class Dictionary(Generic[K, V], ABC):
         pass
 
     @abstractmethod
-    def get(self, k: K) -> Optional[V]:
+    def get(self, k: K) -> V | None:
         """
         Retrieves the value associated with the given key in the dictionary.
         """
@@ -53,7 +53,7 @@ class Dictionary(Generic[K, V], ABC):
         pass
 
     @abstractmethod
-    def key_set(self) -> Set[K]:
+    def key_set(self) -> set[K]:
         """
         Returns a Set view of the keys contained in the dictionary.
         """

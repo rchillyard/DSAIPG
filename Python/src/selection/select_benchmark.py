@@ -1,10 +1,12 @@
-import random
-import time
-import statistics
 import os
-from typing import List, Callable, TypeVar
-from .select_base import Select
+import random
+import statistics
+import time
+from collections.abc import Callable
+from typing import TypeVar
+
 from .quick_select import QuickSelect
+from .select_base import Select
 from .slow_select import SlowSelect
 
 X = TypeVar('X')
@@ -81,7 +83,7 @@ class SelectBenchmark:
     def result_message(self, s: str, d: float, n: int) -> str:
         return f"{s},{self.runs},{n},{d:.2f}\n"
 
-    def do_benchmark(self, description: str, select: Select, k: int, supplier: Callable[[], List[int]], runs: int) -> float:
+    def do_benchmark(self, description: str, select: Select, k: int, supplier: Callable[[], list[int]], runs: int) -> float:
         times = []
         for _ in range(runs):
             data = supplier()

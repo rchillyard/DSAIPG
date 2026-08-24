@@ -1,6 +1,9 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar, Callable, Iterable
+from collections.abc import Callable, Iterable
+from typing import Generic, TypeVar
+
 from .edge import Edge
 from .graph import Graph
 

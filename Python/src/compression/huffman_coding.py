@@ -6,9 +6,10 @@ It includes tree construction, encoding, and decoding functionality.
 """
 
 import heapq
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Callable, Any
 from itertools import count
+from typing import Any, Optional
 
 
 @dataclass(order=True)
@@ -21,7 +22,7 @@ class Node:
     """
     frequency: int
     _counter: int = field(compare=True)
-    symbol: Optional[str] = field(default=None, compare=False)
+    symbol: str | None = field(default=None, compare=False)
     zero: Optional['Node'] = field(default=None, compare=False, repr=False)
     one: Optional['Node'] = field(default=None, compare=False, repr=False)
     
@@ -31,10 +32,10 @@ class Node:
     
     def dfs(
         self,
-        depth_function: Callable[[Any, Optional[int]], Any],
+        depth_function: Callable[[Any, int | None], Any],
         consumer: Callable[['Node', Any], None],
         depth_indicator: Any,
-        branch: Optional[int]
+        branch: int | None
     ) -> None:
         """Perform depth-first traversal of the tree."""
         # TO BE IMPLEMENTED
@@ -67,7 +68,7 @@ class BitBuffer:
         self.value = value
         self.available = available
     
-    def encode(self, code: Code) -> Optional[Code]:
+    def encode(self, code: Code) -> Code | None:
         """
         Encode a code into the buffer.
         
@@ -109,14 +110,13 @@ class HuffmanEncoder:
     def __init__(self, root: Node):
         self._codebook = self._build_codebook(root)
     
-    def _build_codebook(self, node: Node) -> Dict[str, Code]:
+    def _build_codebook(self, node: Node) -> dict[str, Code]:
         """Build the encoding dictionary by traversing the tree."""
-        codebook = {}
-        # TO BE IMPLEMENTED
+        # TO BE IMPLEMENTED  build a dict of symbol -> Code by traversing the tree
         raise NotImplementedError("TO BE IMPLEMENTED")
         # END SOLUTION
     
-    def encode(self, symbols: List[Optional[str]]) -> List[int]:
+    def encode(self, symbols: list[str | None]) -> list[int]:
         """Encode a sequence of symbols into a list of 64-bit integers."""
         buffers = []
         current = BitBuffer()
@@ -137,7 +137,7 @@ class HuffmanEncoder:
         buffers.append(current)
         return [buf.value for buf in buffers]
     
-    def _get_code(self, symbol: Optional[str]) -> Optional[Code]:
+    def _get_code(self, symbol: str | None) -> Code | None:
         """Get code for a symbol, with fallback to emoji selector variant."""
         code = self._codebook.get(symbol)
         if code is None and symbol is not None:
@@ -156,7 +156,7 @@ class HuffmanDecoder:
     def __init__(self, root: Node):
         self._root = root
     
-    def decode(self, encoded: List[int]) -> str:
+    def decode(self, encoded: list[int]) -> str:
         """Decode a list of 64-bit integers back to symbols."""
         symbols = []
         state = self._root
@@ -170,10 +170,10 @@ class HuffmanDecoder:
     
     def _decode_value(
         self,
-        symbols: List[str],
+        symbols: list[str],
         state: Node,
         value: int
-    ) -> Optional[Node]:
+    ) -> Node | None:
         """Decode a single 64-bit value."""
         # TO BE IMPLEMENTED
         raise NotImplementedError("TO BE IMPLEMENTED")
@@ -183,7 +183,7 @@ class HuffmanDecoder:
 class HuffmanCoding:
     """Main class for Huffman coding operations."""
     
-    def __init__(self, nodes: Optional[List[Node]] = None):
+    def __init__(self, nodes: list[Node] | None = None):
         self._heap = list(nodes) if nodes else []
         if self._heap:
             heapq.heapify(self._heap)
@@ -192,7 +192,7 @@ class HuffmanCoding:
         """Add a node to the priority queue."""
         heapq.heappush(self._heap, node)
     
-    def build_tree(self) -> Optional[Node]:
+    def build_tree(self) -> Node | None:
         """
         Build the Huffman tree by repeatedly combining the two lowest-frequency nodes.
         
@@ -250,7 +250,7 @@ class HuffmanCoding:
     @staticmethod
     def show_tree(root: Node) -> None:
         """Print the tree structure to stdout."""
-        def format_depth(depth: Any, branch: Optional[int]) -> str:
+        def format_depth(depth: Any, branch: int | None) -> str:
             return f"{depth}  {branch if branch is not None else ''}"
         
         def print_node(node: Node, depth: str) -> None:
@@ -259,7 +259,7 @@ class HuffmanCoding:
         root.dfs(format_depth, print_node, "", None)
     
     @staticmethod
-    def parse_lin(lin_string: str) -> List[Optional[str]]:
+    def parse_lin(lin_string: str) -> list[str | None]:
         """
         Parse a LIN (bridge hand) format string into individual symbols.
         

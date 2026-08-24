@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar, Optional, Iterator
+from collections.abc import Iterator
+from typing import Generic, TypeVar
 
 Item = TypeVar("Item")
 
@@ -17,7 +18,7 @@ class Queue(Generic[Item], ABC):
         pass
 
     @abstractmethod
-    def poll(self) -> Optional[Item]:
+    def poll(self) -> Item | None:
         """
         Update this Queue by taking the oldest item off the queue.
 

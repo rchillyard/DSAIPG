@@ -1,5 +1,7 @@
-from typing import TypeVar, Optional, Iterable, Dict, List
 import random
+from collections.abc import Iterable
+from typing import TypeVar
+
 from src.adt.symbol_table.tree.bst import BST
 
 K = TypeVar('K')
@@ -16,8 +18,8 @@ class BSTSimple(BST[K, V]):
             self.value = value
             self.count = count
             self.depth = 0
-            self.smaller: Optional['BSTSimple._Node'] = None
-            self.larger: Optional['BSTSimple._Node'] = None
+            self.smaller: BSTSimple._Node | None = None
+            self.larger: BSTSimple._Node | None = None
 
         def __str__(self):
             sb = [f"Node: {self.key}:{self.value}"]
@@ -35,12 +37,12 @@ class BSTSimple(BST[K, V]):
             depth_l = self.larger.get_depth() if self.larger else 0
             return 1 + max(depth_l, depth_s)
 
-    def __init__(self, map_data: Optional[Dict[K, V]] = None):
-        self.root: Optional[BSTSimple._Node] = None
+    def __init__(self, map_data: dict[K, V] | None = None):
+        self.root: BSTSimple._Node | None = None
         if map_data:
             self.put_all(map_data)
 
-    def put_all(self, map_data: Dict[K, V]) -> None:
+    def put_all(self, map_data: dict[K, V]) -> None:
         keys = list(map_data.keys())
         random.shuffle(keys)
         for k in keys:
@@ -50,11 +52,11 @@ class BSTSimple(BST[K, V]):
     def size(self) -> int:
         return self.root.count if self.root else 0
 
-    def get(self, key: K) -> Optional[V]:
+    def get(self, key: K) -> V | None:
         node = self._get_node(self.root, key)
         return node.value if node else None
 
-    def put(self, key: K, value: V) -> Optional[V]:
+    def put(self, key: K, value: V) -> V | None:
         # Note: Java implementation returns previous value, but standard BST put usually doesn't or returns new value.
         # The Java code returns the previous value if key existed, or null.
         # Here we will try to mimic that behavior but it's tricky with recursion if we don't pass it back.
@@ -64,7 +66,7 @@ class BSTSimple(BST[K, V]):
         self.root, old_value = self._put(self.root, key, value)
         return old_value
 
-    def delete(self, key: K) -> Optional[V]:
+    def delete(self, key: K) -> V | None:
         node = self._get_node(self.root, key)
         if not node:
             return None
@@ -81,11 +83,11 @@ class BSTSimple(BST[K, V]):
         Python set would discard that, which for a binary search tree is the one
         property most worth keeping.
         """
-        result: List[K] = []
+        result: list[K] = []
         self._in_order_traverse(self.root, lambda k, v: result.append(k))
         return result
 
-    def depth(self, key: Optional[K] = None) -> int:
+    def depth(self, key: K | None = None) -> int:
         if key is None:
             return self.root.get_depth() if self.root else 0
         else:
@@ -97,7 +99,7 @@ class BSTSimple(BST[K, V]):
 
     # --- Helper Methods ---
 
-    def _get_node(self, node: Optional[_Node], key: K) -> Optional[_Node]:
+    def _get_node(self, node: _Node | None, key: K) -> _Node | None:
         if not node:
             return None
         if key < node.key:
@@ -107,7 +109,7 @@ class BSTSimple(BST[K, V]):
         else:
             return node
 
-    def _put(self, node: Optional[_Node], key: K, value: V) -> tuple[Optional[_Node], Optional[V]]:
+    def _put(self, node: _Node | None, key: K, value: V) -> tuple[_Node | None, V | None]:
         if not node:
             return self._Node(key, value, 1), None
         
@@ -123,7 +125,7 @@ class BSTSimple(BST[K, V]):
         self._evaluate_count(node)
         return node, old_val
 
-    def _delete(self, x: Optional[_Node], key: K) -> Optional[_Node]:
+    def _delete(self, x: _Node | None, key: K) -> _Node | None:
         if not x:
             return None
         
@@ -145,14 +147,14 @@ class BSTSimple(BST[K, V]):
         # TO BE IMPLEMENTED
         raise NotImplementedError("TO BE IMPLEMENTED")
 
-    def _delete_min(self, x: _Node) -> Optional[_Node]:
+    def _delete_min(self, x: _Node) -> _Node | None:
         if not x.smaller:
             return x.larger
         x.smaller = self._delete_min(x.smaller)
         self._evaluate_count(x)
         return x
 
-    def _evaluate_count(self, x: Optional[_Node]) -> None:
+    def _evaluate_count(self, x: _Node | None) -> None:
         if not x:
             return
         count = 1
@@ -162,7 +164,7 @@ class BSTSimple(BST[K, V]):
             count += x.larger.count
         x.count = count
 
-    def _depth(self, node: Optional[_Node], key: K) -> int:
+    def _depth(self, node: _Node | None, key: K) -> int:
         if not node:
             raise ValueError("Key not found")
         if key < node.key:
@@ -172,7 +174,7 @@ class BSTSimple(BST[K, V]):
         else:
             return 0
 
-    def _in_order_traverse(self, node: Optional[_Node], visitor):
+    def _in_order_traverse(self, node: _Node | None, visitor):
         if not node:
             return
         self._in_order_traverse(node.smaller, visitor)
@@ -184,7 +186,7 @@ class BSTSimple(BST[K, V]):
         self._show(self.root, sb, 0)
         return "".join(sb)
 
-    def _show(self, node: Optional[_Node], sb: List[str], indent: int):
+    def _show(self, node: _Node | None, sb: list[str], indent: int):
         if not node:
             return
         sb.append("  " * max(0, indent))

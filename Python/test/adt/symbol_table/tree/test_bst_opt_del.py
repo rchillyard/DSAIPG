@@ -1,5 +1,7 @@
 import unittest
+
 from src.adt.symbol_table.tree.bst_opt_del import BSTOptimisedDeletion
+
 
 class TestBSTOptimisedDeletion(unittest.TestCase):
 

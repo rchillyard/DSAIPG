@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, Optional
+from typing import Generic, TypeVar
 
 K = TypeVar('K')
 
@@ -67,7 +67,7 @@ class PriorityQueue(ABC, Generic[K]):
         pass
 
     @abstractmethod
-    def peek(self, k: int) -> Optional[K]:
+    def peek(self, k: int) -> K | None:
         """
         Retrieves the element at the specified position in the priority queue without removing it.
         WARNING: this is primarily for testing -- not recommended for general use.

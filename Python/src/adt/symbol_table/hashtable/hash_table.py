@@ -1,5 +1,6 @@
 from abc import abstractmethod
-from typing import TypeVar, Generic, Optional, Any
+from typing import Any, Generic, Optional, TypeVar
+
 from ..st import ST
 
 Key = TypeVar('Key')
@@ -34,7 +35,7 @@ class HashTable(ST[Key, Value]):
         """
         self.m = m
 
-    def put(self, key: Key, value: Value) -> Optional[Value]:
+    def put(self, key: Key, value: Value) -> Value | None:
         self.validate_key(key)
         index = self.get_index(key)
         optional_node = self.find_key_value_pair(key, index)
@@ -48,7 +49,7 @@ class HashTable(ST[Key, Value]):
             self.insert_key_value_pair(self.KeyValuePair(key, value), index)
             return None
 
-    def get(self, key: Key) -> Optional[Value]:
+    def get(self, key: Key) -> Value | None:
         self.validate_key(key)
         kv = self.find_key_value_pair(key, self.get_index(key))
         return kv.value if kv else None
@@ -68,5 +69,5 @@ class HashTable(ST[Key, Value]):
         pass
 
     @abstractmethod
-    def find_node_by_key(self, key: Key, index: int) -> Optional[Any]:
+    def find_node_by_key(self, key: Key, index: int) -> Any | None:
         pass

@@ -1,5 +1,7 @@
 import unittest
+
 from src.adt.symbol_table.tree.bst_simple import BSTSimple
+
 
 class TestBSTSimple(unittest.TestCase):
 

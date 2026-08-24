@@ -1,6 +1,8 @@
 import unittest
-from src.adt.symbol_table.tree.bst_simple import BSTSimple
+
 from src.adt.symbol_table.tree.bst_opt_del import BSTOptimisedDeletion
+from src.adt.symbol_table.tree.bst_simple import BSTSimple
+
 
 class TestBSTSimple(unittest.TestCase):
     def setUp(self):

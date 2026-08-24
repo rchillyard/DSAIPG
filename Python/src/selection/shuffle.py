@@ -1,4 +1,5 @@
-from typing import List, TypeVar, Generic, Optional
+from typing import Generic, TypeVar
+
 from .entropy import Entropy
 
 X = TypeVar('X')
@@ -9,7 +10,7 @@ class Shuffle(Generic[X]):
     It implements the Fisher-Yates (Knuth) shuffle algorithm.
     """
 
-    def __init__(self, a: List[X], entropy: Optional[Entropy] = None):
+    def __init__(self, a: list[X], entropy: Entropy | None = None):
         """
         Constructs a new instance of the Shuffle class.
         
@@ -23,7 +24,7 @@ class Shuffle(Generic[X]):
         else:
             self.entropy = entropy
 
-    def shuffle_list(self) -> List[X]:
+    def shuffle_list(self) -> list[X]:
         """
         Shuffles the elements of the initial list in random order using the Knuth shuffle algorithm.
         
@@ -53,7 +54,7 @@ class Shuffle(Generic[X]):
         return bits - (m - n) * k
 
     @staticmethod
-    def shuffle(a: List[object]):
+    def shuffle(a: list[object]):
         """
         Knuth shuffle in-place.
         """
@@ -70,7 +71,7 @@ class Shuffle(Generic[X]):
         return 1 << k
 
     @staticmethod
-    def _swap(a: List[object], i: int, j: int):
+    def _swap(a: list[object], i: int, j: int):
         if i == j:
             return
         a[i], a[j] = a[j], a[i]

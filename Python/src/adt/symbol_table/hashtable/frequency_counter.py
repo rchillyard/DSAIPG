@@ -1,4 +1,5 @@
-from typing import TypeVar, Optional
+from typing import TypeVar
+
 from ..base_immutable_symbol_table import BaseImmutableSymbolTable
 from ..st import ST
 from .st_map import STMap
@@ -11,7 +12,7 @@ class FrequencyCounter(BaseImmutableSymbolTable[Key, int]):
     is the count of the number of times increment has been called for that key.
     """
 
-    def __init__(self, map_st: Optional[ST[Key, int]] = None):
+    def __init__(self, map_st: ST[Key, int] | None = None):
         super().__init__(map_st if map_st is not None else STMap(), lambda: 0)
         self._total = 0
 

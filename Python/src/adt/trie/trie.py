@@ -1,5 +1,6 @@
-from typing import List
+
 from .trie_node import TrieNode
+
 
 class Trie:
     """
@@ -43,7 +44,7 @@ class Trie:
             current = current.children[char]
         return current.is_end_of_word
 
-    def autocomplete(self, prefix: str) -> List[str]:
+    def autocomplete(self, prefix: str) -> list[str]:
         """
         Find all words in the Trie that start with the given prefix.
         
@@ -53,7 +54,7 @@ class Trie:
         Returns:
             List[str]: A list of matching words.
         """
-        results: List[str] = []
+        results: list[str] = []
         current = self.root
         for char in prefix:
             if char not in current.children:
@@ -62,7 +63,7 @@ class Trie:
         self._dfs(current, prefix, results)
         return results
 
-    def _dfs(self, node: TrieNode, prefix: str, results: List[str]) -> None:
+    def _dfs(self, node: TrieNode, prefix: str, results: list[str]) -> None:
         """
         Helper method for depth-first search to collect words.
         

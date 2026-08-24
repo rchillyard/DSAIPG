@@ -1,12 +1,13 @@
-import unittest
 import random
-from src.adt.pq.priority_queue_binary_heap import PriorityQueueBinaryHeap
+import unittest
+
 from src.adt.pq.pq_exception import PQException
+from src.adt.pq.priority_queue_binary_heap import PriorityQueueBinaryHeap
+
 
 class TestPriorityQueueBinaryHeapPorted(unittest.TestCase):
 
     def test_inverted_1a(self):
-        bin_heap = [None, "A", "B"]
         max_pq = False
         # Note: In Python implementation, we pass initial_data or rely on internal list manipulation for testing.
         # Since we want to test specific internal state, we'll initialize and then manually set _heap if needed,

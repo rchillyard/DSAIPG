@@ -1,5 +1,7 @@
 import unittest
+
 from src.adt.symbol_table.hashtable.frequency_counter import FrequencyCounter
+
 
 class TestFrequencyCounter(unittest.TestCase):
 

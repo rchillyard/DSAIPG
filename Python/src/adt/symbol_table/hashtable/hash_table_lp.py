@@ -1,4 +1,5 @@
-from typing import TypeVar, Optional, Set, List
+from typing import Optional, TypeVar
+
 from .hash_table import HashTable
 
 Key = TypeVar('Key')
@@ -14,7 +15,7 @@ class HashTableLP(HashTable[Key, Value]):
 
     def __init__(self, capacity: int):
         super().__init__(capacity)
-        self._elements: List[Optional[HashTable.KeyValuePair[Key, Value]]] = [None] * capacity
+        self._elements: list[HashTable.KeyValuePair[Key, Value] | None] = [None] * capacity
         self._size = 0
 
     def size(self) -> int:
@@ -23,7 +24,7 @@ class HashTableLP(HashTable[Key, Value]):
     def is_empty(self) -> bool:
         return self._size == 0
 
-    def put(self, key: Key, value: Value) -> Optional[Value]:
+    def put(self, key: Key, value: Value) -> Value | None:
         if self._size >= self.m - 1:
             raise self.HashTableException("table is full")
         
@@ -42,17 +43,17 @@ class HashTableLP(HashTable[Key, Value]):
             self._size += 1
             return None
 
-    def get(self, key: Key) -> Optional[Value]:
+    def get(self, key: Key) -> Value | None:
         self.validate_key(key)
         index = self.get_index(key)
         maybe_element = self.find_node_by_key(key, index)
         return maybe_element.value if maybe_element else None
 
-    def delete(self, key: Key) -> Optional[Value]:
+    def delete(self, key: Key) -> Value | None:
         # Java implementation returns null (not implemented?)
         return None
 
-    def keys(self) -> Set[Key]:
+    def keys(self) -> set[Key]:
         result = set()
         for elem in self._elements:
             if elem is not None:

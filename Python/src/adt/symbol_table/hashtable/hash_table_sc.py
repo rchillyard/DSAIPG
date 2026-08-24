@@ -1,4 +1,6 @@
-from typing import TypeVar, Optional, Set, List, Iterator
+from collections.abc import Iterator
+from typing import Optional, TypeVar
+
 from .hash_table import HashTable
 
 Key = TypeVar('Key')
@@ -19,7 +21,7 @@ class HashTableSC(HashTable[Key, Value]):
 
     def __init__(self, m: int = 16):
         super().__init__(m)
-        self._buckets: List[Optional[HashTableSC.Node]] = [None] * m
+        self._buckets: list[HashTableSC.Node | None] = [None] * m
 
     def size(self) -> int:
         result = 0
@@ -27,7 +29,7 @@ class HashTableSC(HashTable[Key, Value]):
             result += sum(1 for _ in self._nodes_as_stream(bucket))
         return result
 
-    def keys(self) -> Set[Key]:
+    def keys(self) -> set[Key]:
         result = set()
         for bucket in self._buckets:
             for node in self._nodes_as_stream(bucket):
@@ -50,7 +52,7 @@ class HashTableSC(HashTable[Key, Value]):
             raise Exception(f"HashTable:findNode: logic error: more than one matching key: {key} at index: {index}")
         return matches[0] if matches else None
 
-    def delete(self, key: Key) -> Optional[Value]:
+    def delete(self, key: Key) -> Value | None:
         self.validate_key(key)
         index = self.get_index(key)
         optional_node = self.find_node_by_key(key, index)

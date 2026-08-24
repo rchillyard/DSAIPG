@@ -1,7 +1,10 @@
 from __future__ import annotations
-from typing import Optional, Iterator, Any, TypeVar
-from .stack import Stack
+
+from collections.abc import Iterator
+from typing import Any, TypeVar
+
 from .linked_list_elements import LinkedListElements
+from .stack import Stack
 
 Item = TypeVar("Item")
 
@@ -11,7 +14,7 @@ class StackLinkedList(Stack[Item]):
     StackLinkedList is a generic implementation of the Stack interface backed by a linked list.
     """
 
-    def __init__(self, linked_list: Optional[LinkedListElements[Item]] = None):
+    def __init__(self, linked_list: LinkedListElements[Item] | None = None):
         self.list = linked_list if linked_list is not None else LinkedListElements()
 
     def push(self, item: Item) -> None:
@@ -20,7 +23,7 @@ class StackLinkedList(Stack[Item]):
     def pop(self) -> Item:
         return self.list.remove()
 
-    def peek(self) -> Optional[Item]:
+    def peek(self) -> Item | None:
         return self.list.get_head()
 
     def is_empty(self) -> bool:

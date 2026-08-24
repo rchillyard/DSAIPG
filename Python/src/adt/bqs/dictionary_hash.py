@@ -1,4 +1,5 @@
-from typing import TypeVar, Optional, Set, Any, Dict
+from typing import Any, TypeVar
+
 from .dictionary import Dictionary
 
 K = TypeVar("K")
@@ -11,12 +12,12 @@ class DictionaryHash(Dictionary[K, V]):
     """
 
     def __init__(self) -> None:
-        self._map: Dict[K, V] = {}
+        self._map: dict[K, V] = {}
 
     def put(self, k: K, v: V) -> None:
         self._map[k] = v
 
-    def get(self, k: K) -> Optional[V]:
+    def get(self, k: K) -> V | None:
         return self._map.get(k)
 
     def size(self) -> int:
@@ -31,5 +32,5 @@ class DictionaryHash(Dictionary[K, V]):
     def clear(self) -> None:
         self._map.clear()
 
-    def key_set(self) -> Set[K]:
+    def key_set(self) -> set[K]:
         return set(self._map.keys())

@@ -1,8 +1,8 @@
 from pytest import approx, raises
 
-from src.graphs.dijkstra.edge_weighted_digraph import EdgeWeightedDigraph
 from src.graphs.dijkstra.dijkstra import Dijkstra
 from src.graphs.dijkstra.directed_edge import DirectedEdge
+from src.graphs.dijkstra.edge_weighted_digraph import EdgeWeightedDigraph
 
 
 def test1():

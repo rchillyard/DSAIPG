@@ -1,5 +1,7 @@
-from typing import TypeVar, Optional, Iterable, Dict, List, Callable
 import random
+from collections.abc import Callable, Iterable
+from typing import Optional, TypeVar
+
 from src.adt.symbol_table.tree.bst import BST
 
 K = TypeVar('K')
@@ -16,8 +18,8 @@ class BSTOptimisedDeletion(BST[K, V]):
             self.value = value
             self.depth = depth
             self.count = 1
-            self.smaller: Optional['BSTOptimisedDeletion._Node'] = None
-            self.larger: Optional['BSTOptimisedDeletion._Node'] = None
+            self.smaller: BSTOptimisedDeletion._Node | None = None
+            self.larger: BSTOptimisedDeletion._Node | None = None
             self.mode = mode
 
         def __str__(self):
@@ -28,7 +30,7 @@ class BSTOptimisedDeletion(BST[K, V]):
                 sb.append(f", larger: {self.larger.key}")
             return "".join(sb)
 
-        def navigate(self, k: Optional[K], 
+        def navigate(self, k: K | None, 
                      function1: Callable[['BSTOptimisedDeletion._Node', Optional['BSTOptimisedDeletion._Node']], Optional['BSTOptimisedDeletion._Node']], 
                      function2: Callable[['BSTOptimisedDeletion._Node', Optional['BSTOptimisedDeletion._Node']], Optional['BSTOptimisedDeletion._Node']]) -> Optional['BSTOptimisedDeletion._Node']:
             if k is not None:
@@ -43,7 +45,7 @@ class BSTOptimisedDeletion(BST[K, V]):
                 self._navigate_subtree(self.larger, None, function1, function2)
                 return None
 
-        def _navigate_subtree(self, subtree: Optional['BSTOptimisedDeletion._Node'], k: Optional[K],
+        def _navigate_subtree(self, subtree: Optional['BSTOptimisedDeletion._Node'], k: K | None,
                               function1: Callable, function2: Callable) -> Optional['BSTOptimisedDeletion._Node']:
             node = subtree.navigate(k, function1, function2) if subtree else function1(self, None)
             return function2(self, node)
@@ -74,13 +76,13 @@ class BSTOptimisedDeletion(BST[K, V]):
                 assert self.larger.key > self.key, "Symmetric order violation"
                 self.larger.validate(d + 1)
 
-    def __init__(self, map_data: Optional[Dict[K, V]] = None, mode: int = 0):
-        self.root: Optional[BSTOptimisedDeletion._Node] = None
+    def __init__(self, map_data: dict[K, V] | None = None, mode: int = 0):
+        self.root: BSTOptimisedDeletion._Node | None = None
         self.mode = mode
         if map_data:
             self.put_all(map_data)
 
-    def put_all(self, map_data: Dict[K, V]) -> None:
+    def put_all(self, map_data: dict[K, V]) -> None:
         keys = list(map_data.keys())
         random.shuffle(keys)
         for k in keys:
@@ -90,14 +92,15 @@ class BSTOptimisedDeletion(BST[K, V]):
     def size(self) -> int:
         return self.root.count if self.root else 0
 
-    def get(self, key: K) -> Optional[V]:
+    def get(self, key: K) -> V | None:
         if not self.root:
             return None
-        do_get = lambda node1, node2: node2
+        def do_get(node1, node2):
+            return node2
         result = self.root.navigate(key, do_get, do_get)
         return result.value if result else None
 
-    def put(self, key: K, value: V) -> Optional[V]:
+    def put(self, key: K, value: V) -> V | None:
         if self.root:
             result = self.root.navigate(key, self._do_put(key, value), lambda n1, n2: n1.update_count(n2))
             return result.value if result else None
@@ -105,7 +108,7 @@ class BSTOptimisedDeletion(BST[K, V]):
             self.root = self._make_node(key, value, 0)
             return value
 
-    def delete(self, key: K) -> Optional[V]:
+    def delete(self, key: K) -> V | None:
         if self.root:
             self.root = self.root.delete(key)
         return None
@@ -119,18 +122,18 @@ class BSTOptimisedDeletion(BST[K, V]):
         BSTOptimisedDeletion.keySet() is left returning null -- which makes the
         class unusable anywhere keys are needed. It is implemented here.
         """
-        result: List[K] = []
+        result: list[K] = []
         self._in_order_traverse(self.root, lambda k, v: result.append(k))
         return result
 
-    def _in_order_traverse(self, node: Optional[_Node], visitor) -> None:
+    def _in_order_traverse(self, node: _Node | None, visitor) -> None:
         if not node:
             return
         self._in_order_traverse(node.smaller, visitor)
         visitor(node.key, node.value)
         self._in_order_traverse(node.larger, visitor)
 
-    def depth(self, key: Optional[K] = None) -> int:
+    def depth(self, key: K | None = None) -> int:
         if key is None:
             return self._depth_node(self.root)
         else:
@@ -145,7 +148,7 @@ class BSTOptimisedDeletion(BST[K, V]):
             self._measure_depth(self.root, depth_stats)
         return depth_stats.get_mean_depth()
 
-    def _measure_depth(self, node: Optional[_Node], stats: '_Depth'):
+    def _measure_depth(self, node: _Node | None, stats: '_Depth'):
         if not node:
             return
         stats.increment(node.depth)
@@ -181,14 +184,14 @@ class BSTOptimisedDeletion(BST[K, V]):
     def _make_node(self, key: K, value: V, depth: int) -> _Node:
         return self._Node(key, value, depth, self.mode)
 
-    def _depth_node(self, node: Optional[_Node]) -> int:
+    def _depth_node(self, node: _Node | None) -> int:
         if not node:
             return 0
         depth_s = self._depth_node(node.smaller)
         depth_l = self._depth_node(node.larger)
         return 1 + max(depth_l, depth_s)
 
-    def _depth_key(self, node: Optional[_Node], key: K) -> int:
+    def _depth_key(self, node: _Node | None, key: K) -> int:
         if not node:
             raise ValueError("Key not found")
         if key < node.key:
@@ -215,7 +218,7 @@ class BSTOptimisedDeletion(BST[K, V]):
         self._show(self.root, sb, 0)
         return "".join(sb)
 
-    def _show(self, node: Optional[_Node], sb: List[str], indent: int):
+    def _show(self, node: _Node | None, sb: list[str], indent: int):
         if not node:
             return
         sb.append("  " * max(0, indent))

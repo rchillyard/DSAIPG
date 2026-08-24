@@ -1,5 +1,7 @@
 from __future__ import annotations
-from typing import TypeVar, Generic, Callable, List, Optional
+
+from collections.abc import Callable
+from typing import Generic, TypeVar
 
 T = TypeVar("T")
 U = TypeVar("U")
@@ -21,24 +23,24 @@ class LazyList(Generic[T]):
         """
         return LazyList(t, lambda: self)
 
-    def take(self, n: int) -> List[T]:
+    def take(self, n: int) -> list[T]:
         """
         Method to take a number (n) of elements from this LazyList.
         """
-        result: List[T] = []
-        cursor: Optional[LazyList[T]] = self
+        result: list[T] = []
+        cursor: LazyList[T] | None = self
         while n > 0 and cursor is not None:
             result.append(cursor.head)
             cursor = cursor.tail_function()
             n -= 1
         return result
 
-    def take_while(self, predicate: Callable[[T], bool]) -> List[T]:
+    def take_while(self, predicate: Callable[[T], bool]) -> list[T]:
         """
         Method to take elements from this LazyList as long as they satisfy the given predicate.
         """
-        result: List[T] = []
-        cursor: Optional[LazyList[T]] = self
+        result: list[T] = []
+        cursor: LazyList[T] | None = self
         while cursor is not None and predicate(cursor.head):
             result.append(cursor.head)
             cursor = cursor.tail_function()

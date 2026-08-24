@@ -1,5 +1,6 @@
-from typing import TypeVar, Generic, List, Iterable, Iterator
 import bisect
+from collections.abc import Iterable, Iterator
+from typing import Generic, TypeVar
 
 T = TypeVar('T')
 
@@ -30,7 +31,7 @@ class OrderedArray(Generic[T]):
             TODO: a lambda function could be used in-place of a comparator.
         """
         if items is None:
-            self._array: List[T] = []
+            self._array: list[T] = []
         elif not make_copy and isinstance(items, list):
             self._array = items
         else:

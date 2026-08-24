@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Iterator, TypeVar
+from collections.abc import Iterator
+from typing import TypeVar
+
 from .list_like import ListLike
 
 Item = TypeVar("Item")
@@ -11,7 +13,7 @@ class LinkedList(ListLike[Item], ABC):
     """
 
     @abstractmethod
-    def get_head(self) -> Optional[Item]:
+    def get_head(self) -> Item | None:
         """
         Method to get the head element of this list.
 

@@ -1,6 +1,8 @@
 import unittest
-from src.selection.shuffle import Shuffle
+
 from src.selection.entropy import Entropy
+from src.selection.shuffle import Shuffle
+
 
 class TestShuffle(unittest.TestCase):
 

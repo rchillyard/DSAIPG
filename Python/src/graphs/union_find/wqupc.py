@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-from typing import List
-
 
 class WQUPC:
     def __init__(self, n: int):
         if n < 0:
             raise ValueError("n must be non-negative")
         self._count = n
-        self._parent: List[int] = list(range(n))
-        self._size: List[int] = [1] * n
+        self._parent: list[int] = list(range(n))
+        self._size: list[int] = [1] * n
 
     @property
     def count(self) -> int:

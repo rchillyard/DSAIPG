@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import List
-
 from src.graphs.union_find.uf import UF
 
 
@@ -12,8 +10,8 @@ class UF_HWQUPC(UF):
         if n < 0:
             raise ValueError("n must be non-negative")
         self._count = n
-        self._parent: List[int] = list(range(n))
-        self._height: List[int] = [1] * n
+        self._parent: list[int] = list(range(n))
+        self._height: list[int] = [1] * n
         self._path_compression = path_compression
 
     def connect(self, p: int, q: int) -> None:
@@ -31,7 +29,7 @@ class UF_HWQUPC(UF):
             IndexError: unless 0 <= p < n.
         """
         self._validate(p)
-        root = p
+        root = p  # noqa: F841  starting point for the exercise, as in UF_HWQUPC.java
         # TO BE IMPLEMENTED  walk up to the root, compressing the path on the way if enabled
         raise NotImplementedError("TO BE IMPLEMENTED")
         # END SOLUTION

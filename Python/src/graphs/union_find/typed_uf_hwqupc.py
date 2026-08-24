@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Dict, Generic, Iterable, TypeVar
+from collections.abc import Iterable
+from typing import Generic, TypeVar
 
-from .uf_hwqupc import UF_HWQUPC
-from .uf_exception import UFException
 from .typed_uf import TypedUF
-
+from .uf_exception import UFException
+from .uf_hwqupc import UF_HWQUPC
 
 T = TypeVar("T")
 
@@ -16,7 +16,7 @@ class TypedUF_HWQUPC(UF_HWQUPC, TypedUF[T], Generic[T]):
     def __init__(self, ts: Iterable[T]):
         items = list(ts)
         super().__init__(len(items))
-        self._map: Dict[T, int] = {t: i for i, t in enumerate(items)}
+        self._map: dict[T, int] = {t: i for i, t in enumerate(items)}
 
     def connected(self, t1: T, t2: T) -> bool:
         return super().is_connected(self._lookup(t1), self._lookup(t2))

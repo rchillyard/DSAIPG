@@ -1,6 +1,8 @@
-from typing import TypeVar, List, Optional, Callable, Iterable, Iterator
-from .priority_queue import PriorityQueue
+from collections.abc import Callable, Iterable, Iterator
+from typing import TypeVar
+
 from .pq_exception import PQException
+from .priority_queue import PriorityQueue
 
 K = TypeVar('K')
 
@@ -17,10 +19,10 @@ class PriorityQueueBinaryHeap(PriorityQueue[K]):
 
     def __init__(self, 
                  max_priority: bool = True, 
-                 comparator: Optional[Callable[[K, K], int]] = None, 
+                 comparator: Callable[[K, K], int] | None = None, 
                  floyd: bool = False, 
                  first: int = 0, 
-                 initial_data: Optional[Iterable[K]] = None):
+                 initial_data: Iterable[K] | None = None):
         """
         Constructs a PriorityQueueBinaryHeap.
 
@@ -37,7 +39,7 @@ class PriorityQueueBinaryHeap(PriorityQueue[K]):
         self._first = first
         self._floyd = floyd
         self._comparator = comparator
-        self._heap: List[Optional[K]] = [None] * first  # Initialize with 'first' number of None placeholders
+        self._heap: list[K | None] = [None] * first  # Initialize with 'first' number of None placeholders
         
         if initial_data:
             for item in initial_data:
@@ -76,7 +78,7 @@ class PriorityQueueBinaryHeap(PriorityQueue[K]):
         for k in range(self._parent(m + self._first - 1), self._first - 1, -1):
             self._sink(k)
 
-    def peek(self, k: int) -> Optional[K]:
+    def peek(self, k: int) -> K | None:
         if 0 <= k < len(self._heap):
             return self._heap[k]
         return None
@@ -95,7 +97,6 @@ class PriorityQueueBinaryHeap(PriorityQueue[K]):
 
     def _do_heapify(self, k: int, p: Callable[[int, int], bool]) -> int:
         i = k
-        m = self.size()
         while True:
             first_child = self._first_child(i)
             if not (first_child < len(self._heap)):

@@ -1,5 +1,6 @@
 from abc import abstractmethod
-from typing import TypeVar, Optional
+from typing import TypeVar
+
 from .immutable_symbol_table import ImmutableSymbolTable
 
 Key = TypeVar('Key')
@@ -12,7 +13,7 @@ class ST(ImmutableSymbolTable[Key, Value]):
     """
 
     @abstractmethod
-    def put(self, key: Key, val: Value) -> Optional[Value]:
+    def put(self, key: Key, val: Value) -> Value | None:
         """
         Insert a key/value pair.
         If the key already exists, then its value will simply be overwritten.
@@ -27,7 +28,7 @@ class ST(ImmutableSymbolTable[Key, Value]):
         pass
 
     @abstractmethod
-    def delete(self, key: Key) -> Optional[Value]:
+    def delete(self, key: Key) -> Value | None:
         """
         Delete a key.
 

@@ -1,5 +1,7 @@
 import random
-from typing import List, Iterable, Optional
+from collections.abc import Iterable
+from typing import Optional
+
 from .directed_edge import DirectedEdge
 
 
@@ -16,7 +18,7 @@ class EdgeWeightedDigraph:
     """
 
     def __init__(
-        self, V: int, E: Optional[int] = None, G: Optional["EdgeWeightedDigraph"] = None
+        self, V: int, E: int | None = None, G: Optional["EdgeWeightedDigraph"] = None
     ):
         """
         Initialize an edge-weighted digraph.
@@ -43,7 +45,7 @@ class EdgeWeightedDigraph:
         self._V = V
         self._E = 0
         self._indegree = [0] * V
-        self._adj: List[List[DirectedEdge]] = [[] for _ in range(V)]
+        self._adj: list[list[DirectedEdge]] = [[] for _ in range(V)]
 
         if E is not None:
             if E < 0:
@@ -131,8 +133,7 @@ class EdgeWeightedDigraph:
     def edges(self) -> Iterable["DirectedEdge"]:
         """Return all directed edges in the digraph."""
         for v in range(self._V):
-            for e in self._adj[v]:
-                yield e
+            yield from self._adj[v]
 
     def __str__(self) -> str:
         """Return a string representation of the digraph."""

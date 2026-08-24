@@ -1,6 +1,7 @@
-import time
 import math
 import secrets
+import time
+
 
 class Entropy:
     """
@@ -165,5 +166,6 @@ class Entropy:
         # So it basically calculates the number of bits needed to represent x-1?
         # Python bit_length of x-1 seems correct.
         
-        if x == 1: return 0
+        if x == 1:
+            return 0
         return (x - 1).bit_length()

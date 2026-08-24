@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import TypeVar, Generic, Optional
+
+from typing import Generic, TypeVar
 
 Key = TypeVar('Key')
 Value = TypeVar('Value')
@@ -21,14 +22,14 @@ class TwoFourTree(Generic[Key, Value]):
 
     class _Node:
         def __init__(self, value: Value, key1: Key, key2: Key, key3: Key):
-            self.left: Optional[TwoFourTree._Node] = None
-            self.middle: Optional[TwoFourTree._Node] = None
-            self.right: Optional[TwoFourTree._Node] = None
+            self.left: TwoFourTree._Node | None = None
+            self.middle: TwoFourTree._Node | None = None
+            self.right: TwoFourTree._Node | None = None
 
     def __init__(self):
-        self.root: Optional[TwoFourTree._Node] = None
+        self.root: TwoFourTree._Node | None = None
 
-    def get(self, key: Key) -> Optional[Value]:
+    def get(self, key: Key) -> Value | None:
         """
         Retrieves the value associated with the specified key in the tree.
         If the key is not present in the tree, returns None.
@@ -38,7 +39,7 @@ class TwoFourTree(Generic[Key, Value]):
         """
         return None
 
-    def _cf(self, key: Key, node: _Node, k: Key, n: _Node) -> Optional[_Node]:
+    def _cf(self, key: Key, node: _Node, k: Key, n: _Node) -> _Node | None:
         """
         Determines and returns the appropriate node based on a comparison between
         the provided keys. If the provided key matches the comparison key, the

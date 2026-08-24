@@ -1,6 +1,8 @@
 import unittest
-from src.adt.pq.priority_queue_binary_heap import PriorityQueueBinaryHeap
+
 from src.adt.pq.pq_exception import PQException
+from src.adt.pq.priority_queue_binary_heap import PriorityQueueBinaryHeap
+
 
 class TestPriorityQueueBinaryHeap(unittest.TestCase):
 
@@ -57,8 +59,10 @@ class TestPriorityQueueBinaryHeap(unittest.TestCase):
     def test_custom_comparator(self):
         # Sort strings by length
         def length_comparator(s1, s2):
-            if len(s1) > len(s2): return 1
-            if len(s1) < len(s2): return -1
+            if len(s1) > len(s2):
+                return 1
+            if len(s1) < len(s2):
+                return -1
             return 0
 
         pq = PriorityQueueBinaryHeap(max_priority=True, comparator=length_comparator)

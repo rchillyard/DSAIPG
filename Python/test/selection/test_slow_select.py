@@ -1,5 +1,7 @@
 import unittest
+
 from src.selection.slow_select import SlowSelect
+
 
 class TestSlowSelect(unittest.TestCase):
 

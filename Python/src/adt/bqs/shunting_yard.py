@@ -1,9 +1,11 @@
 from __future__ import annotations
-from typing import Iterator
+
+from collections.abc import Iterator
 from numbers import Number
+
+from .bqs_exception import BQSException
 from .stack import Stack
 from .stack_linked_list import StackLinkedList
-from .bqs_exception import BQSException
 
 
 class ShuntingYard:

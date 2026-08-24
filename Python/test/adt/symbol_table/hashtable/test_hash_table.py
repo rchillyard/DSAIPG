@@ -1,8 +1,10 @@
 import unittest
+
+from src.adt.symbol_table.hashtable.frequency_counter import FrequencyCounter
 from src.adt.symbol_table.hashtable.hash_table_lp import HashTableLP
 from src.adt.symbol_table.hashtable.hash_table_sc import HashTableSC
 from src.adt.symbol_table.hashtable.st_map import STMap
-from src.adt.symbol_table.hashtable.frequency_counter import FrequencyCounter
+
 
 class TestHashTable(unittest.TestCase):
 

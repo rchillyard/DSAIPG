@@ -1,5 +1,8 @@
 from __future__ import annotations
-from typing import Optional, Iterator, List, TypeVar
+
+from collections.abc import Iterator
+from typing import TypeVar
+
 from .queue import Queue
 
 Item = TypeVar("Item")
@@ -12,7 +15,7 @@ class QueueArray(Queue[Item]):
 
     def __init__(self, capacity: int = 32):
         self.n = capacity
-        self.items: List[Optional[Item]] = [None] * self.n
+        self.items: list[Item | None] = [None] * self.n
         self.i = 0  # head
         self.j = 0  # tail
 
@@ -21,7 +24,7 @@ class QueueArray(Queue[Item]):
         self.j = (self.j + 1) % self.n
         self._ensure_room()
 
-    def poll(self) -> Optional[Item]:
+    def poll(self) -> Item | None:
         if self.is_empty():
             return None
         result = self.items[self.i]
@@ -50,7 +53,7 @@ class QueueArray(Queue[Item]):
     def _ensure_room(self) -> None:
         if self.i == self.j:
             new_n = self.n * 2
-            new_items: List[Optional[Item]] = [None] * new_n
+            new_items: list[Item | None] = [None] * new_n
 
             # Copy elements to the new array
             # If j <= i, it means we wrapped around

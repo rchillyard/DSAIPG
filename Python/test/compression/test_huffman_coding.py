@@ -1,4 +1,5 @@
-from src.compression.huffman_coding import HuffmanCoding, HuffmanEncoder, HuffmanDecoder
+from src.compression.huffman_coding import HuffmanCoding, HuffmanDecoder, HuffmanEncoder
+
 
 def test_generate_code():
     huffman = HuffmanCoding.create_default()

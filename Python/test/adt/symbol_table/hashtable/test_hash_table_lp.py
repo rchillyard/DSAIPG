@@ -1,6 +1,8 @@
-import unittest
 import random
+import unittest
+
 from src.adt.symbol_table.hashtable.hash_table_lp import HashTableLP
+
 
 class TestHashTableLP(unittest.TestCase):
 
@@ -108,8 +110,10 @@ class TestHashTableLP(unittest.TestCase):
         
         class MockHashTableLP(HashTableLP):
             def get_index(self, key):
-                if key == 1: return 1
-                if key == 9: return 1 # Collision
+                if key == 1:
+                    return 1
+                if key == 9:
+                    return 1  # Collision
                 return super().get_index(key)
 
         hash_table = MockHashTableLP(8)

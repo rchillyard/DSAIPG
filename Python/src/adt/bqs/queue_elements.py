@@ -1,7 +1,10 @@
 from __future__ import annotations
-from typing import Optional, Iterator, TypeVar
-from .queue import Queue
+
+from collections.abc import Iterator
+from typing import TypeVar
+
 from .element import Element
+from .queue import Queue
 
 Item = TypeVar("Item")
 
@@ -17,8 +20,8 @@ class QueueElements(Queue[Item]):
         """
         Construct a new (empty) queue.
         """
-        self.oldest: Optional[Element[Item]] = None
-        self.newest: Optional[Element[Item]] = None
+        self.oldest: Element[Item] | None = None
+        self.newest: Element[Item] | None = None
 
     def offer(self, item: Item) -> None:
         """
@@ -27,7 +30,7 @@ class QueueElements(Queue[Item]):
         # TO BE IMPLEMENTED
         raise NotImplementedError("TO BE IMPLEMENTED")
 
-    def poll(self) -> Optional[Item]:
+    def poll(self) -> Item | None:
         """
         Retrieves and removes the oldest item from the queue.
         If the queue is empty, returns None.

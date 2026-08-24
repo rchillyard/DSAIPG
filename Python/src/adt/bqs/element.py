@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import Generic, TypeVar, Optional, Any
+
+from typing import Any, Generic, TypeVar
 
 Item = TypeVar("Item")
 
@@ -11,7 +12,7 @@ class Element(Generic[Item]):
     Each node contains a reference to an item and a reference to the next node in the structure.
     """
 
-    def __init__(self, x: Item, n: Optional[Element[Item]] = None):
+    def __init__(self, x: Item, n: Element[Item] | None = None):
         """
         Constructs a new Element with the given item and reference to the next element.
 
@@ -20,7 +21,7 @@ class Element(Generic[Item]):
             n: the next element in the linked structure, or None if this is the last element
         """
         self.item: Item = x
-        self.next: Optional[Element[Item]] = n
+        self.next: Element[Item] | None = n
 
     def __eq__(self, other: Any) -> bool:
         """

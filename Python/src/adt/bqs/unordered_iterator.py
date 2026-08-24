@@ -1,6 +1,8 @@
 from __future__ import annotations
-from typing import TypeVar, Generic, Iterator, Iterable, List, Optional
+
+from collections.abc import Iterable, Iterator
 from random import Random
+from typing import Generic, TypeVar
 
 T = TypeVar("T")
 
@@ -11,11 +13,11 @@ class UnorderedIterator(Generic[T], Iterator[T]):
     The order of elements in the iterator is random.
     """
 
-    def __init__(self, iterable: Iterable[T], random: Optional[Random] = None):
+    def __init__(self, iterable: Iterable[T], random: Random | None = None):
         """
         Constructor which takes an iterable.
         """
-        self.list: List[T] = list(iterable)
+        self.list: list[T] = list(iterable)
         self.random: Random = random if random is not None else Random()
 
     def __iter__(self) -> Iterator[T]:

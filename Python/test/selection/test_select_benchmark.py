@@ -1,5 +1,7 @@
 import unittest
+
 from src.selection.select_benchmark import SelectBenchmark
+
 
 class TestSelectBenchmark(unittest.TestCase):
 

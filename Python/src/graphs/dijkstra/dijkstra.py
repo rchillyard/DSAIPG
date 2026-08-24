@@ -1,5 +1,5 @@
 import heapq
-from typing import List, Tuple, Optional
+
 from .directed_edge import DirectedEdge
 from .edge_weighted_digraph import EdgeWeightedDigraph
 
@@ -47,9 +47,9 @@ class ShortestPaths:
     def __init__(self, G: EdgeWeightedDigraph):
         self.G = G
         self.n = G.V()
-        self._dist_to: List[float] = [float("inf")] * self.n
-        self.edge_to: List[Optional[DirectedEdge]] = [None] * self.n
-        self.pq: List[Tuple[float, int]] = []
+        self._dist_to: list[float] = [float("inf")] * self.n
+        self.edge_to: list[DirectedEdge | None] = [None] * self.n
+        self.pq: list[tuple[float, int]] = []
 
     def solve(self, s: int):
         """
@@ -93,7 +93,7 @@ class ShortestPaths:
         self._validate_vertex(v)
         return self._dist_to[v] < float("inf")
 
-    def path_to(self, v: int) -> Optional[List[DirectedEdge]]:
+    def path_to(self, v: int) -> list[DirectedEdge] | None:
         """
         Return the shortest path to vertex v as a list of edges.
 

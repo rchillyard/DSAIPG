@@ -1,8 +1,10 @@
-import time
 import random
-from typing import TypeVar, List, Callable
-from src.adt.symbol_table.tree.bst_opt_del import BSTOptimisedDeletion
+import time
+from collections.abc import Callable
+from typing import TypeVar
+
 from src.adt.symbol_table.tree.bst import BST
+from src.adt.symbol_table.tree.bst_opt_del import BSTOptimisedDeletion
 
 K = TypeVar('K')
 V = TypeVar('V')
@@ -34,7 +36,7 @@ class BSTBenchmark:
         self.n_runs = n_runs
         self.stats = stats
 
-    def run_benchmark(self, supplier: Callable[[], List[K]]) -> float:
+    def run_benchmark(self, supplier: Callable[[], list[K]]) -> float:
         total_time = 0
         for _ in range(self.n_runs):
             input_data = supplier()
@@ -46,7 +48,7 @@ class BSTBenchmark:
         
         return total_time / self.n_runs
 
-    def _experiment(self, xs: List[K]):
+    def _experiment(self, xs: list[K]):
         # Delete all elements
         for x in xs:
             self.bst.delete(x)
@@ -54,7 +56,7 @@ class BSTBenchmark:
         for x in xs:
             self.bst.put(x, None) # Value doesn't matter for this benchmark
 
-    def _post_processor(self, xs: List[K]):
+    def _post_processor(self, xs: list[K]):
         mean_depth = self.bst.mean_depth()
         self.stats.set_mean_depth(self.bst.size, mean_depth)
 

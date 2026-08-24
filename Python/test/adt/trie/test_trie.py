@@ -1,5 +1,7 @@
 import unittest
+
 from src.adt.trie.trie import Trie
+
 
 class TestTrie(unittest.TestCase):
     def test_insert_and_search(self):

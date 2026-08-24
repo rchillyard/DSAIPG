@@ -1,4 +1,6 @@
-from typing import TypeVar, Set, Callable, Optional
+from collections.abc import Callable
+from typing import TypeVar
+
 from .immutable_symbol_table import ImmutableSymbolTable
 from .st import ST
 
@@ -21,7 +23,7 @@ class BaseImmutableSymbolTable(ImmutableSymbolTable[Key, Value]):
         self.map = map_st
         self.default_supplier = default_supplier
 
-    def get(self, key: Key) -> Optional[Value]:
+    def get(self, key: Key) -> Value | None:
         """
         Retrieves the value associated with the given key from the symbol table.
         If the key is not present in the symbol table, the method returns a default value.
@@ -32,7 +34,7 @@ class BaseImmutableSymbolTable(ImmutableSymbolTable[Key, Value]):
             return val
         return self.default_supplier()
 
-    def keys(self) -> Set[Key]:
+    def keys(self) -> set[Key]:
         return self.map.keys()
 
     def size(self) -> int:

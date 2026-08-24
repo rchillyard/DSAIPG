@@ -1,6 +1,8 @@
-import time
-from .trie import Trie
 import os
+import time
+
+from .trie import Trie
+
 
 def main():
     """
@@ -17,7 +19,7 @@ def main():
         return
 
     try:
-        with open(resource_path, 'r') as f:
+        with open(resource_path) as f:
             words = [line.strip() for line in f if line.strip()]
     except Exception as e:
         print(f"Error reading dictionary file: {e}")

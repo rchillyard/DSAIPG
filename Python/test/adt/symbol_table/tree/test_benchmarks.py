@@ -1,6 +1,8 @@
 import unittest
+
 from src.adt.symbol_table.tree.benchmarks import BSTBenchmark
 from src.adt.symbol_table.tree.bst_opt_del import BSTOptimisedDeletion
+
 
 class TestBSTBenchmark(unittest.TestCase):
 
@@ -10,7 +12,8 @@ class TestBSTBenchmark(unittest.TestCase):
         bst.put("b", 2)
         
         data = ["a", "b", "c"]
-        supplier = lambda: data
+        def supplier():
+            return data
         
         stats = BSTBenchmark.Stats(3)
         benchmark = BSTBenchmark(bst, 10, stats)
@@ -21,7 +24,8 @@ class TestBSTBenchmark(unittest.TestCase):
     def test_run_benchmark_with_empty_array(self):
         bst = BSTOptimisedDeletion(mode=2)
         data = []
-        supplier = lambda: data
+        def supplier():
+            return data
         
         stats = BSTBenchmark.Stats(0)
         benchmark = BSTBenchmark(bst, 10, stats)
@@ -39,7 +43,8 @@ class TestBSTBenchmark(unittest.TestCase):
         bst.put("a", 1)
         
         data = ["a"]
-        supplier = lambda: data
+        def supplier():
+            return data
         
         stats = BSTBenchmark.Stats(1)
         benchmark = BSTBenchmark(bst, 10, stats)
@@ -54,7 +59,8 @@ class TestBSTBenchmark(unittest.TestCase):
             bst.put(f"word{i}", i)
             
         data = [f"word{i}" for i in range(100)]
-        supplier = lambda: data
+        def supplier():
+            return data
         
         stats = BSTBenchmark.Stats(100)
         benchmark = BSTBenchmark(bst, 10, stats)

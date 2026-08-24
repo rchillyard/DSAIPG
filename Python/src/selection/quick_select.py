@@ -1,4 +1,5 @@
-from typing import List, TypeVar
+from typing import TypeVar
+
 from .select_base import Select
 from .shuffle import Shuffle
 
@@ -20,7 +21,7 @@ class QuickSelect(Select[X]):
         # until the implementation is filled in.
         pass
 
-    def select(self, xs: List[X], k: int) -> X:
+    def select(self, xs: list[X], k: int) -> X:
         """
         Selects the k-th smallest element from the given array.
         This method rearranges the elements in the array using a randomized selection algorithm
@@ -56,5 +57,5 @@ class QuickSelect(Select[X]):
         pass
 
     @staticmethod
-    def _swap(a: List[object], i: int, r: int):
+    def _swap(a: list[object], i: int, r: int):
         a[i], a[r] = a[r], a[i]

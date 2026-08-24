@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, TypeVar, Generic
+from typing import Generic, TypeVar
 
 X = TypeVar('X')
 
@@ -9,7 +9,7 @@ class Select(ABC, Generic[X]):
     """
 
     @abstractmethod
-    def select(self, a: List[X], k: int) -> X:
+    def select(self, a: list[X], k: int) -> X:
         """
         Selects the k-th smallest element from the given array.
 

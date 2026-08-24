@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
 from random import Random
-from typing import Iterator, List, Optional
 
 from .bag import Bag, Item
 from .unordered_iterator import UnorderedIterator
@@ -22,7 +22,7 @@ class BagArray(Bag[Item]):
 
     __slots__ = ("_items", "_count", "_random")
 
-    def __init__(self, rnd: Optional[Random] = None) -> None:
+    def __init__(self, rnd: Random | None = None) -> None:
         """
         Construct an empty BagArray with an initial capacity of 32.
 
@@ -32,7 +32,7 @@ class BagArray(Bag[Item]):
                  unpredictable.
         """
         self._count: int = 0
-        self._items: Optional[List[Optional[Item]]] = None
+        self._items: list[Item | None] | None = None
         self._grow([], 32)
         self._random: Random = rnd if rnd is not None else Random()
 
@@ -74,7 +74,7 @@ class BagArray(Bag[Item]):
             return 0
         return sum(1 for i in self._items if i is not None and i == item)
 
-    def as_array(self) -> List[Item]:
+    def as_array(self) -> list[Item]:
         """
         Return this bag's items as a list, excluding the unused tail of the
         backing store.
@@ -91,7 +91,7 @@ class BagArray(Bag[Item]):
     def __repr__(self) -> str:
         return f"BagArray(items={self.as_array()!r}, count={self._count})"
 
-    def _grow(self, source: List[Optional[Item]], size: int) -> None:
+    def _grow(self, source: list[Item | None], size: int) -> None:
         """
         Replace the internal storage with a copy of source expanded to size.
         """
@@ -105,7 +105,7 @@ class BagArray(Bag[Item]):
         return len(self) == self._capacity()
 
     @staticmethod
-    def _grow_from(source: List[Optional[Item]], size: int) -> List[Optional[Item]]:
+    def _grow_from(source: list[Item | None], size: int) -> list[Item | None]:
         """
         This fairly primitive grow method takes a list called source, creates a new
         list of the given size, copies all the elements of source into the start of

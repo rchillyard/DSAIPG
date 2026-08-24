@@ -1,5 +1,6 @@
 from abc import abstractmethod
-from typing import TypeVar, Optional
+from typing import TypeVar
+
 from src.adt.symbol_table.st import ST
 
 K = TypeVar('K')
@@ -19,7 +20,7 @@ class BST(ST[K, V]):
         pass
 
     @abstractmethod
-    def depth(self, key: Optional[K] = None) -> int:
+    def depth(self, key: K | None = None) -> int:
         """
         Return the depth of the tree (if key is None) or the depth of the key.
         """

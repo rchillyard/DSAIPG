@@ -1,27 +1,30 @@
+from collections.abc import Callable
+from typing import TypeVar
+
 import pytest
-from typing import TypeVar, Optional, Set, Callable, Dict
-from src.adt.symbol_table.st import ST
+
 from src.adt.symbol_table.base_immutable_symbol_table import BaseImmutableSymbolTable
+from src.adt.symbol_table.st import ST
 
 Key = TypeVar('Key')
 Value = TypeVar('Value')
 
 class MockST(ST[Key, Value]):
     def __init__(self):
-        self.internal_map: Dict[Key, Value] = {}
+        self.internal_map: dict[Key, Value] = {}
 
-    def get(self, key: Key) -> Optional[Value]:
+    def get(self, key: Key) -> Value | None:
         return self.internal_map.get(key)
 
-    def put(self, key: Key, value: Value) -> Optional[Value]:
+    def put(self, key: Key, value: Value) -> Value | None:
         old_value = self.internal_map.get(key)
         self.internal_map[key] = value
         return old_value
 
-    def delete(self, key: Key) -> Optional[Value]:
+    def delete(self, key: Key) -> Value | None:
         return self.internal_map.pop(key, None)
 
-    def keys(self) -> Set[Key]:
+    def keys(self) -> set[Key]:
         return set(self.internal_map.keys())
 
     def size(self) -> int:

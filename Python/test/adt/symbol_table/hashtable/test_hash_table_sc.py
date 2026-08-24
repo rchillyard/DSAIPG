@@ -1,6 +1,8 @@
-import unittest
 import random
+import unittest
+
 from src.adt.symbol_table.hashtable.hash_table_sc import HashTableSC
+
 
 class TestHashTableSC(unittest.TestCase):
 
@@ -95,9 +97,12 @@ class TestHashTableSC(unittest.TestCase):
         
         class MockHashTableSC(HashTableSC):
             def get_index(self, key):
-                if key == 1: return 1
-                if key == 2: return 0
-                if key == 3: return 1 # Collision with 1
+                if key == 1:
+                    return 1
+                if key == 2:
+                    return 0
+                if key == 3:
+                    return 1  # Collision with 1
                 return super().get_index(key)
 
         hash_table = MockHashTableSC(2)

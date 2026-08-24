@@ -1,4 +1,5 @@
 import pytest
+
 from src.adt.bqs.queue_array import QueueArray
 
 

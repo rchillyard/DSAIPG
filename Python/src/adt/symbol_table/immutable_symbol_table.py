@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, Set, Optional, Callable
+from collections.abc import Callable
+from typing import Generic, TypeVar
 
 Key = TypeVar('Key')
 Value = TypeVar('Value')
@@ -10,7 +11,7 @@ class ImmutableSymbolTable(ABC, Generic[Key, Value]):
     """
 
     @abstractmethod
-    def get(self, key: Key) -> Optional[Value]:
+    def get(self, key: Key) -> Value | None:
         """
         Retrieve the value for a given key.
 
@@ -23,7 +24,7 @@ class ImmutableSymbolTable(ABC, Generic[Key, Value]):
         pass
 
     @abstractmethod
-    def keys(self) -> Set[Key]:
+    def keys(self) -> set[Key]:
         """
         Get the set of keys in this symbol table.
 

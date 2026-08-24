@@ -2,6 +2,7 @@ import unittest
 
 from src.selection.entropy import Entropy
 
+
 class TestEntropy(unittest.TestCase):
 
     def test_get_random_with_seed(self):
