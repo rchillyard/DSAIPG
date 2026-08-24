@@ -278,8 +278,7 @@ public class HuffmanCoding {
         private Map<String, Code> getEncoder(Node node) {
             Map<String, Code> result = new HashMap<>();
             // TO BE IMPLEMENTED 
-            // END SOLUTION
-            return result;
+                        throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         }
 
         /**
@@ -334,8 +333,7 @@ public class HuffmanCoding {
          */
         private Node decode(StringBuilder stringBuilder, Node state, long x) {
             // TO BE IMPLEMENTED 
-            // END SOLUTION
-            return state;
+                        throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         }
 
         /**
