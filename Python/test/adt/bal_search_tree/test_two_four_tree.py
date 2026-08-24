@@ -1,11 +1,12 @@
 import unittest
-import sys
-import os
 
-# Add the src directory to the path so we can import modules
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../src')))
+from src.adt.bal_search_tree.two_four_tree import TwoFourTree
 
-from adt.bal_search_tree.two_four_tree import TwoFourTree
+# TwoFourTree is a skeleton: its Java counterpart says "Ignore this class.
+# There are no unit tests," and has none.  These tests therefore only pin down
+# the skeleton's current shape -- notably that `get` is a placeholder that
+# always returns None -- rather than any 2-4 tree behaviour.
+
 
 class TestTwoFourTree(unittest.TestCase):
     def test_initialization(self):
@@ -13,8 +14,8 @@ class TestTwoFourTree(unittest.TestCase):
         tree = TwoFourTree[int, str]()
         self.assertIsNone(tree.root)
 
-    def test_get_unimplemented(self):
-        """Test that get returns None (as currently unimplemented)."""
+    def test_get_is_a_placeholder(self):
+        """`get` is a stub that returns None for every key, implemented or not."""
         tree = TwoFourTree[int, str]()
         self.assertIsNone(tree.get(10))
 

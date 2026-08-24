@@ -30,19 +30,23 @@ class TestEntropy(unittest.TestCase):
         self.assertIsInstance(actual, int)
 
     def test_get_entropy_1(self):
+        # EntropyTest.testGetEntropy1 in Java also asserts the *values* drawn,
+        # but those assertions are seeded from the clock and, as its comment
+        # says, are "only good for about 66 2/3 hours" -- which is why the Java
+        # test is commented out.  Only the bit accounting is deterministic, so
+        # that is all this test checks.
         entropy = Entropy(25) # 32 bits
         self.assertEqual(32, entropy.get_bits())
-        
-        # Taking 6 bits
-        six = entropy.get_entropy(6) 
-        # 32 - 6 = 26
+
+        # Taking 6 bits leaves 32 - 6 = 26
+        entropy.get_entropy(6)
         self.assertEqual(26, entropy.get_bits())
-        
+
         entropy.get_entropy(8) # 18
         entropy.get_entropy(8) # 10
         entropy.get_entropy(8) # 2
-        
-        actual = entropy.get_entropy(2)
+
+        entropy.get_entropy(2)
         self.assertEqual(0, entropy.get_bits())
 
     def test_get_entropy_2(self):
