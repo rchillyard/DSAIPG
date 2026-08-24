@@ -2,8 +2,8 @@
 from __future__ import annotations
 from typing import Generic, TypeVar, Dict
 from collections.abc import Iterable, Collection
-from adt.bqs.bag import Bag
-from adt.bqs.bag_array import BagArray
+from src.adt.bqs.bag import Bag
+from src.adt.bqs.bag_array import BagArray
 from .graph import Graph
 
 V = TypeVar("V")

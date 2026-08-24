@@ -73,11 +73,17 @@ class BSTSimple(BST[K, V]):
         return original_value
 
     def keys(self) -> Iterable[K]:
-        keys_set = set()
-        def visitor(k, v):
-            keys_set.add(k)
-        self._in_order_traverse(self.root, visitor)
-        return keys_set
+        """
+        Return this tree's keys in ascending order.
+
+        NOTE: the keys are collected into a list, not a set. BSTSimple.keySet()
+        in Java uses a TreeSet, so its iteration order is the key order; a plain
+        Python set would discard that, which for a binary search tree is the one
+        property most worth keeping.
+        """
+        result: List[K] = []
+        self._in_order_traverse(self.root, lambda k, v: result.append(k))
+        return result
 
     def depth(self, key: Optional[K] = None) -> int:
         if key is None:

@@ -24,13 +24,17 @@ class UF_HWQUPC(UF):
         return self._count
 
     def find(self, p: int) -> int:
+        """
+        Return the component identifier for the component containing site p.
+
+        Raises:
+            IndexError: unless 0 <= p < n.
+        """
         self._validate(p)
         root = p
-        while root != self._parent[root]:
-            if self._path_compression:
-                self._do_path_compression(root)
-            root = self._parent[root]
-        return root
+        # TO BE IMPLEMENTED  walk up to the root, compressing the path on the way if enabled
+        raise NotImplementedError("TO BE IMPLEMENTED")
+        # END SOLUTION
 
     def is_connected(self, p: int, q: int) -> bool:
         return self.find(p) == self.find(q)
@@ -73,12 +77,17 @@ class UF_HWQUPC(UF):
         return self._parent[i]
 
     def _merge_components(self, i: int, j: int) -> None:
-        if self._height[i] < self._height[j]:
-            self._update_parent(i, j)
-            self._update_height(j, i)
-        else:
-            self._update_parent(j, i)
-            self._update_height(i, j)
+        """
+        Merge the components rooted at i and j, weighting by height.
+        """
+        # TO BE IMPLEMENTED  make shorter root point to taller one
+        raise NotImplementedError("TO BE IMPLEMENTED")
+        # END SOLUTION
 
     def _do_path_compression(self, i: int) -> None:
-        self._update_parent(i, self._parent[self._parent[i]])
+        """
+        Implement the single-pass path-halving mechanism of path compression.
+        """
+        # TO BE IMPLEMENTED  update parent to value of grandparent
+        raise NotImplementedError("TO BE IMPLEMENTED")
+        # END SOLUTION

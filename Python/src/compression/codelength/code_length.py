@@ -1,4 +1,4 @@
-from com.phasmidsoftware.dsaipg.compression.codelength.solution import Solution
+from .solution import Solution
 
 class CodeLength:
     """

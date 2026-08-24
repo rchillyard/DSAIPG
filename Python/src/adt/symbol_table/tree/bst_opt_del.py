@@ -111,8 +111,24 @@ class BSTOptimisedDeletion(BST[K, V]):
         return None
 
     def keys(self) -> Iterable[K]:
-        # TODO: Implement properly
-        raise NotImplementedError("TO BE IMPLEMENTED")
+        """
+        Return this tree's keys in ascending order.
+
+        NOTE: this is not an exercise. In the Java tree, keys() is a provided
+        default method on the BST interface that delegates to keySet(), and only
+        BSTOptimisedDeletion.keySet() is left returning null -- which makes the
+        class unusable anywhere keys are needed. It is implemented here.
+        """
+        result: List[K] = []
+        self._in_order_traverse(self.root, lambda k, v: result.append(k))
+        return result
+
+    def _in_order_traverse(self, node: Optional[_Node], visitor) -> None:
+        if not node:
+            return
+        self._in_order_traverse(node.smaller, visitor)
+        visitor(node.key, node.value)
+        self._in_order_traverse(node.larger, visitor)
 
     def depth(self, key: Optional[K] = None) -> int:
         if key is None:
