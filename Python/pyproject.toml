@@ -1,7 +1,7 @@
 [project]
-name = "python"
-version = "0.1.0"
-description = "Add your description here"
+name = "dsaipg"
+version = "1.2.0"
+description = "Python companion code for 'Data Structures, Algorithms, and Invariants--A Practical Guide' by Robin Hillyard"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -12,3 +12,25 @@ dependencies = [
 dev = [
     "ruff>=0.14.5",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+pythonpath = ["."]
+# NOTE: do not narrow python_functions to "test_*".  Several tests here are
+# named test1, test2, ... in the style of the Java originals, and pytest's
+# default of "test*" is what picks them up.
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+# A deliberately modest rule set for a teaching repository: correctness (E, F),
+# consistent import order (I) and modern type syntax (UP).  Most violations of
+# these are auto-fixable, which keeps the barrier low for students.
+select = ["E4", "E7", "E9", "F", "I", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# Re-export modules exist precisely to expose names they do not themselves use.
+"__init__.py" = ["F401"]
