@@ -90,6 +90,9 @@ public class TwoSumBenchmarkTest {
             }).runFromSupplier(supplier, runs);
             assertTrue(t1 >= 0);
         } catch (Exception e) {
+            // NOTE ImplementationMissing extends RuntimeException, so it would
+            // otherwise be swallowed here and reported as a genuine failure.
+            CancelOnNotImplemented.rethrowIfUnimplemented(e);
             throw new AssertionError("Benchmark failed to handle empty arrays.");
         }
     }

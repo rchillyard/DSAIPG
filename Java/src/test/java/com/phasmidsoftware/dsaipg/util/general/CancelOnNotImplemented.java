@@ -61,6 +61,35 @@ public class CancelOnNotImplemented implements TestRule {
     }
 
     /**
+     * Rethrow the given throwable if it signals an unwritten exercise, otherwise
+     * do nothing.
+     *
+     * For use in a test which catches broadly and would otherwise swallow the
+     * signal before the rule can see it. ImplementationMissing extends
+     * RuntimeException, so `catch (Exception e)` absorbs it and whatever the test
+     * throws instead is reported as a genuine failure. Call this first inside such
+     * a catch block:
+     *
+     * <pre>
+     *     try {
+     *         ...
+     *     } catch (Exception e) {
+     *         CancelOnNotImplemented.rethrowIfUnimplemented(e);
+     *         throw new AssertionError("...");
+     *     }
+     * </pre>
+     *
+     * This is the Java counterpart of tryOrCancel and its siblings in the Scala
+     * CancelOnNotImplemented, which exist for the same reason.
+     *
+     * @param thrown the exception the test caught.
+     */
+    public static void rethrowIfUnimplemented(Throwable thrown) {
+        Throwable unimplemented = findUnimplemented(thrown);
+        if (unimplemented instanceof RuntimeException runtimeException) throw runtimeException;
+    }
+
+    /**
      * Look for an unimplemented-exercise exception, at the top of the given
      * throwable or anywhere in its cause chain. Checking the chain matters
      * because a stub reached through a stream, a lambda or a reflective call
