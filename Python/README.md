@@ -25,22 +25,36 @@ Without it:
     .venv/bin/pip install pytest ruff
     .venv/bin/python -m pytest
 
-You should see 362 tests, 298 of them green.
+You should see 362 tests: 298 green and 64 skipped, and nothing red.
 
-## The failing tests are the point
+## The skipped tests are the point
 
-The 64 failures are not a broken installation.
-Each one is a method whose body reads:
+A skipped test is one which reached a method you have not written yet.
+Each is a method whose body reads:
 
     # TO BE IMPLEMENTED
     raise NotImplementedError("TO BE IMPLEMENTED")
 
 Replacing those bodies with working code is the exercise, and the tests
 already assert what the finished code should do.
-So a test that fails now should pass once you have done the work,
-and if a test still fails after you believe you are finished, trust the test.
+So a skipped test should turn green once you have done the work.
 
-To find the stubs, search the tree for `TO BE IMPLEMENTED`.
+**Anything red is a real problem**--either a mistake in your code,
+or something wrong with your installation.
+That is the whole point of the skips:
+they keep the red/green signal meaning something while the work is unfinished.
+
+To find the work, run the tests with `-rs`, which lists the reason for each skip:
+
+    uv run pytest -rs
+
+Each names the file and the line waiting for you, for example
+`You need to implement the code at src/adt/bqs/d_list.py:87`.
+That is more useful than hunting for the stubs,
+because it also tells you how many tests each one is holding up--
+`uf_hwqupc.py` accounts for 18 of them, `bag_array.py` for 10.
+
+You can also search the tree for `TO BE IMPLEMENTED`.
 In PyCharm or IntelliJ, adding `\bTO BE IMPLEMENTED\b.*` as a TODO pattern
 makes them all show up in the TODO tool window.
 

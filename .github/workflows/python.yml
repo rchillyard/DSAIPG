@@ -46,5 +46,9 @@ jobs:
       - name: Every module under src can be imported
         run: uv run pytest test/test_imports.py -q
 
-      - name: Tests fail only where an exercise is unwritten
-        run: uv run python tools/check_stub_failures.py
+      # A plain pytest is a meaningful gate now that conftest.py reports an
+      # unwritten exercise as skipped: red means a real failure, not coursework
+      # not yet done. Before that it was permanently red and said nothing, which
+      # is what tools/check_stub_failures.py existed to work around.
+      - name: Tests
+        run: uv run pytest -rs

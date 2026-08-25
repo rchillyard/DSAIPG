@@ -75,11 +75,16 @@ If you would rather not use `uv`, a plain virtual environment works just as well
     .venv/bin/pip install pytest ruff
     .venv/bin/python -m pytest
 
-Either way you should see 362 tests, of which 298 run green.
-As with the Java tests, don't worry about the failures.
-Every one of the 64 is a stub raising `NotImplementedError("TO BE IMPLEMENTED")`,
-and each is somewhere you need to write code.
-If you see a failure that is *not* that, something is wrong with your installation.
+Either way you should see 362 tests: 298 green and 64 skipped, and nothing red.
+A skipped test is one which reached a method you have not written yet,
+and it will turn green once you have written it.
+Anything red is a real problem, not an unfinished exercise.
+
+To see what each skip is waiting for, add `-rs`:
+
+    uv run pytest -rs
+
+which reports, for each, the file and line to go and write.
 
 There is a linter configured, which is worth running before you submit anything:
 
