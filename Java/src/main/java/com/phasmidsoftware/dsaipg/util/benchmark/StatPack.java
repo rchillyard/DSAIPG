@@ -133,6 +133,17 @@ public class StatPack {
     private final HashMap<String, Statistics> map;
     private final int n;
 
-    public static final StatPack EMPTY = new StatPack(null, 0, 0);
+    /**
+     * Yield a StatPack which tracks nothing and for which isInvalid() is true.
+     *
+     * NOTE a method rather than a shared constant. A StatPack is mutable, so a
+     * single shared instance is shared mutable state; this one happens to be
+     * safe only because add() on it would throw.
+     *
+     * @return a new empty StatPack.
+     */
+    public static StatPack empty() {
+        return new StatPack(null, 0, 0);
+    }
 
 }

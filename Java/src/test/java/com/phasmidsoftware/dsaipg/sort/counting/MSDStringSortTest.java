@@ -239,7 +239,7 @@ public class MSDStringSortTest {
         try {
             final File file = new File(getPathname(resource, MSDStringSortTest.class));
             final String[] result = getWordArray(file, stringListFunction, 2);
-            System.out.println("getWords: testing with " + Utilities.formatWhole(result.length) + " unique words: from " + file);
+            System.out.println("getWords: testing with " + Utilities.formatWholeWithCommas(result.length) + " unique words: from " + file);
             return result;
         } catch (final FileNotFoundException e) {
             System.out.println("Cannot find resource: " + resource);

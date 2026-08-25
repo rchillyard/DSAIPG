@@ -101,13 +101,4 @@ public class Utilities {
         return Math.log(n) / Math.log(2);
     }
 
-    /**
-     * Create a string representing an integer, with commas to separate thousands.
-     *
-     * @param x the integer.
-     * @return a String representing the number with commas.
-     */
-    public static String formatWhole(final int x) {
-        return String.format("%,d", x);
-    }
 }

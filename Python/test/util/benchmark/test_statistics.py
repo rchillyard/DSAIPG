@@ -50,6 +50,20 @@ class TestStatistics:
             statistics.add(x)
         assert str(statistics) == "test: n=4; mean=1; stdDev=2; normalized=0.721"
 
+    def test_str_reports_the_count_not_the_capacity(self):
+        # The Java original reported the capacity here, so a store of 4 holding
+        # 2 values said n=4. Corrected in both trees.
+        statistics = Statistics("test", normalizer_linearithmic_natural, 4, 2)
+        statistics.add(1)
+        statistics.add(1)
+        assert str(statistics) == "test: n=2; mean=1; normalized=0.721"
+
+    def test_str_after_the_store_has_grown(self):
+        statistics = Statistics("test", normalizer_linearithmic_natural, 2, 2)
+        for _ in range(3):
+            statistics.add(1)
+        assert "n=3" in str(statistics)
+
     def test_str_before_anything_is_added(self):
         assert str(Statistics("test", identity, 4, 2)) == "test: <unset>"
 

@@ -114,13 +114,14 @@ class Statistics:
 
     def __str__(self) -> str:
         """
-        NOTE "n" here is the capacity of the store, not the number of values
-        added, which is what the Java original reports.  The two differ once the
-        store has been grown.
+        NOTE "n" is the number of values added, not the capacity of the store.
+        The Java original reported the capacity until this was corrected; the two
+        differ whenever fewer than n_runs values have been added, and again once
+        the store has grown.
         """
         if not self._updated:
             return f"{self._property}: <unset>"
-        parts = [f"{self._property}: n={len(self._doubles)}", f"mean={as_int(self.mean())}"]
+        parts = [f"{self._property}: n={self._count}", f"mean={as_int(self.mean())}"]
         if self.std_dev() > 0.0:
             parts.append(f"stdDev={as_int(self.std_dev())}")
         parts.append(f"normalized={format_decimal_3_places(self.normalized_mean())}")
