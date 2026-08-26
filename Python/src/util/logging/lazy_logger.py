@@ -110,11 +110,9 @@ class LazyLogger:
         Log at the given level, resolving the message only if the level is
         enabled.
 
-        NOTE the level is tested on each call, whereas the Java caches
-        isDebugEnabled and isTraceEnabled in the constructor. Testing here costs
-        almost nothing -- it is what the caching was avoiding in the first place,
-        one integer comparison -- and it means raising the level at runtime takes
-        effect, which under the Java it does not.
+        NOTE the level is tested on each call, as it is in the Java. That costs
+        one comparison, which is the very thing the lazy evaluation exists to
+        protect, and it means a level changed after construction takes effect.
         """
         if not self._logger.isEnabledFor(level):
             return

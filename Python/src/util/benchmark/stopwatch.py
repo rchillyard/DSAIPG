@@ -45,10 +45,10 @@ class Stopwatch:
         assert self._start is not None, "Stopwatch is closed"
         lap_start = self._start
         self._start = _clock()
-        # NOTE each reading is divided before the subtraction, following the
-        # Java. That is not the same as dividing the difference: it can be off by
-        # one unit, because the two readings truncate independently.
-        return self._start // self._time_factor - lap_start // self._time_factor
+        # NOTE divide the elapsed time, not each reading. Dividing the readings
+        # separately truncates each one independently, so the result could be out
+        # by one unit in either direction.
+        return (self._start - lap_start) // self._time_factor
 
     def close(self) -> None:
         """

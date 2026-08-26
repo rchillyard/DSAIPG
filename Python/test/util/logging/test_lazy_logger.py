@@ -41,8 +41,8 @@ class TestLaziness:
         assert counter.calls == 0, "TRACE should be off when the level is DEBUG"
 
     def test_the_level_can_be_raised_after_construction(self, caplog):
-        # The Java caches isDebugEnabled in its constructor, so this does not
-        # hold there. We test the level on each call instead.
+        # The Java used to cache isDebugEnabled in its constructor, so this did
+        # not hold there. Both trees now test the level on each call.
         logger = LazyLogger("test.lazy.late")
         logger.get_logger().setLevel(logging.WARNING)
         counter = Counter()

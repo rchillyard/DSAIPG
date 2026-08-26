@@ -46,18 +46,13 @@ class TimeLogger:
 
 def format_time(time: float) -> str:
     """
-    Format a time to four decimal places.
+    Format a time to four decimal places, with no thousands separators.
 
-    NOTE there is no leading zero: 0.5 formats as ".5000", not "0.5000". That is
-    what the Java produces, because its DecimalFormat pattern is "######.0000",
-    whose integer part is all "#" and so renders a zero as nothing at all.
+    This matches the Java, whose DecimalFormat pattern is "#####0.0000". The
+    final "0" of the integer part is what puts the leading zero on a value below
+    one; the pattern used to end in "#", and 0.5 came out as ".5000".
 
     :param time: the time to format.
     :return: the formatted time.
     """
-    result = f"{time:.4f}"
-    if result.startswith("0."):
-        return result[1:]
-    if result.startswith("-0."):
-        return "-" + result[2:]
-    return result
+    return f"{time:.4f}"
