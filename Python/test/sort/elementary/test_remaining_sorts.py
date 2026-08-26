@@ -27,8 +27,7 @@ class TestEverySortSorts:
         xs = [3, 1, 4, 1, 5, 9, 2, 6]
         assert sorter(cls, len(xs)).sort(xs) == sorted(xs)
 
-    # NOTE RandomSort is absent: it cannot sort an empty list. See TestRandomSort.
-    @pytest.mark.parametrize("cls", [HeapSort, ShellSort])
+    @pytest.mark.parametrize("cls", SORTS)
     def test_an_empty_list(self, cls):
         assert sorter(cls, 0).sort([]) == []
 
@@ -75,9 +74,7 @@ class TestEverySortSorts:
         xs = [3, 1, 4, 1, 5]
         assert sorter(cls, len(xs), INSTRUMENTED).sort(xs) == sorted(xs)
 
-    # NOTE HeapSort is deliberately absent from the sub-range test below: it
-    # ignores from and to. See TestHeapSort.
-    @pytest.mark.parametrize("cls", [ShellSort, RandomSort])
+    @pytest.mark.parametrize("cls", SORTS)
     def test_sorting_a_range_leaves_the_rest_alone(self, cls):
         xs = [9, 3, 1, 2, 9]
         sorter(cls, 5).sort_range(xs, 1, 4)
@@ -85,15 +82,17 @@ class TestEverySortSorts:
 
 
 class TestHeapSort:
-    def test_it_ignores_the_range_it_is_given(self):
-        # RECORDED, NOT ENDORSED. HeapSort uses len(xs) throughout and never
-        # looks at from_ or to, so asking it to sort part of a list silently
-        # sorts all of it. Every other sort here honours the range. Making it
-        # work means offsetting every index in the heap arithmetic, which is a
-        # change worth making deliberately rather than in passing.
+    def test_it_honours_the_range_it_is_given(self):
+        # It used to use len(xs) throughout and never look at from_ or to, so
+        # sorting part of a list silently sorted all of it.
         xs = [9, 3, 1, 2, 9]
         sorter(HeapSort, 5).sort_range(xs, 1, 4)
-        assert xs == [1, 2, 3, 9, 9], "the whole list was sorted, not xs[1:4]"
+        assert xs == [9, 1, 2, 3, 9]
+
+    def test_it_honours_a_range_at_the_end(self):
+        xs = [5, 4, 3, 2, 1]
+        sorter(HeapSort, 5).sort_range(xs, 2, 5)
+        assert xs == [5, 4, 1, 2, 3]
 
     def test_it_is_n_log_n_ish_on_a_reversed_list(self):
         # Heap sort's worth is that its worst case is still n log n.
@@ -155,13 +154,10 @@ class TestRandomSort:
         xs = list(range(CUTOFF - 1, -1, -1))
         assert sorter(RandomSort, len(xs)).sort(xs) == sorted(xs)
 
-    def test_it_cannot_sort_an_empty_list(self):
-        # RECORDED, NOT ENDORSED. RandomSort builds its QuickRandom before
-        # testing the cutoff, and QuickRandom rejects a range of zero, so an
-        # empty list raises instead of sorting trivially. The Java does the same.
-        # Every other sort in the tree handles an empty list.
-        with pytest.raises(ValueError, match="N must be positive"):
-            sorter(RandomSort, 0).sort([])
+    def test_it_sorts_an_empty_list(self):
+        # It used to build its QuickRandom before testing the cutoff, and
+        # QuickRandom rejects a range of zero, so an empty list raised.
+        assert sorter(RandomSort, 0).sort([]) == []
 
     def test_a_list_above_the_cutoff_uses_it(self):
         rng = random.Random(5)

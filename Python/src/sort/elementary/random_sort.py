@@ -50,9 +50,12 @@ class RandomSort(SortWithHelper[X]):
         n = to - from_
         helper = self.get_helper()
         instrumented = helper.instrumented()
-        r = QuickRandom(n, 0)
         inversions = helper.inversions(xs) if instrumented else 0
         if n > CUTOFF:
+            # NOTE built here, not above. QuickRandom rejects a range of zero, so
+            # building it before this test meant an empty list raised rather than
+            # sorting trivially.
+            r = QuickRandom(n, 0)
             m = int(FACTOR * lg(n) * n)
             for _ in range(m):
                 helper.swap_conditional(xs, r.get() + from_, r.get())

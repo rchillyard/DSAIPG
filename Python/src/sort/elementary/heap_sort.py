@@ -26,54 +26,56 @@ class HeapSort(SortWithHelper[X]):
 
     def sort_range(self, xs: list[X], from_: int, to: int) -> None:
         """
-        Sort xs.
+        Sort xs between from_ and to.
 
-        NOTE from_ and to are ignored: this sorts the whole list, as the Java
-        does. Passing a sub-range silently sorts everything, so HeapSort does not
-        honour the Sort contract the way the other sorts here do. Recorded rather
-        than fixed, because making it work over a range means offsetting every
-        index in the heap arithmetic, which is a change worth making
-        deliberately.
+        NOTE the heap occupies xs[from_:to], so heap index k is xs[from_ + k].
+        This used to ignore from_ and to and work on the whole list, so asking it
+        to sort part of one silently sorted all of it.
 
         :param xs: the list to sort.
-        :param from_: ignored.
-        :param to: ignored.
+        :param from_: the index of the first element to sort.
+        :param to: the index one past the last element to sort.
         """
-        if xs is None or len(xs) <= 1:
+        n = to - from_
+        if xs is None or n <= 1:
             return
         # construction phase
-        self._build_max_heap(xs)
+        self._build_max_heap(xs, from_, n)
         # sort-down phase
         helper = self.get_helper()
-        for i in range(len(xs) - 1, 0, -1):
-            helper.swap(xs, 0, i)
-            self._heapify(xs, i, 0)
+        for i in range(n - 1, 0, -1):
+            helper.swap(xs, from_, from_ + i)
+            self._heapify(xs, from_, i, 0)
 
-    def _build_max_heap(self, xs: list[X]) -> None:
+    def _build_max_heap(self, xs: list[X], from_: int, n: int) -> None:
         """
-        Rearrange xs so that every parent is at least as large as its children.
+        Rearrange the heap so that every parent is at least as large as its
+        children.
 
         :param xs: the list.
+        :param from_: the index at which the heap begins.
+        :param n: the number of elements in the heap.
         """
-        for i in range(len(xs) // 2, -1, -1):
-            self._heapify(xs, len(xs), i)
+        for i in range(n // 2, -1, -1):
+            self._heapify(xs, from_, n, i)
 
-    def _heapify(self, xs: list[X], heap_size: int, index: int) -> None:
+    def _heapify(self, xs: list[X], from_: int, heap_size: int, index: int) -> None:
         """
         Restore the heap property at index, assuming it holds below.
 
         :param xs: the list.
+        :param from_: the index at which the heap begins.
         :param heap_size: the number of elements still in the heap.
-        :param index: the index to sift down from.
+        :param index: the heap index to sift down from.
         """
         helper = self.get_helper()
         left = index * 2 + 1
         right = index * 2 + 2
         largest = index
-        if left < heap_size and helper.compare_at(xs, largest, left) < 0:
+        if left < heap_size and helper.compare_at(xs, from_ + largest, from_ + left) < 0:
             largest = left
-        if right < heap_size and helper.compare_at(xs, largest, right) < 0:
+        if right < heap_size and helper.compare_at(xs, from_ + largest, from_ + right) < 0:
             largest = right
         if index != largest:
-            helper.swap(xs, index, largest)
-            self._heapify(xs, heap_size, largest)
+            helper.swap(xs, from_ + index, from_ + largest)
+            self._heapify(xs, from_, heap_size, largest)
