@@ -28,46 +28,53 @@ def msd(n, mapper=ASCIIExt, config=PLAIN):
 class TestRadixSort:
     def test_a_small_list(self):
         xs = [170, 45, 75, 90, 802, 24, 2, 66]
-        radix_sort.sort(xs, 0, len(xs) - 1)
+        radix_sort.sort(xs, 0, len(xs))
         assert xs == sorted(xs)
 
     def test_a_random_list(self):
         rng = random.Random(42)
         xs = [rng.randint(0, 99999) for _ in range(500)]
         expected = sorted(xs)
-        radix_sort.sort(xs, 0, len(xs) - 1)
+        radix_sort.sort(xs, 0, len(xs))
         assert xs == expected
 
     def test_duplicates(self):
         xs = [5, 3, 5, 3, 1, 1, 5]
-        radix_sort.sort(xs, 0, len(xs) - 1)
+        radix_sort.sort(xs, 0, len(xs))
         assert xs == sorted([5, 3, 5, 3, 1, 1, 5])
 
     def test_already_sorted(self):
         xs = list(range(50))
-        radix_sort.sort(xs, 0, 49)
+        radix_sort.sort(xs, 0, 50)
         assert xs == list(range(50))
 
     def test_zeros(self):
         xs = [0, 0, 0]
-        radix_sort.sort(xs, 0, 2)
+        radix_sort.sort(xs, 0, 3)
         assert xs == [0, 0, 0]
 
     def test_a_sub_range(self):
-        # NOTE to is INCLUSIVE here, unlike everywhere else in the tree.
+        # to is exclusive, so this covers indices 1 to 4 inclusive. With the old
+        # inclusive "to" the last element of the range was left where it was.
         xs = [99, 5, 3, 4, 1, 99]
-        radix_sort.sort(xs, 1, 4)
+        radix_sort.sort(xs, 1, 5)
         assert xs == [99, 1, 3, 4, 5, 99]
 
     def test_a_single_element(self):
         xs = [7]
-        radix_sort.sort(xs, 0, 0)
+        radix_sort.sort(xs, 0, 1)
         assert xs == [7]
 
-    def test_from_equal_to_does_nothing(self):
+    def test_an_empty_range_does_nothing(self):
         xs = [3, 1, 2]
         radix_sort.sort(xs, 1, 1)
         assert xs == [3, 1, 2]
+
+    def test_the_whole_list_is_now_legal(self):
+        # to == len is in range when to is exclusive, and used to raise.
+        xs = [3, 1, 2]
+        radix_sort.sort(xs, 0, 3)
+        assert xs == [1, 2, 3]
 
     def test_from_after_to(self):
         with pytest.raises(ValueError, match="From value should be less than to"):
@@ -80,20 +87,20 @@ class TestRadixSort:
             radix_sort.sort([3, 1, 2], -1, 2)
 
     def test_find_max_int(self):
-        assert radix_sort.find_max_int([3, 9, 2, 7], 0, 3) == 9
-        assert radix_sort.find_max_int([3, 9, 2, 7], 2, 3) == 7
+        assert radix_sort.find_max_int([3, 9, 2, 7], 0, 4) == 9
+        assert radix_sort.find_max_int([3, 9, 2, 7], 2, 4) == 7
 
     def test_count_sort_is_stable(self):
         # Stability is what makes the successive passes work. These all have the
         # same units digit, so a pass by units must leave them exactly as they
         # are -- otherwise the order an earlier pass established would be lost.
         xs = [21, 11, 31]
-        radix_sort.count_sort(xs, 1, 0, 2)
+        radix_sort.count_sort(xs, 1, 0, 3)
         assert xs == [21, 11, 31]
 
     def test_count_sort_orders_by_the_selected_digit(self):
         xs = [21, 11, 31]
-        radix_sort.count_sort(xs, 10, 0, 2)
+        radix_sort.count_sort(xs, 10, 0, 3)
         assert xs == [11, 21, 31]
 
 
