@@ -545,6 +545,16 @@ class TestCutoff:
     def test_the_msd_cutoff(self):
         assert instrumented().msd_cutoff() == 256
 
+    def test_the_msd_cutoff_does_not_depend_on_instrumentation(self):
+        # The Java had MSDCutoff() only on the instrumented Helper, so MSD radix
+        # sort cut over to quicksort at 20 for an ordinary run and at 256 when
+        # measured -- the measurements described a different algorithm.
+        assert plain().msd_cutoff() == instrumented().msd_cutoff() == 256
+
+    def test_a_configured_msd_cutoff(self):
+        config = setup_config("false", "", "0", "0", "", "").copy("helper", "msdcutoff", "64")
+        assert NonInstrumentingHelper("test", config).msd_cutoff() == 64
+
 
 class TestRandom:
     def test_it_builds_a_list_of_the_right_length(self):

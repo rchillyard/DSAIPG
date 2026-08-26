@@ -21,16 +21,13 @@ from src.sort.helper.helper_exception import HelperException
 from src.sort.helper.instrument import INSTRUMENTING, INVERSIONS, Instrument
 from src.sort.helper.instrumenter import Instrumenter
 from src.util.config.config import Config
-from src.util.config.config_benchmark import HELPER, MSDCUTOFF, get_seed
+from src.util.config.config_benchmark import HELPER, get_seed
 from src.util.general.utilities import format_whole
 from src.util.logging.lazy_logger import LazyLogger
 
 X = TypeVar("X")
 
 logger = LazyLogger(__name__)
-
-#: The default cutoff for MSD radix sort.
-MSD_CUTOFF_DEFAULT = 256
 
 #: The default number of runs, when [helper] runs is not set.
 DEFAULT_RUNS = 1
@@ -72,7 +69,6 @@ class InstrumentedHelper(BaseHelper[X]):
             instrumenter = Instrumenter.from_config(config)
         super().__init__(description, config, comparator, n, random, instrumenter)
         self.count_inversions = config.get_int(INSTRUMENTING, INVERSIONS, 0)
-        self.msd_cutoff_value = config.get_int(HELPER, MSDCUTOFF, MSD_CUTOFF_DEFAULT)
         self.n_runs = get_runs_config(config) if n_runs is None else n_runs
         self.max_depth_reached = 0
 
@@ -248,9 +244,6 @@ class InstrumentedHelper(BaseHelper[X]):
         return self.swap_conditional(xs, i - 1, i)
 
     # ---- depth, initialization and reporting ----------------------------
-
-    def msd_cutoff(self) -> int:
-        return self.msd_cutoff_value
 
     def init(self, n: int) -> None:
         """

@@ -24,10 +24,13 @@ from src.sort.helper.helper_exception import HelperException
 from src.sort.helper.instrument import Instrument
 from src.util.benchmark.stat_pack import StatPack
 from src.util.config.config import Config
-from src.util.config.config_benchmark import CUTOFF, CUTOFF_DEFAULT, HELPER
+from src.util.config.config_benchmark import CUTOFF, CUTOFF_DEFAULT, HELPER, MSDCUTOFF
 from src.util.general.utilities import fill_random_array
 
 X = TypeVar("X")
+
+#: The default cutoff for MSD radix sort, as documented in config.ini.
+MSD_CUTOFF_DEFAULT = 256
 
 
 class BaseHelper(Helper[X]):
@@ -57,6 +60,7 @@ class BaseHelper(Helper[X]):
         self.random_source = random if random is not None else Random()
         self.instrumenter = instrumenter
         self.configured_cutoff = config.get_int(HELPER, CUTOFF, 0)
+        self.configured_msd_cutoff = config.get_int(HELPER, MSDCUTOFF, MSD_CUTOFF_DEFAULT)
         self.random_array: list[X] | None = None
 
     @abstractmethod
@@ -102,6 +106,18 @@ class BaseHelper(Helper[X]):
         recurse for ever, so anything below one is treated as unset.
         """
         return self.configured_cutoff if self.configured_cutoff >= 1 else CUTOFF_DEFAULT
+
+    def msd_cutoff(self) -> int:
+        """
+        :return: the cutoff below which MSD radix sort hands over to quicksort.
+
+        NOTE this lives here, not on the instrumented Helper, so that it is the
+        same whether or not we are counting. While the Java had it only on the
+        instrumented one, MSD cut over at 20 for an ordinary run and at 256 when
+        instrumented, so the measurements described a different algorithm from
+        the one that normally ran.
+        """
+        return self.configured_msd_cutoff
 
     def close(self) -> None:
         pass
