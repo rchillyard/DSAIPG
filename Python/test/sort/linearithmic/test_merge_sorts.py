@@ -7,6 +7,7 @@ from src.sort.helper.helper import natural_comparison
 from src.sort.helper.helper_factory import create
 from src.sort.linearithmic.merge_sort import MergeSort, get_config_string
 from src.sort.linearithmic.merge_sort_basic import MergeSortBasic
+from src.sort.linearithmic.tim_sort import TimSort
 from src.util.config.config_benchmark import setup_config, setup_config2
 
 PLAIN = setup_config("false", "", "0", "0", "", "")
@@ -157,3 +158,55 @@ class TestSortRangeDirectly:
         s = sorter(MergeSortBasic, 5)
         s.sort_range(xs, 0, 5)
         assert xs == [1, 2, 3, 4, 5]
+
+
+class TestTimSort:
+    """
+    Timsort delegates to Python's own sort, which IS Timsort, so these check that
+    it sorts and is stable rather than checking any statistics: it reports none,
+    deliberately.
+    """
+
+    def test_a_random_list(self):
+        rng = random.Random(42)
+        xs = [rng.randint(0, 9999) for _ in range(500)]
+        assert sorter(TimSort, 500).sort(xs) == sorted(xs)
+
+    def test_an_empty_list(self):
+        assert sorter(TimSort, 0).sort([]) == []
+
+    def test_it_leaves_the_original_alone(self):
+        xs = [3, 1, 2]
+        sorter(TimSort, 3).sort(xs)
+        assert xs == [3, 1, 2]
+
+    def test_a_custom_comparator_is_honoured(self):
+        def case_insensitive(v, w):
+            return natural_comparison(v.lower(), w.lower())
+
+        words = ["Arab", "abroad", "British", "bear", "apple", "Zulu", "zebra"]
+        result = sorter(TimSort, len(words), PLAIN, case_insensitive).sort(words)
+        for i in range(1, len(result)):
+            assert case_insensitive(result[i - 1], result[i]) <= 0
+
+    def test_it_is_stable(self):
+        by_key = lambda v, w: natural_comparison(v[0], w[0])  # noqa: E731
+        pairs = [(1, "a"), (0, "b"), (1, "c"), (0, "d"), (1, "e")]
+        assert sorter(TimSort, 5, PLAIN, by_key).sort(pairs) \
+               == [(0, "b"), (0, "d"), (1, "a"), (1, "c"), (1, "e")]
+
+    def test_it_sorts_only_the_given_range(self):
+        xs = [99, 5, 3, 4, 1, 2, 99]
+        sorter(TimSort, 7).sort_range(xs, 1, 6)
+        assert xs == [99, 1, 2, 3, 4, 5, 99]
+
+    def test_it_reports_no_statistics(self):
+        # Deliberate: it is Python's sort, so there is nothing to count. Better
+        # than the Java, which reports figures below the information-theoretic
+        # floor because its instrumentation was never finished.
+        rng = random.Random(1)
+        xs = [rng.randint(0, 999) for _ in range(200)]
+        s = sorter(TimSort, 200, INSTRUMENTED)
+        s.sort(xs)
+        assert s.get_helper().get_compares() == 0
+        assert s.get_helper().get_hits() == 0
