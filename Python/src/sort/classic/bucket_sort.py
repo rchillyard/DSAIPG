@@ -128,12 +128,6 @@ class BucketSort(ClassificationSorter[X, None]):
         """
         Sort xs by distributing into buckets and finishing with an insertion sort.
 
-        NOTE this cannot sort a sub-range: _check_buckets compares the number of
-        elements distributed against the length of the whole list, so anything but
-        a whole-list sort raises. Ported as the Java has it, where
-        ``sort(xs, 1, 4)`` on five elements raises "incorrect number of buckets:
-        3, 5".
-
         :param xs: the list to sort.
         :param from_: the index of the first element.
         :param to: the index one past the last.
@@ -149,8 +143,8 @@ class BucketSort(ClassificationSorter[X, None]):
                     "BucketSort: classifier undefined AND the type being sorted is not a Number")
         self._clear_buckets()
         self._assign_to_buckets(xs, from_, to)
-        self._check_buckets(xs)
-        self._unload_buckets(xs)
+        self._check_buckets(to - from_)
+        self._unload_buckets(xs, from_, to)
         self.insertion_sort.sort_range(xs, from_, to)
 
     def _clear_buckets(self) -> None:
@@ -178,28 +172,38 @@ class BucketSort(ClassificationSorter[X, None]):
             index = max(0, min(index, len(self.buckets) - 1))
             self.buckets[index].append(x)
 
-    def _check_buckets(self, xs: list[X]) -> None:
+    def _check_buckets(self, expected: int) -> None:
         """
-        :param xs: the list being sorted.
-        :raises RuntimeError: if the buckets do not hold every element.
+        NOTE compared against the size of the range being sorted, not the length
+        of the whole list. It used to be the latter, so sorting any sub-range
+        raised: sort_range(xs, 1, 4) on five elements gave "incorrect number of
+        buckets: 3, 5".
+
+        :param expected: the number of elements that should have been distributed.
+        :raises RuntimeError: if the buckets do not hold exactly that many.
         """
         count = sum(len(bucket) for bucket in self.buckets)
-        if count != len(xs):
-            raise RuntimeError(f"incorrect number of buckets: {count}, {len(xs)}")
+        if count != expected:
+            raise RuntimeError(f"incorrect number of buckets: {count}, {expected}")
 
-    def _unload_buckets(self, xs: list[X]) -> None:
+    def _unload_buckets(self, xs: list[X], from_: int, to: int) -> None:
         """
-        Empty the buckets back into the list, in bucket order.
+        Empty the buckets back into xs[from_:to], in bucket order.
+
+        NOTE the elements go back into the range, not from index 0. Starting at
+        zero was the other half of why a sub-range could not be sorted.
 
         :param xs: the list to write into.
+        :param from_: the index at which to start writing.
+        :param to: one past the last index that may be written.
         """
         helper = self.get_helper()
-        i = 0
+        i = from_
         for bucket in self.buckets:
             helper.increment_copies(len(bucket))
             helper.increment_hits(2 * len(bucket))
             for x in bucket:
-                if i >= len(xs):
-                    raise RuntimeError(f"unloadBucket: index out of bounds: {len(xs)}")
+                if i >= to:
+                    raise RuntimeError(f"unload_buckets: index out of bounds: {to}")
                 xs[i] = x
                 i += 1

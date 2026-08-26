@@ -141,14 +141,19 @@ class TestBucketSort:
         assert sorter.sort(["zoo", "yak", "wren", "vole", "urchin"]) \
                == ["urchin", "vole", "wren", "yak", "zoo"]
 
-    def test_it_cannot_sort_a_sub_range(self):
-        # RECORDED, NOT ENDORSED. _check_buckets compares the number of elements
-        # distributed against the length of the whole list, so anything but a
-        # whole-list sort raises. The Java does the same: sort(xs, 1, 4) on five
-        # elements gives "incorrect number of buckets: 3, 5".
+    def test_it_sorts_a_sub_range(self):
+        # Three things used to stop this: the check compared against the whole
+        # list's length, unloading wrote from index 0, and the numeric classifier
+        # looked at the list from index 0.
         xs = ["zulu", "bravo", "charlie", "alpha", "delta"]
-        with pytest.raises(RuntimeError, match="incorrect number of buckets: 3, 5"):
-            bucket(5, classify_string_initial).sort_range(xs, 1, 4)
+        bucket(5, classify_string_initial).sort_range(xs, 1, 4)
+        assert xs == ["zulu", "alpha", "bravo", "charlie", "delta"]
+
+    def test_it_sorts_a_sub_range_of_numbers(self):
+        # The numeric classifier is chosen from the range, not the whole list.
+        xs = [900, 5, 3, 4, 1, 2, 900]
+        bucket(7, None, 4).sort_range(xs, 1, 6)
+        assert xs == [900, 1, 2, 3, 4, 5, 900]
 
 
 class TestClassifiers:
