@@ -206,7 +206,7 @@ class TestCopies:
         xs = [1, 2, 3, 4]
         helper.copy_block(xs, 0, xs, 1, 3)
         assert xs == [1, 1, 2, 3]
-        assert helper.get_hits() == 4, "n + 1 when the source and target are the same"
+        assert helper.get_hits() == 6, "2n: n read and n written, same list or not"
 
     def test_copy_array(self):
         helper = instrumented()
@@ -309,7 +309,9 @@ class TestSwapInto:
         assert helper.get_swaps() == 1
         assert helper.get_copies() == 3, "one copy per element shifted, not two"
         assert helper.get_fixes() == 3, "one inversion fixed for each element shifted up"
-        assert helper.get_hits() == 6
+        # one read of xs[3], one write of it at the end, and 2*3 for the block
+        # move of the three elements above it.
+        assert helper.get_hits() == 8
 
     @pytest.mark.parametrize("n", [1, 2, 3, 5])
     def test_it_copies_each_element_once(self, n):

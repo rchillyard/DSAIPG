@@ -99,15 +99,16 @@ class InstrumentedHelper(BaseHelper[X]):
         """
         Copy a block: n copies, and a hit for each element read and written.
 
-        NOTE when source and target are the same list, this counts n + 1 hits
-        rather than 2n, following the Java.
+        NOTE 2n whether or not the source and target are the same list: n
+        elements are read and n are written either way. This used to charge
+        n + 1 for the same-list case, following the Java, whose comment asked
+        whether that was right. It was not -- counting the accesses a list
+        actually performs shows 2n, and InsertionSortOpt, which is nothing but
+        block moves, was reporting 55% of the accesses it made.
         """
         super().copy_block(source, i, target, j, n)
         self.instrumenter.increment_copies(n)
-        if source is target:
-            self.instrumenter.increment_hits(n + 1)
-        else:
-            self.instrumenter.increment_hits(2 * n)
+        self.instrumenter.increment_hits(2 * n)
 
     def distribute_block(self, source: list[X], from_: int, to: int, target: list[X],
                          f: Callable[[X], int]) -> None:

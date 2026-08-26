@@ -182,10 +182,10 @@ class TestAccessesAreCounted:
         for cls in IN_PLACE:
             _, _, hits, accesses = measure(cls, xs)
             assert accesses > 0
-            # Every sort should be within an order of magnitude of the truth.
-            # QuickSortExp is the known outlier: its partition reads the list
-            # directly and counts a single hit for the whole pass.
-            floor = 0.02 if cls is QuickSortExp else 0.20
-            assert hits / accesses >= floor, \
+            # Every sort must now account for essentially every access. The few
+            # per cent missing from the two quicksorts are the raw reads left
+            # deliberately uncounted where swap_conditional had already fetched
+            # the value -- those are reads that do not happen twice.
+            assert hits / accesses >= 0.98, \
                 f"{cls.__name__} counted {hits} of {accesses} accesses " \
-                f"({hits / accesses:.0%}), which is below the recorded floor"
+                f"({hits / accesses:.0%})"
