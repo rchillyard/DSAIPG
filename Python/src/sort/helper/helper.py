@@ -325,8 +325,12 @@ class Helper(Instrument, Generic[X]):
         """
         x = self.get(xs, i)
         j = self.binary_search(xs, from_, i, x)
-        if j < from_:
-            j = from_ - j - 1
+        # NOTE binary_search returns -(insertion point) - 1 when it does not find
+        # the value, so the insertion point is -j - 1 regardless of from_. The
+        # Java read "from - j - 1", which is the same thing only when from is
+        # zero: sorting a sub-range starting anywhere else came out reversed.
+        if j < 0:
+            j = -j - 1
         if j < i:
             self.swap_into(xs, j, i, x)
 
