@@ -324,15 +324,40 @@ class Helper(Instrument, Generic[X]):
         :param i: the index of the element to insert.
         """
         x = self.get(xs, i)
-        j = self.binary_search(xs, from_, i, x)
-        # NOTE binary_search returns -(insertion point) - 1 when it does not find
-        # the value, so the insertion point is -j - 1 regardless of from_. The
-        # Java read "from - j - 1", which is the same thing only when from is
-        # zero: sorting a sub-range starting anywhere else came out reversed.
-        if j < 0:
-            j = -j - 1
+        j = self.binary_search_upper_bound(xs, from_, i, x)
         if j < i:
             self.swap_into(xs, j, i, x)
+
+    def binary_search_upper_bound(self, xs: list[X], from_: int, to: int, x: X) -> int:
+        """
+        Find where x belongs in the sorted range xs[from_:to], placing it AFTER
+        any elements equal to it.
+
+        That is what makes the sort stable: an element must not move past one
+        that compares equal to it. It also means no element is moved
+        unnecessarily, so the number of elements moved is exactly the number of
+        inversions.
+
+        NOTE this is written in terms of compare and get, both of which the
+        instrumented Helper overrides, so there is one implementation rather than
+        one per Helper. Duplication of exactly that kind is what let several
+        counting and comparison bugs survive in the Java version of this package.
+
+        :param xs: the list, which must be sorted over the given range.
+        :param from_: the first index of the range.
+        :param to: one past the last index of the range.
+        :param x: the value to place.
+        :return: the index of the first element greater than x, or to if there
+                 is none.
+        """
+        low, high = from_, to
+        while low < high:
+            mid = (low + high) >> 1
+            if self.compare(self.get(xs, mid), x) <= 0:
+                low = mid + 1
+            else:
+                high = mid
+        return low
 
     # ---- comparing -------------------------------------------------------
 

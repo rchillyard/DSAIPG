@@ -180,27 +180,26 @@ class TestInsertionSortOpt:
         opt.sort(xs)
         assert opt.get_helper().get_copies() == count_inversions(xs, natural_comparison)
 
-    def test_it_is_not_stable_and_so_moves_more_than_it_needs_to(self):
-        # RECORDED, NOT ENDORSED. swap_into_sorted inserts before the elements
-        # equal to the one being placed rather than after them, so equal elements
-        # come out reversed and each is moved past unnecessarily. Helper's own
-        # description of the method calls it "a stable swap using half-exchanges".
-        # Plain insertion sort is stable; this is not.
+    def test_it_is_stable(self):
+        # Insertion sort is stable, and the optimised version must be too. It was
+        # not: swap_into_sorted placed each element before the run of elements
+        # equal to it rather than after, so equal elements came out reversed.
         by_key = lambda v, w: natural_comparison(v[0], w[0])  # noqa: E731
         pairs = [(1, "a"), (0, "b"), (1, "c"), (0, "d"), (1, "e")]
-        opt = sorter(InsertionSortOpt, 5, INSTRUMENTED, comparator=by_key)
-        assert opt.sort(pairs) == [(0, "d"), (0, "b"), (1, "e"), (1, "c"), (1, "a")]
-        plain = sorter(InsertionSort, 5, INSTRUMENTED, comparator=by_key)
-        assert plain.sort(pairs) == [(0, "b"), (0, "d"), (1, "a"), (1, "c"), (1, "e")]
+        expected = [(0, "b"), (0, "d"), (1, "a"), (1, "c"), (1, "e")]
+        assert sorter(InsertionSortOpt, 5, INSTRUMENTED, comparator=by_key).sort(pairs) == expected
+        assert sorter(InsertionSort, 5, INSTRUMENTED, comparator=by_key).sort(pairs) == expected
 
-    def test_equal_elements_cost_extra_moves(self):
-        # The same fault, measured: with many duplicates it moves far more
-        # elements than there are inversions.
+    def test_equal_elements_cost_no_extra_moves(self):
+        # Every element moved is one inversion fixed, and none is moved that need
+        # not be -- so this holds with duplicates too. Before the sort was made
+        # stable it moved 10116 elements against 8911 inversions here, because
+        # each was moved past the ones equal to it.
         rng = random.Random(11)
         xs = [rng.randint(0, 9) for _ in range(200)]
         opt = sorter(InsertionSortOpt, 200, INSTRUMENTED)
         opt.sort(xs)
-        assert opt.get_helper().get_copies() > count_inversions(xs, natural_comparison)
+        assert opt.get_helper().get_copies() == count_inversions(xs, natural_comparison)
 
 
 class TestInsertionSortBasic:
