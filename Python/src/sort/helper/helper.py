@@ -697,34 +697,6 @@ class Helper(Instrument, Generic[X]):
 
     # ---- searching -------------------------------------------------------
 
-    def binary_search(self, xs: list[X], from_: int, to: int, x: X) -> int:
-        """
-        Find x within the sorted run xs[from_:to].
-
-        NOTE the return value follows Java's Arrays.binarySearch rather than
-        Python's bisect: a match gives its index, and a miss gives
-        -(insertion point) - 1. swap_into_sorted depends on being able to tell
-        the two apart, which a bare insertion point cannot do.
-
-        :param xs: the list, which must be sorted over the given range.
-        :param from_: the first index to search.
-        :param to: one past the last index to search.
-        :param x: the value to look for.
-        :return: the index of x, or -(insertion point) - 1.
-        """
-        low = from_
-        high = to - 1
-        while low <= high:
-            mid = (low + high) >> 1
-            cmp = self.pure_comparison(xs[mid], x)
-            if cmp < 0:
-                low = mid + 1
-            elif cmp > 0:
-                high = mid - 1
-            else:
-                return mid
-        return -(low + 1)
-
     # ---- discrimination, for radix sorts ---------------------------------
 
     def discriminate(self, x: X, d: int) -> X:

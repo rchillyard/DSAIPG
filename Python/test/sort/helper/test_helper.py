@@ -339,25 +339,6 @@ class TestSwapInto:
         assert xs == [1, 2, 3, 4]
 
 
-class TestBinarySearch:
-    def test_a_hit_gives_the_index(self):
-        assert plain().binary_search([1, 3, 5, 7], 0, 4, 5) == 2
-
-    def test_a_miss_gives_the_insertion_point_encoded(self):
-        # -(insertion point) - 1, following Java rather than bisect, because
-        # swap_into_sorted has to tell a hit from a miss.
-        assert plain().binary_search([1, 3, 5, 7], 0, 4, 4) == -3
-
-    def test_a_miss_past_the_end(self):
-        assert plain().binary_search([1, 3, 5], 0, 3, 9) == -4
-
-    def test_a_miss_before_the_start(self):
-        assert plain().binary_search([2, 4, 6], 0, 3, 1) == -1
-
-    def test_an_empty_range(self):
-        assert plain().binary_search([1, 2, 3], 1, 1, 2) == -2
-
-
 class TestSortedness:
     def test_is_sorted(self):
         assert plain().is_sorted([1, 2, 3])
