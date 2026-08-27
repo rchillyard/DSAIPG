@@ -9,7 +9,7 @@ import com.phasmidsoftware.dsaipg.util.config.Config;
 import com.phasmidsoftware.dsaipg.util.general.CodePointMapper;
 import com.phasmidsoftware.dsaipg.util.general.SuffixComparator;
 
-import static com.phasmidsoftware.dsaipg.sort.helper.InstrumentedComparatorHelper.MSD_CUTOFF_DEFAULT;
+import static com.phasmidsoftware.dsaipg.sort.helper.BaseHelper.MSD_CUTOFF_DEFAULT;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.HELPER;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.MSDCUTOFF;
 

@@ -86,6 +86,11 @@ public class PrimTest {
             }
             System.out.println("Total cost = " + cost);
         } catch (Exception e) {
+            // NOTE an unwritten exercise reaching here must be rethrown, or this
+            // broad catch turns "you have not written UF_HWQUPC.find yet" into a
+            // silently passing test. CancelOnNotImplemented then reports it as
+            // skipped in the student tree, and it is inert here.
+            CancelOnNotImplemented.rethrowIfUnimplemented(e);
             e.printStackTrace();
             // Test will fail due to the uncaught exception.
         }
@@ -163,6 +168,11 @@ public class PrimTest {
             }
             System.out.println("Total cost = " + cost);
         } catch (Exception e) {
+            // NOTE an unwritten exercise reaching here must be rethrown, or this
+            // broad catch turns "you have not written UF_HWQUPC.find yet" into a
+            // silently passing test. CancelOnNotImplemented then reports it as
+            // skipped in the student tree, and it is inert here.
+            CancelOnNotImplemented.rethrowIfUnimplemented(e);
             e.printStackTrace();
         }
     }

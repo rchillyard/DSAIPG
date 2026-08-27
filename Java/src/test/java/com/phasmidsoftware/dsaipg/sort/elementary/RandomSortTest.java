@@ -156,4 +156,20 @@ public class RandomSortTest {
 
     final static LazyLogger logger = new LazyLogger(RandomSort.class);
 
+
+    /**
+     * RandomSort used to build its QuickRandom before testing the cutoff, and
+     * QuickRandom rejects a range of zero, so an empty array threw rather than
+     * sorting trivially.
+     */
+    @Test
+    public void testSortEmpty() throws IOException {
+        Integer[] xs = {};
+        Config config = Config.load(RandomSortTest.class);
+        Helper<Integer> helper = HelperFactory.create("empty", 1, config);
+        try (SortWithHelper<Integer> sorter = new RandomSort<>(helper)) {
+            sorter.sort(xs, 0, 0);
+        }
+        assertEquals(0, xs.length);
+    }
 }

@@ -16,8 +16,10 @@ import java.util.function.Supplier;
  * LazyLogger is an extension of the {@link Logger} class providing lazy logging capabilities.
  * This class enhances the performance of logging by deferring the evaluation of log messages
  * until it is determined that the log level is enabled.
- * NOTE: debug and trace are now determined at construction time.
- * However, there are also "set" methods which can turn them on.
+ * NOTE: whether debug and trace are enabled is determined on each call, so a level
+ * changed after construction -- by setLevel, by configuration, or on a parent logger --
+ * takes effect. The cost is the one comparison that the lazy evaluation was there to
+ * protect in the first place.
  * <p>
  * The primary features of LazyLogger include:
  * - Lazy evaluation of log messages using {@link Supplier<String>}.
@@ -37,7 +39,7 @@ public class LazyLogger extends Logger {
      * @param fMessage a {@code Supplier<String>} that provides the message to log.
      */
     public void trace(Supplier<String> fMessage) {
-        if (traceEnabled)
+        if (logger.isTraceEnabled())
             logger.trace(fMessage.get());
     }
 
@@ -48,7 +50,7 @@ public class LazyLogger extends Logger {
      * @param t        the throwable to be logged alongside the message.
      */
     public void trace(Supplier<String> fMessage, Throwable t) {
-        if (traceEnabled)
+        if (logger.isTraceEnabled())
             logger.trace(fMessage.get(), t);
     }
 
@@ -59,7 +61,7 @@ public class LazyLogger extends Logger {
      *                 and logged if debug logging is enabled.
      */
     public void debug(Supplier<String> fMessage) {
-        if (debugEnabled)
+        if (logger.isDebugEnabled())
             logger.debug(fMessage.get());
     }
 
@@ -70,7 +72,7 @@ public class LazyLogger extends Logger {
      * @param t the throwable to be logged alongside the debug message.
      */
     public void debug(Supplier<String> fMessage, Throwable t) {
-        if (debugEnabled)
+        if (logger.isDebugEnabled())
             logger.debug(fMessage.get(), t);
     }
 
@@ -80,7 +82,7 @@ public class LazyLogger extends Logger {
      * @return true if trace logging is enabled, false otherwise.
      */
     public boolean isTraceEnabled() {
-        return traceEnabled;
+        return logger.isTraceEnabled();
     }
 
     /**
@@ -89,7 +91,7 @@ public class LazyLogger extends Logger {
      * @return true if debug logging is enabled, false otherwise.
      */
     public boolean isDebugEnabled() {
-        return debugEnabled;
+        return logger.isDebugEnabled();
     }
 
     /**
@@ -98,7 +100,7 @@ public class LazyLogger extends Logger {
      * @param message the non-lazy message object to be logged at the TRACE level.
      */
     public void trace(Object message) {
-        if (traceEnabled) logger.trace(NOT_LAZY + message);
+        if (logger.isTraceEnabled()) logger.trace(NOT_LAZY + message);
     }
 
     /**
@@ -108,7 +110,7 @@ public class LazyLogger extends Logger {
      * @param t       the throwable associated with the message.
      */
     public void trace(Object message, Throwable t) {
-        if (traceEnabled)
+        if (logger.isTraceEnabled())
             logger.trace(NOT_LAZY + message, t);
     }
 
@@ -118,7 +120,7 @@ public class LazyLogger extends Logger {
      * @param message an object containing the message to be logged.
      */
     public void debug(Object message) {
-        if (debugEnabled)
+        if (logger.isDebugEnabled())
             logger.debug(NOT_LAZY + message);
     }
 
@@ -129,7 +131,7 @@ public class LazyLogger extends Logger {
      * @param t       the throwable associated with the message, providing further details about an error or exception.
      */
     public void debug(Object message, Throwable t) {
-        if (debugEnabled)
+        if (logger.isDebugEnabled())
             logger.debug(NOT_LAZY + message, t);
     }
 
@@ -441,14 +443,11 @@ public class LazyLogger extends Logger {
 
     /**
      * Sets the logging level for the logger.
-     * And resets debugEnabled, traceEnabled as appropriate.
      *
      * @param level the desired logging level to be set.
      */
     public void setLevel(Level level) {
         logger.setLevel(level);
-        debugEnabled = logger.isDebugEnabled();
-        traceEnabled = logger.isTraceEnabled();
     }
 
     /**
@@ -490,8 +489,6 @@ public class LazyLogger extends Logger {
     public LazyLogger(Class<?> clazz) {
         super("LazyLogger");
         logger = Logger.getLogger(clazz);
-        debugEnabled = logger.isDebugEnabled();
-        traceEnabled = logger.isTraceEnabled();
     }
 
     /**
@@ -500,19 +497,4 @@ public class LazyLogger extends Logger {
      * This logger is intended for tracking application behavior and troubleshooting purposes.
      */
     private final Logger logger;
-    /**
-     * Indicates whether debug mode is enabled.
-     * This flag is used to control the logging or execution of
-     * debug-level operations within the application.
-     * This value is set at construction time and during any call to setLevel.
-     */
-    private boolean debugEnabled;
-    /**
-     * Indicates whether tracing is enabled for the application or component.
-     * When set to true, additional diagnostic or debug information may be logged
-     * to help with troubleshooting or analysis.
-     * When false, tracing is disabled to improve performance or reduce verbosity in logging.
-     * This value is set at construction time and during any call to setLevel.
-     */
-    private boolean traceEnabled;
 }

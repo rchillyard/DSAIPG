@@ -123,4 +123,174 @@ public class BagTest {
             bag.add(i);
         assertEquals("Bag_Array{items=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], count=10}", bag.toString());
     }
+
+    /**
+     * Growth: the only thing which still needs growFrom.
+     * <p>
+     * The constructor and {@link Bag_Array#of} allocate their storage directly, so
+     * a bag can now be built and used without the exercise being written. These
+     * are what guard it instead -- and they are worth having in their own right,
+     * since growth used to be covered only incidentally by testBagAdd2.
+     */
+    /**
+     * Growth DOUBLES the capacity, which is what makes the amortized cost of an
+     * addition O(1) rather than O(n).
+     * <p>
+     * NOTE what this does and does not guard. The factor is chosen by
+     * {@code add}, which calls {@code grow(items, 2 * capacity())}, and add is not
+     * part of the exercise — so a student cannot get the doubling wrong. What it
+     * does catch is growFrom returning an array of the wrong length, and a later
+     * change to add's growth policy. Growing by a constant would pass every other
+     * test in this class, so the policy is worth pinning down somewhere.
+     * <p>
+     * It is why {@link Bag_Array#capacity} is package-private.
+     */
+    @Test
+    public void growthDoublesTheCapacity() {
+        Bag_Array<Integer> bag = new Bag_Array<>();
+        for (int i = 0; i < 32; i++) bag.add(i);
+        assertEquals("no growth until it is actually full", 32, bag.capacity());
+        bag.add(32);
+        assertEquals(64, bag.capacity());
+    }
+
+    /**
+     * And it keeps doubling: the third growth takes it to 256, not to 32 + 3k for
+     * some k.
+     */
+    @Test
+    public void growthKeepsDoubling() {
+        Bag_Array<Integer> bag = new Bag_Array<>();
+        for (int i = 0; i <= 128; i++) bag.add(i);
+        assertEquals(256, bag.capacity());
+    }
+
+    /**
+     * of allocates directly, so its capacity is decided at construction and no
+     * growth has happened.
+     */
+    @Test
+    public void ofAllocatesRoomWithoutGrowing() {
+        assertEquals(32, Bag_Array.of(1, 2, 3).capacity());
+        Integer[] items = new Integer[64];
+        for (int i = 0; i < items.length; i++) items[i] = i;
+        assertEquals(128, Bag_Array.of(items).capacity());
+    }
+
+    /**
+     * A direct test of the exercise's contract rather than of its use, and it
+     * earns its place: {@code add} only ever calls
+     * {@code grow(items, 2 * capacity())}, where the source is the whole backing
+     * array, so an implementation returning an array of {@code from.length * 2}
+     * is accidentally right at every call site and passes every other test in
+     * this class — while ignoring the size it was given. Only calling it directly
+     * can tell the difference.
+     */
+    @Test
+    public void growFromHonoursTheRequestedSize() {
+        assertArrayEquals(new Object[]{1, 2, null, null, null},
+                Bag_Array.growFrom(new Object[]{1, 2}, 5));
+        assertArrayEquals(new Object[]{null, null, null},
+                Bag_Array.growFrom(new Object[]{}, 3));
+        assertArrayEquals(new Object[]{1, 2, 3},
+                Bag_Array.growFrom(new Object[]{1, 2, 3}, 3));
+    }
+
+    @Test
+    public void growthPreservesTheItemsAndTheirOrder() {
+        Bag_Array<Integer> bag = new Bag_Array<>();
+        Integer[] expected = new Integer[33];
+        for (int i = 0; i < 33; i++) {
+            bag.add(i);
+            expected[i] = i;
+        }
+        assertEquals(33, bag.size());
+        assertArrayEquals(expected, bag.asArray());
+    }
+
+    /**
+     * Several doublings in a row, not just the first.
+     */
+    @Test
+    public void repeatedGrowth() {
+        Bag_Array<Integer> bag = new Bag_Array<>();
+        int n = 32 * 8 + 1;
+        for (int i = 0; i < n; i++) bag.add(i);
+        assertEquals(n, bag.size());
+        Object[] actual = bag.asArray();
+        for (int i = 0; i < n; i++) assertEquals(i, actual[i]);
+    }
+
+    /**
+     * The unused tail of the grown array must be null rather than stale entries.
+     * multiplicity scans the whole backing store rather than stopping at count, so
+     * a growth which duplicated anything into the tail shows up as a count above
+     * one.
+     */
+    @Test
+    public void growthLeavesNoStaleEntries() {
+        Bag<Integer> bag = new Bag_Array<>();
+        for (int i = 0; i < 33; i++) bag.add(i);
+        for (int i = 0; i < 33; i++)
+            assertEquals("item " + i + " should appear exactly once", 1, bag.multiplicity(i));
+    }
+
+    @Test
+    public void growthAfterClear() {
+        Bag<Integer> bag = new Bag_Array<>();
+        for (int i = 0; i < 33; i++) bag.add(i);
+        bag.clear();
+        assertTrue(bag.isEmpty());
+        bag.add(1);
+        assertArrayEquals(new Integer[]{1}, bag.asArray());
+    }
+
+    /**
+     * The varargs constructor, which allocates directly and so never needs
+     * growFrom.
+     */
+    @Test
+    public void of() {
+        Bag_Array<Integer> bag = Bag_Array.of(1, 2, 3);
+        assertEquals(3, bag.size());
+        assertArrayEquals(new Integer[]{1, 2, 3}, bag.asArray());
+    }
+
+    @Test
+    public void ofNothing() {
+        Bag_Array<Integer> bag = Bag_Array.of();
+        assertTrue(bag.isEmpty());
+        // NOTE Object[], not Integer[], for the reason given in testAsArray: the
+        // array really is an Object[] at runtime, so using the result at its
+        // declared type is a ClassCastException waiting to happen.
+        Object[] items = bag.asArray();
+        assertEquals(0, items.length);
+    }
+
+    /**
+     * A bag from {@code of} has room to spare, so the next add does not
+     * immediately need growFrom. Sizing exactly would put the dependency back.
+     */
+    @Test
+    public void ofLeavesRoomToGrow() {
+        Bag_Array<Integer> bag = Bag_Array.of(1, 2, 3);
+        bag.add(4);
+        assertArrayEquals(new Integer[]{1, 2, 3, 4}, bag.asArray());
+    }
+
+    @Test
+    public void ofMoreThanTheInitialCapacity() {
+        Integer[] items = new Integer[64];
+        for (int i = 0; i < items.length; i++) items[i] = i;
+        Bag_Array<Integer> bag = Bag_Array.of(items);
+        assertEquals(items.length, bag.size());
+        assertArrayEquals(items, bag.asArray());
+    }
+
+    @Test
+    public void ofKeepsDuplicates() {
+        Bag_Array<Integer> bag = Bag_Array.of(1, 1, 2);
+        assertEquals(3, bag.size());
+        assertEquals(2, bag.multiplicity(1));
+    }
 }

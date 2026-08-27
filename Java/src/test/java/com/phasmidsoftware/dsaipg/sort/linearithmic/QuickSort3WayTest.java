@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Comparator;
 import java.util.Random;
 
 import static com.phasmidsoftware.dsaipg.sort.helper.Instrument.*;
@@ -28,6 +29,8 @@ import static com.phasmidsoftware.dsaipg.util.benchmark.SortBenchmarkHelper.getW
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.setupConfig;
 import static com.phasmidsoftware.dsaipg.util.general.Utilities.round;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertTrue;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
@@ -300,4 +303,34 @@ public class QuickSort3WayTest {
     }
 
     private static Config config;
+
+    /**
+     * The partition method has two branches: an instrumented one which compares through
+     * the Helper, and an uninstrumented one which used to compare with compareTo --
+     * ignoring the Helper's comparator entirely, so an uninstrumented sort with a custom
+     * comparator came out in the natural ordering instead.
+     * <p>
+     * This is the case that exposed it: MSDStringSort cuts over to QuickSort_3way with a
+     * SuffixComparator, and produced "Arab" before "abroad" -- uppercase first, which is
+     * the natural ordering of Strings, not the case-folding order it was asked for.
+     * <p>
+     * NOTE the array must be longer than the insertion-sort cutoff, or partition never runs.
+     */
+    @Test
+    public void testUninstrumentedSortHonoursTheComparator() throws IOException {
+        Comparator<String> caseInsensitive = String.CASE_INSENSITIVE_ORDER;
+        Config config = setupConfig("false", "false", "0", "0", "", "");
+        String[] xs = {"Arab", "abroad", "British", "bear", "French", "fair", "Italian", "idea",
+                "Muslim", "mask", "Olympic", "object", "Republican", "recording", "Spanish",
+                "sensitive", "apple", "army", "art", "about", "above", "abuse", "academic",
+                "accept", "zebra", "Zulu", "yellow", "Yale", "xylophone", "Xerox"};
+        Helper<String> helper = HelperFactory.createGeneric("3-way", caseInsensitive, xs.length, 1, config);
+        assertFalse("this test must exercise the uninstrumented branch", helper.instrumented());
+        try (Sort<String> sorter = new QuickSort_3way<>(helper)) {
+            sorter.sort(xs, 0, xs.length);
+        }
+        for (int i = 1; i < xs.length; i++)
+            assertTrue("not ordered by the comparator at " + i + ": " + xs[i - 1] + " > " + xs[i],
+                    caseInsensitive.compare(xs[i - 1], xs[i]) <= 0);
+    }
 }

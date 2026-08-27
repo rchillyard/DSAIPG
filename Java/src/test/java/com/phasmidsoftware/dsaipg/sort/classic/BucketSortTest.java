@@ -164,4 +164,53 @@ public class BucketSortTest {
         sorter.mutatingSort(input);
         assertArrayEquals(new String[]{"Alpha", "bravo", "Charlie", "delta"}, input);
     }
+
+    /**
+     * A sub-range must sort, leaving the rest alone. Three things stopped this:
+     * checkBuckets compared against the whole array's length, unloadBuckets wrote
+     * from index 0, and the numeric classifier looked at the array from index 0.
+     * sort(xs, 1, 4) on five elements used to throw "incorrect number of buckets:
+     * 3, 5".
+     */
+    @Test
+    public void testSortSubRange() throws IOException {
+        String[] xs = {"zulu", "bravo", "charlie", "alpha", "delta"};
+        Sort<String> sorter = new BucketSort<String>(BucketSort::classifyStringInitial,
+                BucketSort.ALPHABET_SIZE, xs.length, Config.load(BucketSortTest.class));
+        sorter.sort(xs, 1, 4);
+        assertArrayEquals(new String[]{"zulu", "alpha", "bravo", "charlie", "delta"}, xs);
+    }
+
+    /**
+     * The numeric classifier is chosen from the range being sorted, not from the
+     * whole array.
+     */
+    @Test
+    public void testSortSubRangeOfNumbers() throws IOException {
+        Integer[] xs = {900, 5, 3, 4, 1, 2, 900};
+        Sort<Integer> sorter = new BucketSort<Integer>(null, 4, xs.length, Config.load(BucketSortTest.class));
+        sorter.sort(xs, 1, 6);
+        assertArrayEquals(new Integer[]{900, 1, 2, 3, 4, 5, 900}, xs);
+    }
+
+    /**
+     * When every value is the same the gap is zero. This used to give the right
+     * answer only because 0.0/0.0 is NaN, Math.floor(NaN) is NaN, and (int) NaN
+     * is 0; it is now tested for outright.
+     */
+    @Test
+    public void testSortAllEqual() throws IOException {
+        Integer[] xs = {5, 5, 5, 5};
+        Sort<Integer> sorter = new BucketSort<Integer>(null, 16, xs.length, Config.load(BucketSortTest.class));
+        sorter.mutatingSort(xs);
+        assertArrayEquals(new Integer[]{5, 5, 5, 5}, xs);
+    }
+
+    @Test
+    public void testSortSingleton() throws IOException {
+        Integer[] xs = {7};
+        Sort<Integer> sorter = new BucketSort<Integer>(null, 16, xs.length, Config.load(BucketSortTest.class));
+        sorter.mutatingSort(xs);
+        assertArrayEquals(new Integer[]{7}, xs);
+    }
 }

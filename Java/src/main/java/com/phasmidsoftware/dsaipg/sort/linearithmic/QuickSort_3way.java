@@ -112,7 +112,15 @@ public class QuickSort_3way<X extends Comparable<X>> extends QuickSort<X> {
                 }
             } else
                 while (i <= gt) {
-                    int cmp = xs[i].compareTo(v);
+                    // NOTE pureComparison, NOT compareTo. This branch exists only to
+                    // skip the counting, not to change the ordering: compareTo ignores
+                    // the Helper's comparator altogether, so an uninstrumented sort with
+                    // a custom comparator was ordered by the natural ordering instead.
+                    // That is how MSDStringSort, which cuts over to this sort with a
+                    // SuffixComparator, produced output like "Arab" before "abroad".
+                    // pureComparison applies the comparator without counting anything, so
+                    // this stays as fast as it was.
+                    int cmp = helper.pureComparison(xs[i], v);
                     if (cmp < 0) swap(xs, lt++, i++);
                     else if (cmp > 0) swap(xs, i, gt--);
                     else i++;

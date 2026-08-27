@@ -25,8 +25,7 @@ public class Bag_Array<Item> implements Bag<Item> {
      * @param random a random source.
      */
     public Bag_Array(Random random) {
-        //noinspection unchecked
-        grow((Item[]) new Object[0], 32);
+        allocate(INITIAL_CAPACITY);
         this.random = random;
     }
 
@@ -37,6 +36,32 @@ public class Bag_Array<Item> implements Bag<Item> {
      */
     public Bag_Array() {
         this(new Random());
+    }
+
+    /**
+     * Construct a Bag_Array containing the given items.
+     * <p>
+     * NOTE this deliberately does not call {@link #growFrom}: it allocates storage
+     * large enough at the outset. That matters because growFrom is an exercise. A
+     * bag which could not even be constructed until the exercise was written made
+     * every test that merely uses a bag depend on it -- of the tests blocked that
+     * way, two thirds were testing graphs and classification sorts, not bags.
+     * Now only genuine growth, past the initial capacity, needs the exercise.
+     * <p>
+     * The new bag has room to spare, so adding one more item does not immediately
+     * force a growth.
+     *
+     * @param items the items to put in the bag.
+     * @param <T>   the item type.
+     * @return a Bag_Array containing exactly those items.
+     */
+    @SafeVarargs
+    public static <T> Bag_Array<T> of(T... items) {
+        Bag_Array<T> result = new Bag_Array<>();
+        if (items.length * 2 > INITIAL_CAPACITY) result.allocate(items.length * 2);
+        System.arraycopy(items, 0, result.items, 0, items.length);
+        result.count = items.length;
+        return result;
     }
 
     /**
@@ -153,13 +178,29 @@ public class Bag_Array<Item> implements Bag<Item> {
     }
 
     /**
+     * Allocate fresh, empty storage of the given size, discarding whatever was
+     * there. Used at construction, where there is nothing to copy.
+     *
+     * @param size the size of the new array.
+     */
+    private void allocate(int size) {
+        //noinspection unchecked
+        items = (Item[]) new Object[size];
+    }
+
+    /**
      * Retrieves the current capacity of the internal storage for the bag.
      * The capacity is defined as the size of the array used to store items.
      * It represents the maximum number of items the bag can hold without resizing.
      *
+     * NOTE package-private rather than private so that BagTest can assert that
+     * growth DOUBLES the capacity. That property cannot be observed from outside:
+     * an implementation which grew by a constant instead would satisfy every other
+     * test, while making n additions cost O(n^2) rather than amortized O(n).
+     *
      * @return the capacity of the internal storage.
      */
-    private int capacity() {
+    int capacity() {
         assert items != null; // Should be not-null any time after construction.
         return items.length;
     }
@@ -179,13 +220,26 @@ public class Bag_Array<Item> implements Bag<Item> {
      * copies all the elements of from into the start of the resulting array,
      * then returns the result.
      *
+     * NOTE package-private rather than private so that BagTest can test this
+     * contract directly. Testing it only through {@code add} is not enough: add
+     * always calls {@code grow(items, 2 * capacity())}, where the source is the
+     * whole backing array, so an implementation returning an array of
+     * {@code from.length * 2} is accidentally right at every call site while
+     * ignoring the size it was given.
+     *
      * @param from the source array
      * @param size the size of the new array
      */
-    private static <T> T[] growFrom(T[] from, int size) {
+    static <T> T[] growFrom(T[] from, int size) {
         // TO BE IMPLEMENTED  grow array and copy
                 throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
+
+    /**
+     * The capacity a bag starts with. Growth doubles this, and only that doubling
+     * goes through growFrom.
+     */
+    private static final int INITIAL_CAPACITY = 32;
 
     private final Random random;
 

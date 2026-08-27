@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.function.Function;
 
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.HELPER;
+import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.MSDCUTOFF;
 
 /**
  * The ClassicHelper class provides an implementation of the NonComparableHelper interface,
@@ -319,6 +320,17 @@ public class ClassicHelper<X> implements NonComparableHelper<X> {
      * @param xs an array of elements of type X to be post-processed
      */
     @Override
+    /**
+     * @return the cutoff below which MSD radix sort hands over to quicksort.
+     * NOTE this class does not extend BaseHelper, so it needs its own copy. While
+     * it had none, an uninstrumented MSDStringSort -- which is what
+     * HelperFactory.createGeneric builds by default -- cut over at 20 rather
+     * than the documented 256.
+     */
+    public int MSDCutoff() {
+        return config.getInt(HELPER, MSDCUTOFF, BaseHelper.MSD_CUTOFF_DEFAULT);
+    }
+
     public void postProcess(X[] xs) {
         NonComparableHelper.super.postProcess(xs);
         if (checkSorted && !isSorted(xs))

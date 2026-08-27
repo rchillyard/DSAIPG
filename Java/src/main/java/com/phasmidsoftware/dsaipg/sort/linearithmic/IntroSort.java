@@ -142,8 +142,14 @@ public class IntroSort<X extends Comparable<X>> extends QuickSort_DualPivot<X> {
                 if (child < n && helper.compare(a, from + child - 1, from + child) < 0) child++;
                 if (helper.compare(d, a[from + child - 1]) >= 0) break;
             } else {
-                if (child < n && a[from + child - 1].compareTo(a[from + child]) < 0) child++;
-                if (d.compareTo(a[from + child - 1]) >= 0) break;
+                // NOTE pureComparison, NOT compareTo -- see QuickSort_3way.
+                // compareTo ignores the Helper's comparator, so an uninstrumented
+                // sort with a custom comparator came out in the natural ordering
+                // instead. This branch exists to skip the counting, not to change
+                // the ordering.
+                if (child < n && helper.pureComparison(a[from + child - 1], a[from + child]) < 0)
+                    child++;
+                if (helper.pureComparison(d, a[from + child - 1]) >= 0) break;
             }
             helper.incrementFixes(1);
             a[from + i - 1] = a[from + child - 1];

@@ -6,6 +6,7 @@ import org.ini4j.Ini;
 
 import static com.phasmidsoftware.dsaipg.sort.helper.InstrumentedComparableHelper.*;
 import static com.phasmidsoftware.dsaipg.sort.linearithmic.MergeSort.INSURANCE;
+import static com.phasmidsoftware.dsaipg.sort.linearithmic.MergeSort.MERGESORT;
 import static com.phasmidsoftware.dsaipg.sort.linearithmic.MergeSort.NOCOPY;
 
 /**
@@ -103,8 +104,8 @@ public class Config_Benchmark {
         ini.put(sInstrumenting, COPIES, instrumenting);
         ini.put(sInstrumenting, FIXES, instrumenting);
         ini.put("huskyhelper", "countinteriminversions", interimInversions);
-        ini.put(Config_Benchmark.HELPER, INSURANCE, insurance);
-        ini.put(Config_Benchmark.HELPER, NOCOPY, noCopy);
+        ini.put(MERGESORT, INSURANCE, insurance);
+        ini.put(MERGESORT, NOCOPY, noCopy);
         return new Config(ini);
     }
 

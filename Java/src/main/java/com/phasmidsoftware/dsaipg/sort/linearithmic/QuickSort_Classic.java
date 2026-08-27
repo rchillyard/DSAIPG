@@ -124,9 +124,13 @@ public class QuickSort_Classic<X extends Comparable<X>> extends QuickSort<X> {
 //                System.out.println(((BaseHelper<?>) helper).showInterimStats("end: "+partition));
             } else {
                 while (true) {
-                    while (i < hi && ys[++i].compareTo(v) < 0) {
+                    // NOTE pureComparison, NOT compareTo. This branch exists only to
+                    // skip the counting, not to change the ordering: compareTo ignores
+                    // the Helper's comparator, so an uninstrumented sort with a custom
+                    // comparator came out in the natural ordering instead.
+                    while (i < hi && helper.pureComparison(ys[++i], v) < 0) {
                     }
-                    while (j > from && ys[--j].compareTo(v) > 0) {
+                    while (j > from && helper.pureComparison(ys[--j], v) > 0) {
                     }
                     if (i >= j) break;
                     swap(ys, i, j);

@@ -125,7 +125,6 @@ public abstract class QuickSort<X extends Comparable<X>> extends SortWithCompara
      */
     public QuickSort(String description, int N, int nRuns, Config config) {
         super(description, N, nRuns, config);
-        System.out.println("QuickSort: " + description);
         insertionSort = setupInsertionSort(getHelper());
     }
 

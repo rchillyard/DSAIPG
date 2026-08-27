@@ -83,6 +83,13 @@ public abstract class BaseHelper<X> implements Helper<X> {
     }
 
     /**
+     * @return the cutoff below which MSD radix sort hands over to quicksort.
+     */
+    public int MSDCutoff() {
+        return MSDcutoff;
+    }
+
+    /**
      * Closes and performs necessary cleanup for this helper instance.
      * Typically used to release any resources or finalize any operations
      * associated with the helper. The exact behavior depends on the
@@ -285,6 +292,7 @@ public abstract class BaseHelper<X> implements Helper<X> {
         this.config = config;
         this.n = n;
         this.cutoff = config.getInt(HELPER, CUTOFF, CUTOFF_DEFAULT);
+        this.MSDcutoff = config.getInt(HELPER, MSDCUTOFF, MSD_CUTOFF_DEFAULT);
     }
 
     /**
@@ -326,10 +334,25 @@ public abstract class BaseHelper<X> implements Helper<X> {
      */
     protected final int cutoff;
     /**
+     * The cutoff below which MSD radix sort hands over to quicksort.
+     * NOTE this lives here, rather than on InstrumentedComparatorHelper where it
+     * used to, so that it is the same whether or not we are instrumenting.
+     * While it was only on the instrumented Helper, MSDStringSort cut over at
+     * MSDCutoff() == 20 -- the Helper default -- for an ordinary run, and at 256
+     * when instrumented, so the measurements described a different algorithm
+     * from the one that normally ran.
+     */
+    protected final int MSDcutoff;
+    /**
      * Keep track of the random array that was generated. This is available via the InstrumentedHelper class.
      */
     protected X[] randomArray;
     protected int n;
 
     public static final String INSTRUMENT = "instrument";
+
+    /**
+     * The default cutoff for MSD radix sort, as documented in config.ini.
+     */
+    public static final int MSD_CUTOFF_DEFAULT = 256;
 }

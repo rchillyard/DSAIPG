@@ -152,9 +152,13 @@ public class QuickSort_DualPivot<X extends Comparable<X>> extends QuickSort<X> {
             } else {
                 while (i <= gt) {
                     X x = xs[i];
-                    if (x.compareTo(v1) < 0) {
+                    // NOTE pureComparison, NOT compareTo -- see QuickSort_3way.
+                    // compareTo ignores the Helper's comparator, so an
+                    // uninstrumented sort with a custom comparator came out in
+                    // the natural ordering instead.
+                    if (helper.pureComparison(x, v1) < 0) {
                         swap(xs, lt++, i++);
-                    } else if (x.compareTo(v2) > 0) {
+                    } else if (helper.pureComparison(x, v2) > 0) {
                         swap(xs, i, gt--);
                     } else i++;
                 }

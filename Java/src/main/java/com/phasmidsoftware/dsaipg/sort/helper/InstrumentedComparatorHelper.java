@@ -174,9 +174,12 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
      */
     public void swapInto(X[] xs, int i, int j, X x) {
         instrumenter.incrementSwaps(1);
-        instrumenter.incrementCopies(j - i);
         instrumenter.incrementFixes(j - i);
         instrumenter.incrementHits(1); // for the final assignment
+        // NOTE the copies are NOT counted here. super.swapInto delegates to
+        // copyBlock, which is itself instrumented and counts j - i of them.
+        // Counting them here as well made every half-swap report twice as many
+        // copies as it performed.
         super.swapInto(xs, i, j, x);
     }
 
@@ -311,8 +314,15 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
     public void copyBlock(X[] source, int i, X[] target, int j, int n) {
         super.copyBlock(source, i, target, j, n);
         instrumenter.incrementCopies(n);
-        if (source == target) instrumenter.incrementHits(n+1);  // CONSIDER is this right?
-        else instrumenter.incrementHits(2L * n);
+        // NOTE 2n whether or not the source and target are the same array: n
+        // elements are read and n are written either way.
+        // This used to charge n + 1 for the same-array case, with a comment
+        // asking whether that was right. It was not. Measured by counting the
+        // accesses a list actually performs -- which the Python tree can do and
+        // this one cannot -- a same-array block move of n elements performs 2n
+        // accesses, and InsertionSortOpt, which is nothing but block moves, was
+        // reporting 55% of the accesses it made.
+        instrumenter.incrementHits(2L * n);
     }
 
     /**
@@ -399,9 +409,6 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
      *
      * @return the current MSD cutoff value as an integer.
      */
-    public int MSDCutoff() {
-        return MSDcutoff;
-    }
 
     /**
      * Initialize this Helper.
@@ -593,7 +600,6 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
         // CONSIDER using config.toString here somewhere.
         super(description, comparator, n, random, instrumenter, config);
         this.countInversions = config.getInt(Instrumenter.INSTRUMENTING, Instrumenter.INVERSIONS, 0);
-        this.MSDcutoff = config.getInt(HELPER, MSDCUTOFF, MSD_CUTOFF_DEFAULT);
         this.nRuns = nRuns;
         debugEnabled = logger.isDebugEnabled();
     }
@@ -682,34 +688,6 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
     }
 
     /**
-     * This version of binarySearch is copied from Arrays, but is generalized to operate on X.
-     * Furthermore, it does not check its indexes like the Arrays public method.
-     *
-     * @param xs   the array of X elements.
-     * @param from the 'from' index.
-     * @param to   the to index.
-     * @param key  the key.
-     * @return the index of the element where <code>key</code> was found, otherwise the index where it would have been found.
-     */
-    @Override
-    public int binarySearch(X[] xs, int from, int to, X key) {
-        int low = from;
-        int high = to - 1;
-
-        while (low <= high) {
-            int mid = (low + high) >>> 1;
-            int cmp = compare(get(xs, mid), key);
-            if (cmp < 0)
-                low = mid + 1;
-            else if (cmp > 0)
-                high = mid - 1;
-            else
-                return mid; // key found
-        }
-        return -(low + 1);  // key not found.
-    }
-
-    /**
      * Checks the consistency between recorded fixes and the calculated inversions
      * against the initial value stored in the instrumenter's statistics pack.
      * NOTE: this private methods is only for testing (using reflection).
@@ -726,7 +704,6 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
         }
     }
 
-    protected final int MSDcutoff;
     protected final int nRuns;
     protected long countInversions;
     protected int maxDepth = 0;
@@ -740,7 +717,6 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
      * It shouldn't matter too much because those arrays will grow as needed.
      */
     public static final int DEFAULT_RUNS = 1;
-    public static final int MSD_CUTOFF_DEFAULT = 256;
 
     /**
      * Retrieves the number of runs from the specified configuration object.

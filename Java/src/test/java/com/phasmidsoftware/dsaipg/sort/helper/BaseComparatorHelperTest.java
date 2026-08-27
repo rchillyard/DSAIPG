@@ -6,7 +6,11 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
@@ -26,10 +30,22 @@ public class BaseComparatorHelperTest {
 
     @Test
     public void swap() {
+        // Two reads and two writes, and one swap. The counts here were checked
+        // against the Helper itself, not inferred.
+        Integer[] xs = {1, 2};
+        helper.swap(xs, 0, 1);
+        assertArrayEquals(new Integer[]{2, 1}, xs);
+        assertEquals(1, helper.getSwaps());
+        assertEquals(4, helper.getHits());
     }
 
     @Test
     public void swapStable() {
+        Integer[] xs = {1, 3, 2};
+        helper.swapStable(xs, 2);
+        assertArrayEquals(new Integer[]{1, 2, 3}, xs);
+        assertEquals(1, helper.getSwaps());
+        assertEquals(4, helper.getHits());
     }
 
     @Test
@@ -51,6 +67,13 @@ public class BaseComparatorHelperTest {
 
     @Test
     public void testCompare() {
+        // swapV and swapW each read one element rather than two, because the
+        // caller already holds the other. That is the whole reason they exist.
+        Integer[] xs = {1, 2};
+        helper.swapV(xs[0], xs, 0, 1);
+        assertArrayEquals(new Integer[]{2, 1}, xs);
+        assertEquals(1, helper.getSwaps());
+        assertEquals(3, helper.getHits());
     }
 
     @Test
@@ -72,29 +95,67 @@ public class BaseComparatorHelperTest {
 
     @Test
     public void testLess() {
+        Integer[] xs = {1, 2};
+        assertTrue(helper.notInverted(xs, 0, 1));
+        assertEquals(1, helper.getCompares());
+        assertEquals(2, helper.getHits());
     }
 
     @Test
     public void testLess1() {
+        Integer[] xs = {1, 2};
+        assertTrue(helper.notInverted(xs, xs[0], 1));
+        assertEquals(1, helper.getCompares());
+        assertEquals(1, helper.getHits());
     }
 
     @Test
     public void testLess2() {
+        Integer[] xs = {1, 2};
+        assertTrue(helper.notInverted(xs, 0, xs[1]));
+        assertEquals(1, helper.getCompares());
+        assertEquals(1, helper.getHits());
     }
 
     @Test
     public void inSequence() {
+        // inSequence deliberately affects no statistics: checking whether an
+        // array is sorted must not show up as work the sort did.
+        Integer[] xs = {1, 2};
+        assertEquals(Integer.valueOf(2), helper.inSequence(xs, 1, 1));
+        assertNull(helper.inSequence(xs, 3, 1));
+        assertEquals(0, helper.getCompares());
+        assertEquals(0, helper.getHits());
     }
 
     @Test
     public void swapConditional() {
+        Integer[] xs = {2, 1};
+        assertTrue(helper.swapConditional(xs, 0, 1));
+        assertArrayEquals(new Integer[]{1, 2}, xs);
+        assertEquals(1, helper.getCompares());
+        assertEquals(1, helper.getSwaps());
+        assertEquals(4, helper.getHits());
+        assertEquals(2, helper.getLookups());
     }
 
     @Test
     public void swapStableConditional() {
+        Integer[] xs = {1, 2};
+        assertFalse("an ordered pair is left alone", helper.swapStableConditional(xs, 1));
+        assertArrayEquals(new Integer[]{1, 2}, xs);
+        assertEquals(1, helper.getCompares());
+        assertEquals(0, helper.getSwaps());
+        assertEquals(2, helper.getHits());
     }
 
     @Test
     public void testCompare1() {
+        // swapVW reads nothing at all: two writes only.
+        Integer[] xs = {1, 2};
+        helper.swapVW(xs[0], xs[1], xs, 0, 1);
+        assertArrayEquals(new Integer[]{2, 1}, xs);
+        assertEquals(1, helper.getSwaps());
+        assertEquals(2, helper.getHits());
     }
 }
