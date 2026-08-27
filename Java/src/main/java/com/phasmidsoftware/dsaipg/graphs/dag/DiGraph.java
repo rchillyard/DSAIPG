@@ -28,6 +28,13 @@ public class DiGraph<V, E> extends AbstractGraph<V, Edge<V, E>> {
      */
     public DiGraph<V, E> reverse() {
         DiGraph<V, E> result = new DiGraph<>();
+        // NOTE the vertices must be carried over first, and separately. Rebuilding
+        // from the edges alone loses any vertex with no edge at either end -- and
+        // since kernelDAG() walks reverse().reversePostOrderDFS(), such a vertex
+        // was then left out of the strongly-connected-component decomposition
+        // altogether, though it is a component of its own. A graph of one lone
+        // vertex produced no kernels at all.
+        for (V v : vertices()) result.getAdjacencyBag(v);
         for (Edge<V, E> e : edges()) result.addEdge(e.reverse());
         return result;
     }

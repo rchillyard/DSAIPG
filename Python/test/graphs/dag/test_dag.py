@@ -130,6 +130,21 @@ class TestDiGraph:
         target = cyclic_digraph()
         assert set(target.reverse().vertices()) == set(target.vertices())
 
+    def test_reverse_keeps_a_vertex_with_no_edges(self):
+        # The case reverse() used to drop, since it rebuilt from the edges alone.
+        target: DiGraph = DiGraph()
+        target.add_edge(Edge("A", "B", 1))
+        target.add_vertex("Z")
+        assert set(target.reverse().vertices()) == {"A", "B", "Z"}
+
+    def test_reverse_of_a_graph_with_no_edges(self):
+        target: DiGraph = DiGraph()
+        target.add_vertex("A")
+        target.add_vertex("B")
+        reversed_ = target.reverse()
+        assert set(reversed_.vertices()) == {"A", "B"}
+        assert len(list(reversed_.edges())) == 0
+
     def test_reverse_twice_gives_the_original_edges(self):
         target = cyclic_digraph()
         assert set(target.reverse().reverse().edges()) == set(target.edges())
@@ -177,29 +192,22 @@ class TestKernelDAG:
         assert len(kernels) == len(list(target.vertices()))
         assert all(len(k.vertices) == 1 for k in kernels)
 
-    def test_an_isolated_vertex_is_lost(self):
-        # RECORDED, NOT ENDORSED. A vertex with no edges should be a strongly
-        # connected component of its own, and it is not: kernel_dag walks
-        # self.reverse(), and reverse() rebuilds the graph from its EDGES only,
-        # so a vertex nothing points at and nothing leaves simply does not appear.
-        # The Java loses it in exactly the same way.
-        #
-        # It goes unnoticed because every test graph in this package, in both
-        # trees, has an edge at every vertex.
+    def test_a_single_isolated_vertex_is_its_own_kernel(self):
+        # kernel_dag walks the reversed graph, so this used to produce NO kernels
+        # at all: reverse() rebuilt from edges alone and lost the vertex. It went
+        # unnoticed because every test graph in this package, in both trees, has
+        # an edge at every vertex.
         target: DiGraph = DiGraph()
         target.add_vertex("A")
-        assert list(target.vertices()) == ["A"]
-        assert list(target.kernel_dag().vertices()) == [], \
-            "the isolated vertex is dropped; see graphs/dag notes in Deferred work.md"
+        assert [k.vertices for k in target.kernel_dag().vertices()] == [["A"]]
 
-    def test_reverse_is_where_the_isolated_vertex_goes(self):
-        # The same defect, pinned at its source rather than at the symptom.
+    def test_an_isolated_vertex_alongside_a_component(self):
         target: DiGraph = DiGraph()
         target.add_edge(Edge("A", "B", 1))
         target.add_vertex("Z")
-        assert set(target.vertices()) == {"A", "B", "Z"}
-        assert set(target.reverse().vertices()) == {"A", "B"}, \
-            "reverse() copies edges, so a vertex with none is not carried over"
+        kernels = list(target.kernel_dag().vertices())
+        assert {frozenset(k.vertices) for k in kernels} \
+               == {frozenset("A"), frozenset("B"), frozenset("Z")}
 
 
 class TestKernel:

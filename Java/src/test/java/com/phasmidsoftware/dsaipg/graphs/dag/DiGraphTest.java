@@ -44,6 +44,36 @@ public class DiGraphTest {
         assertEquals(1, edges.size());
     }
 
+    /**
+     * A vertex with no edge at either end must survive reverse(), and must appear
+     * in the kernel DAG as a component of its own.
+     * <p>
+     * reverse() used to rebuild the graph from its edges alone, so such a vertex
+     * simply vanished — and because kernelDAG() walks
+     * reverse().reversePostOrderDFS(), it was then missing from the
+     * strongly-connected-component decomposition too. A graph consisting of one
+     * lone vertex produced no kernels at all. It went unnoticed because every
+     * other test graph here has an edge at every vertex.
+     */
+    @Test
+    public void testReverseKeepsAnIsolatedVertex() {
+        DiGraph<String, Integer> graph = new DiGraph<>();
+        graph.addEdge(new Edge<>("A", "B", 1));
+        graph.addVertex("Z");
+        assertEquals(3, graph.vertices().size());
+        assertEquals(3, graph.reverse().vertices().size());
+        assertEquals(1, graph.reverse().edges().size());
+    }
+
+    @Test
+    public void testKernelDAGOfASingleIsolatedVertex() {
+        DiGraph<String, Integer> graph = new DiGraph<>();
+        graph.addVertex("A");
+        final SizedIterable<DiGraph.Kernel<String>> kernels = graph.kernelDAG().vertices();
+        assertEquals(1, kernels.size());
+        assertEquals("[A]", kernels.iterator().next().toString());
+    }
+
     @Test
     public void testKernelDAG() {
         DiGraph<String, Integer> graph = creatTestGraph();

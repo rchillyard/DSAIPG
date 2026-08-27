@@ -130,6 +130,14 @@ class DiGraph(AbstractGraph[V, "Edge[V, E]"], Generic[V, E]):
         :return: a graph with every edge pointing the other way.
         """
         result: DiGraph[V, E] = DiGraph(self._random)
+        # NOTE the vertices must be carried over first, and separately. Rebuilding
+        # from the edges alone loses any vertex with no edge at either end -- and
+        # since kernel_dag walks the reversed graph, such a vertex was then left
+        # out of the strongly-connected-component decomposition altogether, though
+        # it is a component of its own. A graph of one lone vertex produced no
+        # kernels at all.
+        for v in self.vertices():
+            result.get_adjacency_bag(v)
         for e in self.edges():
             result.add_edge(e.reverse())
         return result
