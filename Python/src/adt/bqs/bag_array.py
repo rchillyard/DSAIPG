@@ -6,6 +6,10 @@ from random import Random
 from .bag import Bag, Item
 from .unordered_iterator import UnorderedIterator
 
+#: The capacity a bag starts with. Growth doubles this, and only that doubling
+#: goes through _grow_from.
+INITIAL_CAPACITY = 32
+
 
 class BagArray(Bag[Item]):
     """
@@ -32,9 +36,39 @@ class BagArray(Bag[Item]):
                  unpredictable.
         """
         self._count: int = 0
-        self._items: list[Item | None] | None = None
-        self._grow([], 32)
+        self._items: list[Item | None] | None = [None] * INITIAL_CAPACITY
         self._random: Random = rnd if rnd is not None else Random()
+
+    @classmethod
+    def of(cls, *items: Item, rnd: Random | None = None) -> BagArray[Item]:
+        """
+        Construct a BagArray containing the given items.
+
+        NOTE this deliberately does not go through _grow_from: it allocates
+        storage large enough at the outset. That matters because _grow_from is an
+        exercise. A bag which could not even be constructed until the exercise was
+        written made every test that merely uses a bag depend on it -- of the
+        tests blocked that way, two thirds were testing graphs and classification
+        sorts, not bags. Now only genuine growth, past the initial capacity, needs
+        the exercise.
+
+        The new bag has room to spare, so adding one more item does not
+        immediately force a growth.
+
+        Args:
+            items: the items to put in the bag.
+            rnd: a random source, as for the constructor.
+
+        Returns:
+            a BagArray containing exactly those items.
+        """
+        result = cls(rnd)
+        if len(items) * 2 > INITIAL_CAPACITY:
+            result._items = [None] * (len(items) * 2)
+        assert result._items is not None
+        result._items[: len(items)] = items
+        result._count = len(items)
+        return result
 
     def add(self, item: Item) -> None:
         """
