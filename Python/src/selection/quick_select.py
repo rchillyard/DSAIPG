@@ -45,7 +45,6 @@ class QuickSelect(Select[X]):
         
         # TO BE IMPLEMENTED implement the logic for QuickSelect using the partition and createPartition methods below.
         raise NotImplementedError("TO BE IMPLEMENTED")
-        # END SOLUTION
         
         return xs[k]
 

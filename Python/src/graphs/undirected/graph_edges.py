@@ -5,12 +5,23 @@ from typing import Generic, TypeVar
 
 from .abstract_graph import AbstractGraph
 from .edge import Edge
+from .edge_graph import EdgeGraph
 
 V = TypeVar("V")
 E = TypeVar("E")
 
 
-class GraphEdges(Generic[V, E], AbstractGraph[V, Edge[V, E]]):
+class GraphEdges(Generic[V, E], AbstractGraph[V, Edge[V, E]], EdgeGraph[V, E]):
+    """
+    A graph whose adjacency type is the Edge itself, so edges can carry attributes.
+
+    NOTE the EdgeGraph base was missing until now, though the Java has
+    ``implements EdgeGraph<V, E>``. Two things followed from that: EdgeGraph was
+    an interface with no implementation anywhere in the Python tree, and
+    ``add_edge_vertices`` -- the Java's ``addEdge(from, to, attribute)`` -- could
+    not be called on the only class that should have had it.
+    """
+
     __slots__ = ()
 
     def edges(self) -> Iterable[Edge[V, E]]:

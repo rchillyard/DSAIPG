@@ -40,7 +40,6 @@ class Node:
         """Perform depth-first traversal of the tree."""
         # TO BE IMPLEMENTED
         raise NotImplementedError("TO BE IMPLEMENTED")
-        # END SOLUTION
 
 
 @dataclass(frozen=True)
@@ -114,7 +113,6 @@ class HuffmanEncoder:
         """Build the encoding dictionary by traversing the tree."""
         # TO BE IMPLEMENTED  build a dict of symbol -> Code by traversing the tree
         raise NotImplementedError("TO BE IMPLEMENTED")
-        # END SOLUTION
     
     def encode(self, symbols: list[str | None]) -> list[int]:
         """Encode a sequence of symbols into a list of 64-bit integers."""
@@ -177,7 +175,6 @@ class HuffmanDecoder:
         """Decode a single 64-bit value."""
         # TO BE IMPLEMENTED
         raise NotImplementedError("TO BE IMPLEMENTED")
-        # END SOLUTION
 
 
 class HuffmanCoding:

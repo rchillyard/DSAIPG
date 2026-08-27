@@ -32,3 +32,15 @@ class Edge(Generic[V, E]):
 
     def __str__(self) -> str:
         return f"{self.a}-{self.b}: {self.attribute}"
+
+    def __repr__(self) -> str:
+        """
+        The same form as __str__, because Java has only toString to serve both.
+
+        It matters here rather than being a nicety: an Edge lives inside a
+        BagArray inside a graph's dict, and both of those build their own string
+        with repr. Without this, printing a graph gave
+        ``Edge(a=1, b=2, attribute=1.0)`` from the dataclass where the Java gives
+        ``1-2: 1.0``.
+        """
+        return str(self)

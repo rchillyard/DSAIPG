@@ -117,4 +117,3 @@ class BagArray(Bag[Item]):
         """
         # TO BE IMPLEMENTED  grow array and copy
         raise NotImplementedError("TO BE IMPLEMENTED")
-        # END SOLUTION

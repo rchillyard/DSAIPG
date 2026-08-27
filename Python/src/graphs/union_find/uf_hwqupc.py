@@ -32,7 +32,6 @@ class UF_HWQUPC(UF):
         root = p  # noqa: F841  starting point for the exercise, as in UF_HWQUPC.java
         # TO BE IMPLEMENTED  walk up to the root, compressing the path on the way if enabled
         raise NotImplementedError("TO BE IMPLEMENTED")
-        # END SOLUTION
 
     def is_connected(self, p: int, q: int) -> bool:
         return self.find(p) == self.find(q)
@@ -80,7 +79,6 @@ class UF_HWQUPC(UF):
         """
         # TO BE IMPLEMENTED  make shorter root point to taller one
         raise NotImplementedError("TO BE IMPLEMENTED")
-        # END SOLUTION
 
     def _do_path_compression(self, i: int) -> None:
         """
@@ -88,4 +86,3 @@ class UF_HWQUPC(UF):
         """
         # TO BE IMPLEMENTED  update parent to value of grandparent
         raise NotImplementedError("TO BE IMPLEMENTED")
-        # END SOLUTION
