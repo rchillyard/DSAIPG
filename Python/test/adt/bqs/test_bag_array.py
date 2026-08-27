@@ -42,15 +42,32 @@ def test_bag_grows_past_initial_capacity():
 
 
 def test_growth_doubles_the_capacity_rather_than_adding_one():
-    # The property that makes a growable array amortized O(1) per add. Growing by
-    # a constant instead would still pass every other test here, and would make n
-    # adds cost O(n^2) -- so it is worth asserting directly.
+    # Doubling is what makes the amortized cost of an add O(1) rather than O(n).
+    #
+    # NOTE what this does and does not guard. The factor is chosen by `add`, which
+    # calls `_grow(self._items, 2 * self._capacity())`, and add is not part of the
+    # exercise -- so a student cannot get the doubling wrong. What it does catch is
+    # _grow_from returning a list of the wrong length, and a later change to add's
+    # growth policy. Growing by a constant would pass every other test here, so
+    # the policy is worth pinning down somewhere.
     b = BagArray()
     for i in range(INITIAL_CAPACITY):
         b.add(i)
     assert b._capacity() == INITIAL_CAPACITY, "no growth until it is actually full"
     b.add(99)
     assert b._capacity() == 2 * INITIAL_CAPACITY
+
+
+def test_grow_from_honours_the_requested_size():
+    # A direct test of the exercise's contract rather than of its use, and it
+    # earns its place: `add` only ever calls `_grow(items, 2 * capacity())`, where
+    # source is the whole backing list, so an implementation returning
+    # `[None] * (len(source) * 2)` is accidentally right at every call site and
+    # passes every other test in this file -- while ignoring the size it was
+    # given. Only calling it directly can tell the difference.
+    assert BagArray._grow_from([1, 2], 5) == [1, 2, None, None, None]
+    assert BagArray._grow_from([], 3) == [None, None, None]
+    assert BagArray._grow_from([1, 2, 3], 3) == [1, 2, 3]
 
 
 def test_growth_preserves_the_items_and_their_order():
