@@ -29,11 +29,18 @@ import static org.junit.Assert.assertTrue;
  * the Helper's back, and its published statistics are wrong.
  * <p>
  * This exists because TimSort's were, badly. It was reimplemented from the JDK so
- * that it could be instrumented, but only binarySort goes through the Helper; run
- * detection and merging do not. On 1,000 random ints it reported 3,677
- * comparisons out of 8,702 actually made, and on already-sorted input it reported
- * 0 out of 999 -- and zero is impossible for any comparison sort, which must make
- * at least n - 1 comparisons to establish an order.
+ * that it could be instrumented, and then only binarySort ever was; run detection,
+ * galloping and merging went through nothing that counted. On 1,000 random ints it
+ * reported 3,677 comparisons out of 8,702 actually made, and on already-sorted
+ * input it reported 0 out of 999 -- and zero is impossible for any comparison
+ * sort, which must make at least n - 1 comparisons to establish an order. The
+ * sorted case was the tell: on sorted input the run detector finds one run and
+ * binarySort, the only instrumented method, is never called at all.
+ * <p>
+ * That is fixed. TimSortWrapper now passes the same check as every other sort:
+ * 8,670 comparisons reported out of 8,670 made on random input, 999 out of 999 on
+ * sorted input, and hits up from 4,601 to 39,836 once the reads, the writes and
+ * the block moves were counted too.
  * <p>
  * NOTE the information-theoretic bound lg(n!) does NOT settle this on its own: it
  * bounds the worst case over all inputs, not any particular input, and a sort may
@@ -160,20 +167,12 @@ public class InstrumentationIsCompleteTest {
     }
 
     /**
-     * TimSortWrapper is the reason this test exists, and it still fails it: only
-     * binarySort goes through the Helper, so run detection and merging are
-     * uncounted.
-     * <p>
-     * Asserted as it currently behaves, NOT as it should. When the remaining
-     * Helper calls are added, this test will fail -- and the right response is to
-     * replace it with a plain check("TimSortWrapper", TimSortWrapper::new).
+     * TimSortWrapper is the reason this test exists. It used to be asserted here as
+     * it BEHAVED rather than as it should, so that finishing the instrumentation
+     * would make the recording fail and say so -- which is what happened.
      */
     @Test
-    public void testTimSortWrapperIsStillUncounted() {
-        assertTrue("TimSortWrapper now counts every comparison -- replace this test with check()",
-                uncounted("TimSortWrapper", TimSortWrapper::new, randomArray()) > 0);
-        assertEquals("on already-sorted input it reports no comparisons at all, "
-                        + "though it must make at least n - 1",
-                N - 1, uncounted("TimSortWrapper", TimSortWrapper::new, sortedArray()));
+    public void testTimSortWrapper() {
+        check("TimSortWrapper", TimSortWrapper::new);
     }
 }
