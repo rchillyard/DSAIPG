@@ -34,16 +34,15 @@ class TestLucasFamily:
         assert Pell().get(50) == 4866752642924153522
 
     def test_pell_beyond_a_64_bit_long(self):
-        # The Java's PellTest asserts get(90) == 7052354271195710746, which is NOT
-        # the 90th Pell number -- it is what a long holds once that value has
-        # wrapped. Python's integers do not overflow, so the true value comes out,
-        # and this assertion cannot match the Java's.
+        # The Java's PellTest used to assert get(90) == 7052354271195710746, which
+        # is NOT the 90th Pell number but what a long holds once that value has
+        # wrapped. Both trees use arbitrary precision now and assert this value.
         assert Pell().get(90) == 9960168529794442859224531878561050
         assert Pell().get(90) > 2 ** 63 - 1
 
     def test_fibonacci_beyond_a_32_bit_int(self):
-        # The Java stores these in an ArrayList<Integer>, so it wraps at n = 47.
-        # FibonacciTest stops at get(7), so it never shows there.
+        # The Java used to store these in an ArrayList<Integer>, so it wrapped at
+        # n = 47 while its test stopped at get(7). BigInteger now, in both trees.
         assert Fibonacci().get(47) == 4807526976
         assert Fibonacci().get(47) > 2 ** 31 - 1
 

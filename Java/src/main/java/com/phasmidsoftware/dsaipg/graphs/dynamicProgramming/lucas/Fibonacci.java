@@ -1,46 +1,40 @@
 package com.phasmidsoftware.dsaipg.graphs.dynamicProgramming.lucas;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
- * The Fibonacci class provides a way to compute the Fibonacci sequence.
- * The Fibonacci sequence is a series of numbers where each number is the sum of the two preceding ones,
- * traditionally starting with 1 and 1.
+ * The Fibonacci numbers, memoised: 1, 1, 2, 3, 5, 8, ...
  * <p>
- * This implementation uses memoization to optimize the computation by storing previously calculated results
- * in an internal list.
+ * NOTE these are BigIntegers. They used to be ints, which overflow silently at
+ * n = 47 — fib(47) is 4,807,526,976 against an int maximum of 2,147,483,647 — and
+ * the test stopped at get(7), so nothing ever showed it. A sequence class whose
+ * whole purpose is to produce large terms should not have a ceiling it does not
+ * mention, and the Python port has none, its integers being arbitrary precision.
  */
 public class Fibonacci {
 
     /**
-     * Retrieves the nth Fibonacci number.
-     * If the value is already computed and stored, it is returned directly.
-     * Otherwise, the value is calculated, memoized, and returned.
-     *
-     * @param n The index of the Fibonacci number to retrieve. Must be non-negative.
-     * @return The nth Fibonacci number.
-     * @throws UnsupportedOperationException If n is negative.
+     * @param n which term.
+     * @return the nth Fibonacci number.
+     * @throws UnsupportedOperationException if n is negative.
      */
-    public int get(int n) {
+    public BigInteger get(int n) {
         if (n < 0) throw new UnsupportedOperationException("Fibonacci.get is not supported for negative n");
         if (n < fib.size()) return fib.get(n);
         return evaluate(n);
     }
 
-    /**
-     * Constructs a new Fibonacci object and initializes the base cases of the Fibonacci sequence.
-     * The Fibonacci sequence always starts with the first two numbers as 1 and 1.
-     * These values are precomputed and stored in the internal list for subsequent calculations.
-     */
     public Fibonacci() {
-        fib.add(0, 1);
-        fib.add(1, 1);
+        fib.add(0, BigInteger.ONE);
+        fib.add(1, BigInteger.ONE);
     }
 
-    private int evaluate(int n) {
-        for (int i = fib.size(); i <= n; i++) fib.add(i, fib.get(i - 2) + fib.get(i - 1));
+    private BigInteger evaluate(int n) {
+        for (int i = fib.size(); i <= n; i++) fib.add(i, fib.get(i - 2).add(fib.get(i - 1)));
         return fib.get(n);
     }
 
-    final ArrayList<Integer> fib = new ArrayList<>();
+    final List<BigInteger> fib = new ArrayList<>();
 }

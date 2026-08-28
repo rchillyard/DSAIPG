@@ -1,46 +1,43 @@
 package com.phasmidsoftware.dsaipg.graphs.dynamicProgramming.lucas;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
- * The Pell class represents a numerical sequence called the Pell sequence.
- * The Pell numbers are a series of integers where each number is defined by the recurrence relation:
- * P(n) = 2 * P(n-1) + P(n-2), with the initial values P(0) = 0 and P(1) = 1.
+ * The Pell numbers, memoised: 0, 1, 2, 5, 12, 29, ...
  * <p>
- * This implementation uses memoization to compute Pell numbers efficiently, storing results
- * in an internal list to avoid redundant calculations.
+ * x[i] = x[i-2] + 2 * x[i-1].
+ * <p>
+ * NOTE BigInteger, and here it was not merely theoretical. These grow by a factor
+ * of about 2.414 each term, so they pass a 64-bit long at around n = 62 — and
+ * PellTest asserted {@code get(90) == 7052354271195710746}, which is not the 90th
+ * Pell number but what a long holds once that value has wrapped. The true value is
+ * 9,960,168,529,794,442,859,224,531,878,561,050, which the test now asserts.
  */
 public class Pell {
 
     /**
-     * Retrieves the nth Pell number.
-     * If the value is already computed and stored in the internal list, it is returned directly.
-     * Otherwise, the value is calculated using the recurrence relation, memoized, and returned.
-     *
-     * @param n The index of the Pell number to retrieve. Must be non-negative.
-     * @return The nth Pell number.
-     * @throws UnsupportedOperationException If n is negative.
+     * @param n which term.
+     * @return the nth Pell number, computed once and remembered.
+     * @throws UnsupportedOperationException if n is negative.
      */
-    public long get(int n) {
+    public BigInteger get(int n) {
         if (n < 0) throw new UnsupportedOperationException("Pell.get is not supported for negative n");
         if (n < pell.size()) return pell.get(n);
         return evaluate(n);
     }
 
-    /**
-     * Constructs a new Pell object and initializes the base cases of the Pell sequence.
-     * The Pell sequence begins with the first two numbers P(0) = 0 and P(1) = 1.
-     * These values are precomputed and stored in the internal list for subsequent calculations.
-     */
     public Pell() {
-        pell.add(0, 0L);
-        pell.add(1, 1L);
+        pell.add(0, BigInteger.ZERO);
+        pell.add(1, BigInteger.ONE);
     }
 
-    private long evaluate(int n) {
-        for (int i = pell.size(); i <= n; i++) pell.add(i, pell.get(i - 2) + 2 * pell.get(i - 1));
+    private BigInteger evaluate(int n) {
+        for (int i = pell.size(); i <= n; i++)
+            pell.add(i, pell.get(i - 2).add(BigInteger.TWO.multiply(pell.get(i - 1))));
         return pell.get(n);
     }
 
-    final ArrayList<Long> pell = new ArrayList<>();
+    final List<BigInteger> pell = new ArrayList<>();
 }

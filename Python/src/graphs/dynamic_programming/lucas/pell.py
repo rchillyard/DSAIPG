@@ -11,16 +11,13 @@ class Pell(Recurrence):
     """
     0, 1, 2, 5, 12, 29, ... -- x[i] = x[i-2] + 2*x[i-1].
 
-    NOTE these grow by a factor of about 2.414 each time, so they leave a 64-bit
-    long behind at around n = 62. The Java's PellTest asserts
-    ``get(90) == 7052354271195710746``, which is not the 90th Pell number: it is
-    what a long holds after that value has wrapped. The true value is
-    9,960,168,529,794,442,859,224,531,878,561,050.
-
-    Python's integers are arbitrary precision, so `get(90)` here gives the real
-    number and CANNOT reproduce the Java's assertion. The test says so, and the
-    Java's is recorded in `Deferred work.md` as an assertion of an arithmetic
-    accident rather than of a Pell number.
+    NOTE these grow by a factor of about 2.414 each time, so they pass a 64-bit
+    long at around n = 62. The Java used to hold them in a long and its PellTest
+    asserted ``get(90) == 7052354271195710746`` -- not the 90th Pell number, but
+    what a long holds once that value has wrapped. The Java uses BigInteger now,
+    so both trees give the true 9,960,168,529,794,442,859,224,531,878,561,050 and
+    there is no divergence left to document. Python's integers were arbitrary
+    precision all along, which is what brought the discrepancy to light.
     """
 
     def __init__(self) -> None:
