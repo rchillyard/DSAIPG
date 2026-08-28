@@ -1,10 +1,13 @@
 package com.phasmidsoftware.dsaipg.graphs.dynamicProgramming.knapsack;
 
 import com.google.common.collect.ImmutableList;
+import com.phasmidsoftware.dsaipg.graphs.dag.Edge;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -19,6 +22,11 @@ public class KnapsackTest {
 
     final Knapsack.Item itemA = new Knapsack.Item("A", 2, 1);
     final Knapsack.Item itemB = new Knapsack.Item("B", 1, 2);
+
+    // The three objects of Figure 10.12, with their weights and values.
+    final Knapsack.Item itemX = new Knapsack.Item("x", 10, 40);
+    final Knapsack.Item itemY = new Knapsack.Item("y", 3, 20);
+    final Knapsack.Item itemZ = new Knapsack.Item("z", 5, 30);
 
     @Test
     public void testIncrement() {
@@ -90,6 +98,75 @@ public class KnapsackTest {
         Knapsack.Solution solution2 = knapsack.mu(1, 2);
         assertEquals(itemB.value, solution2.value);
         assertEquals(ImmutableList.of(itemB), solution2.items);
+    }
+
+    /**
+     * The book's worked example (Figure 10.12): a knapsack carrying at most 10,
+     * and three objects. Packing x uses the whole capacity for a value of 40; y
+     * and z together weigh only 8 and are worth 50, which is the optimum.
+     */
+    @Test
+    public void figure10_12() {
+        Knapsack knapsack = new Knapsack(ImmutableList.of(itemX, itemY, itemZ));
+        Knapsack.Solution solution = knapsack.value(10);
+        assertEquals(50, solution.value);
+        assertEquals(ImmutableList.of(itemY, itemZ), solution.items);
+        assertEquals("the optimal packing leaves two of the ten unused",
+                8, solution.items.stream().mapToInt(i -> i.weight).sum());
+    }
+
+    /**
+     * The edges out of a sub-problem are the two decisions about item kappa: leave
+     * it (no attribute) or pack it (attributed with the item). The second is
+     * present only when the item fits.
+     */
+    @Test
+    public void graphRecordsTheTwoDecisions() {
+        Knapsack knapsack = new Knapsack(ImmutableList.of(itemX, itemY, itemZ));
+        knapsack.value(10);
+        // At (3, 10) we decide about z, which weighs 5 and therefore fits.
+        assertEquals(Map.of(new Knapsack.Key(2, 10), "leave", new Knapsack.Key(2, 5), "take"),
+                decisions(knapsack, 3, 10));
+        // At (1, 7) we decide about x, which weighs 10: too heavy, so only one edge.
+        assertEquals(Map.of(new Knapsack.Key(0, 7), "leave"), decisions(knapsack, 1, 7));
+    }
+
+    /**
+     * Every edge takes kappa down by exactly one, which is what makes the graph
+     * acyclic whatever the weights happen to be.
+     */
+    @Test
+    public void graphIsAcyclic() {
+        Knapsack knapsack = new Knapsack(ImmutableList.of(itemX, itemY, itemZ));
+        knapsack.value(10);
+        for (Edge<Knapsack.Key, Knapsack.Item> edge : knapsack.graph().edges())
+            assertEquals(edge.toString(), edge.getFrom().kappa - 1, edge.getTo().kappa);
+    }
+
+    /**
+     * The graph holds only the sub-problems the search actually reached. The book
+     * warns that a naive bottom-up solution "will evaluate all nW values of m,
+     * including many that will never be needed"; here n is 3 and W is 10, so a
+     * naive sweep would visit 30 sub-problems and we visit far fewer.
+     */
+    @Test
+    public void graphIsBuiltLazily() {
+        Knapsack knapsack = new Knapsack(ImmutableList.of(itemX, itemY, itemZ));
+        assertEquals("nothing is built until we ask", 0, knapsack.graph().vertices().size());
+        knapsack.value(10);
+        assertEquals(12, knapsack.graph().vertices().size());
+    }
+
+    /**
+     * Reports the decisions available at a sub-problem, as a map from the
+     * sub-problem each one leads to. Not a list, because the adjacency bag hands
+     * the edges out in a random order.
+     */
+    private static Map<Knapsack.Key, String> decisions(Knapsack knapsack, int kappa, int omega) {
+        Map<Knapsack.Key, String> result = new HashMap<>();
+        for (Edge<Knapsack.Key, Knapsack.Item> edge : knapsack.graph().adjacent(new Knapsack.Key(kappa, omega)))
+            result.put(edge.getTo(), edge.getAttributes() == null ? "leave" : "take");
+        return result;
     }
 
     @Test

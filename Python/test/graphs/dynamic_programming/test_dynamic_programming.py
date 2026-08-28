@@ -6,6 +6,14 @@ from src.graphs.dynamic_programming.coins.coin_changer import CoinChanger
 from src.graphs.dynamic_programming.house_robber.house_robber import solve_house_robber
 from src.graphs.dynamic_programming.knapsack.bellman_ford import bellman_ford
 from src.graphs.dynamic_programming.knapsack.coins import Coins
+from src.graphs.dynamic_programming.knapsack.knapsack import (
+    EMPTY,
+    Item,
+    Key,
+    Knapsack,
+    Solution,
+    solution_of,
+)
 from src.graphs.dynamic_programming.knapsack.vertex import Vertex
 from src.graphs.dynamic_programming.lucas.fibonacci import Fibonacci
 from src.graphs.dynamic_programming.lucas.lucas import Lucas
@@ -245,3 +253,134 @@ class TestCoins:
     def test_greedy_would_get_this_wrong(self):
         # 6 = 3 + 3. Greedy takes 4 first and then needs two 1s.
         assert Coins([1, 3, 4]).number(6).n == 2
+
+
+class TestKnapsack:
+    """
+    The 0-1 knapsack problem as the book presents it: Figure 10.12, a graph whose
+    vertices are sub-problems (kappa, omega) and whose edges are the two decisions
+    about one item.
+    """
+
+    item_a = Item("A", 2, 1)
+    item_b = Item("B", 1, 2)
+
+    # The three objects of Figure 10.12, with their weights and values.
+    item_x = Item("x", 10, 40)
+    item_y = Item("y", 3, 20)
+    item_z = Item("z", 5, 30)
+
+    def test_increment(self):
+        solution = EMPTY.increment(self.item_a)
+        assert solution.value == self.item_a.value
+        assert solution.items == (self.item_a,)
+
+    def test_value_of_nothing(self):
+        assert Knapsack([]).value(10) == EMPTY
+
+    def test_value_of_one_item(self):
+        assert Knapsack([self.item_a]).value(2) == Solution(1, (self.item_a,))
+
+    def test_value_prefers_the_more_valuable_of_two(self):
+        # B weighs less and is worth more, so it wins whichever order they come in
+        assert Knapsack([self.item_a, self.item_b]).value(2) == solution_of([self.item_b])
+        assert Knapsack([self.item_b, self.item_a]).value(2) == solution_of([self.item_b])
+
+    def test_mu_with_no_items(self):
+        assert Knapsack([]).mu(0, 10) == EMPTY
+
+    def test_mu_with_an_item_that_may_not_fit(self):
+        knapsack = Knapsack([self.item_a])
+        assert knapsack.mu(1, 1) == EMPTY, "A weighs 2, so it does not fit"
+        assert knapsack.mu(1, 2).items == (self.item_a,)
+
+    def test_mu_with_an_item_that_always_fits(self):
+        knapsack = Knapsack([self.item_b])
+        assert knapsack.mu(1, 1).items == (self.item_b,)
+        assert knapsack.mu(1, 2).items == (self.item_b,)
+
+    def test_the_books_worked_example(self):
+        # Packing x uses the whole capacity for a value of 40; y and z together
+        # weigh only 8 and are worth 50, which is the optimum.
+        solution = Knapsack([self.item_x, self.item_y, self.item_z]).value(10)
+        assert solution.value == 50
+        assert solution.items == (self.item_y, self.item_z)
+        assert sum(i.weight for i in solution.items) == 8
+
+    def test_the_edges_are_the_two_decisions(self):
+        knapsack = Knapsack([self.item_x, self.item_y, self.item_z])
+        knapsack.value(10)
+        # At (3, 10) we decide about z, which weighs 5 and therefore fits.
+        assert self.decisions(knapsack, 3, 10) == {Key(2, 10): "leave", Key(2, 5): "take"}
+        # At (1, 7) we decide about x, which weighs 10: too heavy, so only one edge.
+        assert self.decisions(knapsack, 1, 7) == {Key(0, 7): "leave"}
+
+    def test_every_edge_takes_kappa_down_by_one(self):
+        # so the graph is acyclic whatever the weights happen to be
+        knapsack = Knapsack([self.item_x, self.item_y, self.item_z])
+        knapsack.value(10)
+        for edge in knapsack.graph.edges():
+            assert edge.get_to().kappa == edge.get_from().kappa - 1
+
+    def test_the_graph_is_built_lazily(self):
+        # The book warns that a naive bottom-up solution "will evaluate all nW
+        # values of m, including many that will never be needed". Here n is 3 and
+        # W is 10, so a naive sweep would visit 30 sub-problems.
+        knapsack = Knapsack([self.item_x, self.item_y, self.item_z])
+        assert len(knapsack.graph.vertices()) == 0, "nothing is built until we ask"
+        knapsack.value(10)
+        assert len(knapsack.graph.vertices()) == 12
+
+    def test_the_google_data_set(self):
+        # see https://developers.google.com/optimization/pack/knapsack#java_1
+        values = [360, 83, 59, 130, 431, 67, 230, 52, 93, 125, 670, 892, 600, 38, 48, 147,
+                  78, 256, 63, 17, 120, 164, 432, 35, 92, 110, 22, 42, 50, 323, 514, 28, 87, 73, 78, 15, 26,
+                  78, 210, 36, 85, 189, 274, 43, 33, 10, 19, 389, 276, 312]
+        weights = [7, 0, 30, 22, 80, 94, 11, 81, 70, 64, 59, 18, 0, 36, 3, 8, 15, 42, 9,
+                   0, 42, 47, 52, 32, 26, 48, 55, 6, 29, 84, 2, 4, 18, 56, 7, 29, 93, 44, 71, 3, 86, 66, 31,
+                   65, 0, 79, 20, 65, 52, 13]
+        packed = [0, 1, 3, 4, 6, 10, 11, 12, 14, 15, 16, 17, 18, 19, 21, 22, 24, 27, 28, 29, 30, 31,
+                  32, 34, 38, 39, 41, 42, 44, 47, 48, 49]
+        items = [Item(f"Item {i}", w, v) for i, (w, v) in enumerate(zip(weights, values))]
+        knapsack = Knapsack(items)
+        solution = knapsack.value(850)
+        assert solution.value == 7534
+        assert solution.items == tuple(items[i] for i in packed)
+        assert knapsack.sub_problems() == 31373
+        assert knapsack.sub_problems() < len(items) * 850, "far fewer than the nW of a naive sweep"
+
+    @pytest.mark.parametrize("seed", range(8))
+    def test_against_brute_force(self, seed):
+        # NOTE this replaces the Java's valueRandom100 and valueRandom200, which
+        # assert values drawn from java.util.Random's own sequence -- not something
+        # Python can reproduce. Checking every subset of a small instance is a
+        # stronger test anyway, since it validates the answer rather than recording
+        # whatever the code produced.
+        import itertools
+        import random
+
+        rng = random.Random(seed)
+        items = [Item(f"Item {i}", rng.randint(0, 12), rng.randint(0, 10)) for i in range(12)]
+        for capacity in (0, 5, 15, 40):
+            best = max(
+                sum(i.value for i in subset)
+                for n in range(len(items) + 1)
+                for subset in itertools.combinations(items, n)
+                if sum(i.weight for i in subset) <= capacity
+            )
+            solution = Knapsack(items).value(capacity)
+            assert solution.value == best, f"seed {seed}, capacity {capacity}"
+            assert sum(i.weight for i in solution.items) <= capacity
+            assert sum(i.value for i in solution.items) == solution.value
+
+    @staticmethod
+    def decisions(knapsack, kappa, omega):
+        """
+        Report the decisions available at a sub-problem, as a map from the
+        sub-problem each one leads to. Not a list, because the adjacency bag hands
+        the edges out in a random order.
+        """
+        return {
+            e.get_to(): "leave" if e.get_attributes() is None else "take"
+            for e in knapsack.graph.adjacent(Key(kappa, omega))
+        }
