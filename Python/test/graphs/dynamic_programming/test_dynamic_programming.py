@@ -5,6 +5,7 @@ from src.graphs.dag.edge import Edge
 from src.graphs.dynamic_programming.coins.coin_changer import CoinChanger
 from src.graphs.dynamic_programming.house_robber.house_robber import solve_house_robber
 from src.graphs.dynamic_programming.knapsack.bellman_ford import bellman_ford
+from src.graphs.dynamic_programming.knapsack.coins import Coins
 from src.graphs.dynamic_programming.knapsack.vertex import Vertex
 from src.graphs.dynamic_programming.lucas.fibonacci import Fibonacci
 from src.graphs.dynamic_programming.lucas.lucas import Lucas
@@ -177,3 +178,70 @@ class TestVertex:
 
     def test_str(self):
         assert str(Vertex("A", 1.0)) == "Vertex{id='A', currentBagWeight=1.0}"
+
+
+class TestCoins:
+    """
+    The coin chooser as the book presents it: Figure 10.11, a graph whose vertices
+    are remaining values and whose edges are coin choices.
+    """
+
+    def test_zero(self):
+        coins = Coins()
+        assert coins.number(0) == coins.zero
+        assert coins.sub_problems() == 0
+
+    def test_one(self):
+        coins = Coins()
+        assert coins.number(1) == coins.zero.increment(0)
+        assert coins.sub_problems() == 1
+
+    def test_six(self):
+        coins = Coins()
+        assert coins.number(6) == coins.zero.increment(0).increment(1)
+        assert coins.sub_problems() == 6
+
+    def test_the_books_worked_example(self):
+        # 87c in six coins: 3 x 25 + 1 x 10 + 2 x 1.
+        coins = Coins()
+        solution = coins.number(87)
+        assert solution.n == 6
+        assert solution.counts == (2, 0, 1, 3)
+        assert solution.total(coins.coins) == 87
+        assert coins.sub_problems() == 87, "time and space are Theta(v)"
+
+    def test_the_graph_has_a_vertex_per_sub_problem(self):
+        coins = Coins()
+        coins.number(6)
+        assert sorted(coins.graph.vertices()) == [0, 1, 2, 3, 4, 5, 6]
+
+    def test_the_edges_are_the_coin_choices(self):
+        coins = Coins()
+        coins.number(6)
+        # from 6 only the 1c and 5c coins fit; 10c and 25c do not
+        assert {e.get_to(): e.get_attributes() for e in coins.graph.adjacent(6)} == {5: 0, 1: 1}
+
+    def test_every_edge_goes_downwards(self):
+        # so the graph is acyclic -- the book's "no complication due to cycles" --
+        # and descending order is a topological order
+        coins = Coins()
+        coins.number(30)
+        for edge in coins.graph.edges():
+            assert edge.get_to() < edge.get_from()
+
+    def test_a_coin_list_of_a_different_size(self):
+        # The Java's zeros() returned a hard-coded four-element array, so any longer
+        # list threw ArrayIndexOutOfBounds from increment. Only US was ever used.
+        coins = Coins([1, 2, 5, 10, 20, 50])
+        solution = coins.number(38)
+        assert solution.n == 5
+        assert solution.total(coins.coins) == 38
+
+    def test_an_unmakeable_value(self):
+        # The book: "this implies that there is one value of ci that is 1;
+        # otherwise, the problem might not be solvable".
+        assert not Coins([5, 10]).number(3).is_solution
+
+    def test_greedy_would_get_this_wrong(self):
+        # 6 = 3 + 3. Greedy takes 4 first and then needs two 1s.
+        assert Coins([1, 3, 4]).number(6).n == 2
