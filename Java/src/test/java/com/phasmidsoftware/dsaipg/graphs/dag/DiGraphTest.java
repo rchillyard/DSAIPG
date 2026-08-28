@@ -5,7 +5,7 @@ import com.phasmidsoftware.dsaipg.adt.bqs.Stack;
 import com.phasmidsoftware.dsaipg.util.iteration.SizedIterable;
 import org.junit.Test;
 
-import java.util.Iterator;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -90,23 +90,49 @@ public class DiGraphTest {
         }
     }
 
+    /**
+     * Reinstated. Five of this test's six assertions were commented out and it
+     * popped five values into locals it never looked at, so it checked only that
+     * the first vertex was "A" and that six things came off the stack.
+     * <p>
+     * The commented assertions cannot come back as they were: this graph has two
+     * cycles, so its reverse post-order genuinely depends on which edge the bag
+     * hands out first, and pinning one permutation would be asserting an accident.
+     * What is true regardless is asserted instead.
+     * <p>
+     * "A" first IS sound, and worth keeping: everything is reachable from A and A
+     * is the first vertex the search starts from, so A finishes last and therefore
+     * pops first, whatever order the bags choose.
+     */
     @Test
     public void testReversePostOrderDFS1() throws BQSException {
-        // FIXME
         DiGraph<String, Integer> graph = creatTestGraph();
         final Stack<String> reversePostOrder = graph.reversePostOrderDFS();
-        assertEquals("A", reversePostOrder.pop());
-        String pop1 = reversePostOrder.pop();
-        String pop2 = reversePostOrder.pop();
-        String pop3 = reversePostOrder.pop();
-        String pop4 = reversePostOrder.pop();
-        String pop5 = reversePostOrder.pop();
-        assertTrue(reversePostOrder.isEmpty());
-//        assertEquals("D", pop1);
-//        assertEquals("F", pop2);
-//        assertEquals("E", pop3);
-//        assertEquals("B", pop4);
-//        assertEquals("C", pop5);
+        assertEquals("everything is reachable from A, so A finishes last and pops first",
+                "A", reversePostOrder.pop());
+        final List<String> rest = new ArrayList<>();
+        while (!reversePostOrder.isEmpty()) rest.add(reversePostOrder.pop());
+        Collections.sort(rest);
+        assertEquals("every other vertex appears exactly once",
+                List.of("B", "C", "D", "E", "F"), rest);
+    }
+
+    /**
+     * The order within the run is not fixed, but the SET of vertices is, and so is
+     * the fact that nothing is visited twice. That holds for any bag ordering.
+     */
+    @Test
+    public void reversePostOrderVisitsEveryVertexOnce() throws BQSException {
+        for (long seed = 0; seed < 5; seed++) {
+            DiGraph<String, Integer> graph = creatTestGraph(new Random(seed));
+            final Stack<String> stack = graph.reversePostOrderDFS();
+            final List<String> popped = new ArrayList<>();
+            while (!stack.isEmpty()) popped.add(stack.pop());
+            assertEquals("seed " + seed + ": A always pops first", "A", popped.get(0));
+            final List<String> sorted = new ArrayList<>(popped);
+            Collections.sort(sorted);
+            assertEquals("seed " + seed, List.of("A", "B", "C", "D", "E", "F"), sorted);
+        }
     }
 
     @Test
@@ -123,7 +149,11 @@ public class DiGraphTest {
     }
 
     private DiGraph<String, Integer> creatTestGraph() {
-        DiGraph<String, Integer> graph = new DiGraph<>();
+        return creatTestGraph(new Random());
+    }
+
+    private DiGraph<String, Integer> creatTestGraph(Random random) {
+        DiGraph<String, Integer> graph = new DiGraph<>(random);
 //         /------->---------D------->------F
 //        A--->B           ^  |
 //         <-   |          | ->

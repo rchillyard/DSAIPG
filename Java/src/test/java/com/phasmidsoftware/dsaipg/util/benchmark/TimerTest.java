@@ -111,7 +111,14 @@ public class TimerTest {
             return null;
         });
         assertEquals(10, new PrivateMethodTester(timer).invokePrivate("getLaps"));
-        assertEquals(TENTH_DOUBLE / 10, mean, 6);
+        // NOTE the tolerance is deliberately loose, for the reason spelled out in
+        // StopwatchTest: Thread.sleep guarantees *at least* the requested time but
+        // may overshoot without limit on a loaded machine. A tight bound flakes --
+        // this one failed at 30.3ms against a 20 +/- 8.5 budget, purely because
+        // something else was running. What the test is really for is the unit
+        // conversion, and a wrong unit is out by a factor of 1000, so allowing up
+        // to four times the sleep still catches it while surviving a busy machine.
+        assertEquals(TENTH_DOUBLE / 10, mean, 40);
         assertEquals(10, run);
         assertEquals(0, pre);
         assertEquals(0, post);
@@ -126,7 +133,14 @@ public class TimerTest {
             return null;
         });
         assertEquals(10, new PrivateMethodTester(timer).invokePrivate("getLaps"));
-        assertEquals(zzz, mean, 8.5);
+        // NOTE the tolerance is deliberately loose, for the reason spelled out in
+        // StopwatchTest: Thread.sleep guarantees *at least* the requested time but
+        // may overshoot without limit on a loaded machine. A tight bound flakes --
+        // this one failed at 30.3ms against a 20 +/- 8.5 budget, purely because
+        // something else was running. What the test is really for is the unit
+        // conversion, and a wrong unit is out by a factor of 1000, so allowing up
+        // to four times the sleep still catches it while surviving a busy machine.
+        assertEquals(zzz, mean, 80);
         assertEquals(10, run);
         assertEquals(0, pre);
         assertEquals(0, post);
@@ -144,7 +158,14 @@ public class TimerTest {
             return t;
         }, t -> GoToSleep(6, 1));
         assertEquals(6, new PrivateMethodTester(timer).invokePrivate("getLaps"));
-        assertEquals(zzz, mean, 6);
+        // NOTE the tolerance is deliberately loose, for the reason spelled out in
+        // StopwatchTest: Thread.sleep guarantees *at least* the requested time but
+        // may overshoot without limit on a loaded machine. A tight bound flakes --
+        // this one failed at 30.3ms against a 20 +/- 8.5 budget, purely because
+        // something else was running. What the test is really for is the unit
+        // conversion, and a wrong unit is out by a factor of 1000, so allowing up
+        // to four times the sleep still catches it while surviving a busy machine.
+        assertEquals(zzz, mean, 80);
         assertEquals(6, run);
         assertEquals(6, pre);
         assertEquals(6, post);

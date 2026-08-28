@@ -39,19 +39,6 @@ public class DAG_Impl<V, E> extends DiGraph<V, E> implements DAG<V, E> {
         return reversePostOrderDFS();
     }
 
-    /**
-     * Retrieves all the edges of the directed acyclic graph (DAG).
-     * This method iterates through all adjacency lists and collects all edges into a single collection.
-     *
-     * @return a SizedIterable containing all the edges of the graph.
-     */
-    public SizedIterable<Edge<V, E>> edges() {
-        Bag<Edge<V, E>> result = new Bag_Array<>(random);
-        for (Bag<Edge<V, E>> b : adjacentEdges.values())
-            for (Edge<V, E> e : b)
-                result.add(e);
-        return result;
-    }
 
     /**
      * Adds a directed edge to the graph by updating the adjacency list for the source vertex
@@ -78,17 +65,6 @@ public class DAG_Impl<V, E> extends DiGraph<V, E> implements DAG<V, E> {
         addEdge(new Edge<>(from, to, attributes));
     }
 
-    /**
-     * Retrieves or initializes the adjacency bag for a given vertex in the graph.
-     * An adjacency bag contains all the edges that originate from the specified vertex.
-     * If the adjacency bag for the vertex does not exist, it is created and stored.
-     *
-     * @param vertex the vertex for which the adjacency bag is requested.
-     * @return the Bag of edges adjacent to the given vertex.
-     */
-    protected Bag<Edge<V, E>> getAdjacencyBag(V vertex) {
-        return adjacentEdges.computeIfAbsent(vertex, k -> new Bag_Array<>(random));
-    }
 
     /**
      * Constructor for the DAG_Impl class.
@@ -97,7 +73,7 @@ public class DAG_Impl<V, E> extends DiGraph<V, E> implements DAG<V, E> {
      * @param random a Random instance used for probabilistic or randomized operations.
      */
     public DAG_Impl(Random random) {
-        this.random = random;
+        super(random);
     }
 
     /**
@@ -106,14 +82,8 @@ public class DAG_Impl<V, E> extends DiGraph<V, E> implements DAG<V, E> {
      * It serves as a convenience constructor to create a DAG_Impl without providing a specific random number generator.
      */
     public DAG_Impl() {
-        this(new Random());
+        super();
     }
 
-    /**
-     * A final instance of {@link Random} used for generating random numbers in the DAG_Impl class.
-     * This instance facilitates randomized operations, such as probabilistic graph processing
-     * or randomized graph traversal algorithms.
-     */
-    private final Random random;
 
 }

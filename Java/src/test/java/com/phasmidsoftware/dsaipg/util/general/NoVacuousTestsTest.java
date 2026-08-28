@@ -104,9 +104,162 @@ public class NoVacuousTestsTest {
                 + "Write them, or delete them. If one is genuinely not ready, add it to KNOWN with a "
                 + "note saying when it will be written.", "[]", unexpected.toString());
 
-        Set<String> written = new TreeSet<>(KNOWN);
+        Set<String> written = presentIn(KNOWN, root);
         written.removeAll(found);
         assertEquals("These entries in KNOWN are no longer vacuous -- remove them, so the ratchet "
                 + "keeps tightening.", "[]", written.toString());
+    }
+
+    /**
+     * Methods which look like tests but carry no live {@code @Test}, so JUnit never
+     * runs them. Some are legitimate — helpers, and overrides of an interface method
+     * inside an anonymous class — and are listed here to say so. The rest are
+     * disabled tests, which are worse than vacuous ones: an empty body at least
+     * looks empty, whereas these read as perfectly good tests and simply never run.
+     */
+    private static final Set<String> KNOWN_DISABLED = new HashSet<>(Arrays.asList(
+            // legitimate: helpers and un-annotated interface overrides
+            "graphs/tunnels/BoruvkaTest.java:setSequence",
+            "graphs/tunnels/KruskalTest.java:setSequence",
+            "graphs/tunnels/PrimTest.java:setSequence",
+            "sort/Benchmarks.java:runBenchmark",
+            "sort/counting/RadixSortStepDefinition/RadixSortTest.java:buildIntArrayFromString",
+            "sort/generic/SortTest.java:sort",
+            "sort/generic/SortTest.java:postProcess",
+            "sort/helper/BaseComparableHelperTest.java:postProcess",
+            // genuinely disabled: an @Test was commented out
+            "adt/symbolTable/tree/BSTBenchmarkTest.java:testRunBenchmarkWithValidSupplier",
+            "adt/symbolTable/tree/BSTBenchmarkTest.java:testRunBenchmarkWithEmptyArray",
+            "adt/symbolTable/tree/BSTBenchmarkTest.java:testRunBenchmarkWithLargeInput",
+            "misc/reduction/MovesTest.java:test2_4",
+            "misc/reduction/MovesTest.java:test2_5",
+            "projects/life/base/MatrixTest.java:testConstructor3",
+            "select/EntropyTest.java:testGetEntropy0",
+            "select/EntropyTest.java:testGetEntropy1",
+            "sort/counting/LSDStringSortStepDefinition/LSDStringSortTest.java:testSort4",
+            "sort/counting/MSDStringSortTest.java:sort5",
+            "sort/helper/BaseComparableHelperTest.java:inversions",
+            "sort/linearithmic/QuickSort3WayTest.java:testSortHuge",
+            "util/general/FastInverseSquareRootTest.java:testInvSqrtNegative",
+            "util/general/GeoConversionsTest.java:testPosition2UTM_3",
+            "util/general/GeoConversionsTest.java:testPosition2UTM_4",
+            "util/general/GeoConversionsTest.java:testPosition2UTM_5",
+            "util/general/UTMTest.java:testToPositionSouthernHemisphere",
+            "util/general/UTMTest.java:testToPositionEdgeCaseEquator",
+            "util/general/UTMTest.java:testToPositionEdgeCasePoleHemisphereChange",
+            // genuinely disabled: never annotated at all
+            "adt/symbolTable/hashtable/HashTableLPTest.java:testHashTable5",
+            "misc/lab_1/MyTreeTest.java:Node1",
+            "sort/helper/InstrumentedComparableHelperTest.java:testMergeSortMany",
+            "sort/linearithmic/QuickSort_ClassicTest.java:testSortDetailedRandom",
+            "util/benchmark/SortBenchmarkTest.java:testMinComparisons",
+            "util/config/ConfigTest.java:testUnLogged",
+            "util/logging/LazyLoggerTest.java:testTraceLazyException",
+            "util/logging/LazyLoggerTest.java:testDebugLazyException"
+    ));
+
+    /**
+     * A public void method which could be a test.
+     */
+    private static final Pattern TEST_SHAPED = Pattern.compile(
+            "^[ \\t]*public void (\\w+)\\s*\\([^)]*\\)\\s*(?:throws [\\w, .]+)?\\{?[ \\t]*$");
+
+    /**
+     * JUnit's own lifecycle methods, which are not tests and need no annotation to
+     * be found (they have one, but it is simpler to name them).
+     */
+    private static final Set<String> LIFECYCLE = new HashSet<>(Arrays.asList(
+            "setUp", "tearDown", "beforeClass", "afterClass", "before", "after", "evaluate"));
+
+    /**
+     * A method which looks like a test but has no live annotation is invisible to
+     * {@link #noNewVacuousTests}, which matches empty bodies, and invisible to
+     * JUnit, which only runs what is annotated. It therefore reads as a working
+     * test forever while doing nothing at all — the same failure as a vacuous test
+     * but better disguised, since the body is full of plausible assertions.
+     * <p>
+     * The ratchet works the same way: the list may shrink, never grow.
+     */
+    @Test
+    public void noNewDisabledTests() throws IOException {
+        Path root = Paths.get("src/test/java/com/phasmidsoftware/dsaipg");
+        assertTrue("cannot find the test sources at " + root.toAbsolutePath(), Files.isDirectory(root));
+        Set<String> found = new TreeSet<>();
+        try (Stream<Path> paths = Files.walk(root)) {
+            List<Path> javaFiles = new ArrayList<>();
+            paths.filter(p -> p.toString().endsWith(".java")).forEach(javaFiles::add);
+            for (Path p : javaFiles) {
+                String relative = root.relativize(p).toString();
+                List<String> lines = Files.readAllLines(p);
+                for (int i = 0; i < lines.size(); i++) {
+                    Matcher m = TEST_SHAPED.matcher(lines.get(i));
+                    if (!m.matches()) continue;
+                    String name = m.group(1);
+                    if (LIFECYCLE.contains(name)) continue;
+                    if (!hasLiveAnnotation(lines, i)) found.add(relative + ":" + name);
+                }
+            }
+        }
+        Set<String> unexpected = new TreeSet<>(found);
+        unexpected.removeAll(KNOWN_DISABLED);
+        assertEquals("These methods look like tests but have no live @Test, so JUnit never runs "
+                + "them. Annotate them, delete them, or add them to KNOWN_DISABLED with a reason.",
+                "[]", unexpected.toString());
+
+        Set<String> revived = presentIn(KNOWN_DISABLED, root);
+        revived.removeAll(found);
+        assertEquals("These entries in KNOWN_DISABLED are no longer disabled -- remove them, so the "
+                + "ratchet keeps tightening.", "[]", revived.toString());
+    }
+
+    /**
+     * Walk back from a method declaration over its contiguous annotations, comments
+     * and blank lines, looking for an annotation that would make JUnit or Cucumber
+     * run it.
+     * <p>
+     * NOTE contiguous. Walking past the first line of real code finds the PREVIOUS
+     * method's annotations and reports every disabled test as live -- which is
+     * exactly the mistake that made an earlier version of this scan report six
+     * disabled methods where there are thirty-six.
+     *
+     * @param lines the file.
+     * @param i     the index of the method declaration.
+     * @return true if the method is annotated such that something will run it.
+     */
+    private static boolean hasLiveAnnotation(List<String> lines, int i) {
+        for (int j = i - 1; j >= 0; j--) {
+            String s = lines.get(j).trim();
+            if (s.isEmpty()) continue;
+            if (s.startsWith("@")) {
+                if (s.startsWith("@Test") || s.startsWith("@Before") || s.startsWith("@After")
+                        || s.startsWith("@Given") || s.startsWith("@When") || s.startsWith("@Then")
+                        || s.startsWith("@Override") || s.startsWith("@ParameterizedTest")) return true;
+                continue;
+            }
+            if (s.startsWith("*") || s.startsWith("/*") || s.startsWith("//")) continue;
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * Restrict a KNOWN list to the entries whose file is actually present.
+     * <p>
+     * NOTE this test runs in the generated student tree too, and that tree is a
+     * SUBSET: CleanTree's exclusions drop {@code projects/life}, {@code admin},
+     * {@code madhava} and more. Without this filter the "no longer disabled" check
+     * fires there for every listed entry in an excluded file -- which is what
+     * happened for projects/life/base/MatrixTest, green here and red there.
+     *
+     * @param known the list.
+     * @param root  the test source root.
+     * @return the entries whose file exists.
+     */
+    private static Set<String> presentIn(Set<String> known, Path root) {
+        Set<String> result = new TreeSet<>();
+        for (String entry : known)
+            if (Files.isRegularFile(root.resolve(entry.substring(0, entry.lastIndexOf(':')))))
+                result.add(entry);
+        return result;
     }
 }

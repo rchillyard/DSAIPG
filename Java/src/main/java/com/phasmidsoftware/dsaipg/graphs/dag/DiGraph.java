@@ -22,12 +22,50 @@ import java.util.function.Consumer;
 public class DiGraph<V, E> extends AbstractGraph<V, Edge<V, E>> {
 
     /**
+     * Construct a DiGraph with an explicit source of randomness.
+     * <p>
+     * NOTE the Random matters because the adjacency bags iterate in a deliberately
+     * random order, so a traversal of this graph is only repeatable if the bags
+     * are. Without this constructor a DiGraph's bags each got their own unseeded
+     * Random, which is why DiGraphTest could not be made deterministic and why
+     * three DAGTest methods were commented out with "this fails because bags are
+     * iterated randomly now". DAG_Impl had it and DiGraph did not, for no reason
+     * beyond where it was first needed.
+     *
+     * @param random the source of randomness for the adjacency bags.
+     */
+    public DiGraph(Random random) {
+        this.random = random;
+    }
+
+    /**
+     * Construct a DiGraph with its own unseeded source of randomness.
+     */
+    public DiGraph() {
+        this(new Random());
+    }
+
+    /**
+     * Retrieve or create the adjacency bag for a vertex.
+     * <p>
+     * NOTE overridden so that the bag gets THIS graph's Random, which
+     * AbstractGraph knows nothing about.
+     *
+     * @param vertex the vertex.
+     * @return its adjacency bag, created if absent.
+     */
+    @Override
+    protected Bag<Edge<V, E>> getAdjacencyBag(V vertex) {
+        return adjacentEdges.computeIfAbsent(vertex, k -> new Bag_Array<>(random));
+    }
+
+    /**
      * Reverse the sense of this DAG.
      *
      * @return a DAG whose edges all point in the opposite direction to those in this DAG.
      */
     public DiGraph<V, E> reverse() {
-        DiGraph<V, E> result = new DiGraph<>();
+        DiGraph<V, E> result = new DiGraph<>(random);
         // NOTE the vertices must be carried over first, and separately. Rebuilding
         // from the edges alone loses any vertex with no edge at either end -- and
         // since kernelDAG() walks reverse().reversePostOrderDFS(), such a vertex
@@ -58,7 +96,7 @@ public class DiGraph<V, E> extends AbstractGraph<V, Edge<V, E>> {
      * @return a {@code SizedIterable} containing all edges in the graph.
      */
     public SizedIterable<Edge<V, E>> edges() {
-        Bag<Edge<V, E>> result = new Bag_Array<>();
+        Bag<Edge<V, E>> result = new Bag_Array<>(random);
         for (Iterable<Edge<V, E>> b : adjacentEdges.values())
             for (Edge<V, E> e : b)
                 result.add(e);
@@ -111,6 +149,11 @@ public class DiGraph<V, E> extends AbstractGraph<V, Edge<V, E>> {
     public String toString() {
         return adjacentEdges.toString();
     }
+
+    /**
+     * The source of randomness for the adjacency bags.
+     */
+    protected final Random random;
 
     /**
      * This class implements Depth First Search (DFS) traversal for a graph.
