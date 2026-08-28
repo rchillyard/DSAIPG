@@ -11,7 +11,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -37,6 +39,7 @@ public class GeoGraphSphericalTest {
     private final Edge<Building, TunnelProperties> riha = new Edge<>(ri, ha, new TunnelProperties(276L, 28, 0, 0));
     final GeoPoint london = new MockGeoPoint("London", new Position_Spherical(51.5, -0.5)); // Heathrow (approx) 51°28′14″N, 0°27′42″W
     final GeoPoint boston = new MockGeoPoint("Boston", new Position_Spherical(42.35, -71)); // Logan (approx) 42°21′51″N, 71°0′18″W
+    final GeoPoint dublin = new MockGeoPoint("Dublin", new Position_Spherical(53.4, -6.3));
 
 
     @Before
@@ -61,20 +64,70 @@ public class GeoGraphSphericalTest {
         assertEquals(riha, iterator.next());
     }
 
+    /**
+     * edges() reports each edge once, however many vertices it touches. Since the
+     * fix that made Graph_Edges properly undirected, an edge sits in the adjacency
+     * bag of BOTH its endpoints, so this is the assertion that stops it being
+     * double counted.
+     */
     @Test
     public void edges() {
+        GeoGraphSpherical<GeoPoint, String> graph = new GeoGraphSpherical<>();
+        assertEquals("an empty graph has no edges", 0, graph.edges().size());
+        graph.addEdge(new GeoEdge<>(london, boston, "across the pond"));
+        assertEquals(1, graph.edges().size());
+        assertEquals("but it is adjacent to each of its two ends",
+                1, ((SizedIterable<?>) graph.adjacent(london)).size());
+        assertEquals(1, ((SizedIterable<?>) graph.adjacent(boston)).size());
+        graph.addEdge(new GeoEdge<>(boston, dublin, "the shorter hop"));
+        assertEquals(2, graph.edges().size());
+        assertEquals("Boston is now on two of them",
+                2, ((SizedIterable<?>) graph.adjacent(boston)).size());
     }
 
+    /**
+     * Adding an edge introduces whichever of its vertices the graph has not met.
+     */
     @Test
     public void addEdge() {
+        GeoGraphSpherical<GeoPoint, String> graph = new GeoGraphSpherical<>();
+        graph.addEdge(new GeoEdge<>(london, boston, "across the pond"));
+        assertEquals(2, graph.vertices().size());
+        graph.addEdge(new GeoEdge<>(boston, dublin, "the shorter hop"));
+        assertEquals("Boston was already here, so only Dublin is new",
+                3, graph.vertices().size());
+        graph.addEdge(new GeoEdge<>(london, boston, "by another route"));
+        assertEquals("a second edge between the same pair adds no vertex",
+                3, graph.vertices().size());
+        assertEquals("but it is a second edge", 3, graph.edges().size());
     }
 
+    /**
+     * The string form is the adjacency map: each vertex against the bag of edges at
+     * it. Asserted by what it contains rather than in full, because the vertices
+     * come out in hash order and the bags in random order.
+     */
     @Test
     public void toStringTest() {
+        GeoGraphSpherical<GeoPoint, String> graph = new GeoGraphSpherical<>();
+        graph.addEdge(new GeoEdge<>(london, boston, "across the pond"));
+        String s = graph.toString();
+        assertTrue(s, s.startsWith("{") && s.endsWith("}"));
+        assertTrue("both vertices appear", s.contains("London") && s.contains("Boston"));
+        assertTrue("and each holds the edge", s.contains("London-Boston: across the pond"));
+        assertEquals("once for each end of it, since the graph is undirected",
+                2, s.split("across the pond", -1).length - 1);
     }
 
     @Test
     public void vertices() {
+        GeoGraphSpherical<GeoPoint, String> graph = new GeoGraphSpherical<>();
+        assertEquals(0, graph.vertices().size());
+        graph.addEdge(new GeoEdge<>(london, boston, "across the pond"));
+        List<GeoPoint> vertices = new ArrayList<>();
+        for (GeoPoint v : graph.vertices()) vertices.add(v);
+        assertEquals(2, vertices.size());
+        assertTrue(vertices.contains(london) && vertices.contains(boston));
     }
 
     @Test
@@ -118,8 +171,19 @@ public class GeoGraphSphericalTest {
         assertEquals(londonToBoston, bostonLondonApprox, 4000);
     }
 
+    /**
+     * Two properties that hold wherever the points are, unlike the four length
+     * tests above which each pin down one particular distance: a point is no
+     * distance from itself, and the distance is the same measured either way.
+     */
     @Test
     public void getDistance() {
+        GeoGraphSpherical<GeoPoint, Object> graph = new GeoGraphSpherical<>();
+        assertEquals("nowhere is any distance from itself", 0, graph.getDistance(boston, boston), 1E-6);
+        assertEquals("and the sea is as wide going back",
+                graph.getDistance(london, boston), graph.getDistance(boston, london), 1E-6);
+        assertEquals("Boston to London is the distance the other tests measure",
+                londonToBoston, graph.getDistance(boston, london), 4000);
     }
 
 

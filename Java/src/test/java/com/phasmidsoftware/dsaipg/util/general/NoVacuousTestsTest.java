@@ -46,25 +46,6 @@ public class NoVacuousTestsTest {
      */
     private static final Set<String> KNOWN = new HashSet<>(Arrays.asList(
             "compression/HuffmanCodingTest.java:testAdd",
-            "graphs/gis/GeoEdgeTest.java:getAttribute",
-            "graphs/gis/GeoEdgeTest.java:get",
-            "graphs/gis/GeoEdgeTest.java:getOther",
-            "graphs/gis/GeoEdgeTest.java:hashCodeTest",
-            "graphs/gis/GeoEdgeTest.java:toStringTest",
-            "graphs/gis/GeoEdgeTest.java:create",
-            "graphs/gis/GeoGraphSphericalTest.java:edges",
-            "graphs/gis/GeoGraphSphericalTest.java:addEdge",
-            "graphs/gis/GeoGraphSphericalTest.java:toStringTest",
-            "graphs/gis/GeoGraphSphericalTest.java:vertices",
-            "graphs/gis/GeoGraphSphericalTest.java:getDistance",
-            "graphs/gis/GeoKruskalTest.java:getMST",
-            "graphs/gis/GeoKruskalTest.java:iterator",
-            "graphs/gis/GeoKruskalTest.java:getGeoMST",
-            "graphs/gis/Position_SphericalTest.java:getLatitude",
-            "graphs/gis/Position_SphericalTest.java:getLongitude",
-            "graphs/gis/Position_SphericalTest.java:getX",
-            "graphs/gis/Position_SphericalTest.java:getY",
-            "graphs/gis/Position_SphericalTest.java:toStringTest",
             "projects/mcts/tictactoe/PositionTest.java:testReflect",
             "projects/mcts/tictactoe/PositionTest.java:testRotate",
             "sort/classic/BucketSortTest.java:init",
@@ -120,9 +101,6 @@ public class NoVacuousTestsTest {
     private static final Set<String> KNOWN_DISABLED = new HashSet<>(Arrays.asList(
             // legitimate: helpers and un-annotated interface overrides
             "sort/counting/RadixSortStepDefinition/RadixSortTest.java:buildIntArrayFromString",
-            "sort/generic/SortTest.java:sort",
-            "sort/generic/SortTest.java:postProcess",
-            "sort/helper/BaseComparableHelperTest.java:postProcess",
             // genuinely disabled: an @Test was commented out
             "adt/symbolTable/tree/BSTBenchmarkTest.java:testRunBenchmarkWithValidSupplier",
             "adt/symbolTable/tree/BSTBenchmarkTest.java:testRunBenchmarkWithEmptyArray",
@@ -187,12 +165,18 @@ public class NoVacuousTestsTest {
             for (Path p : javaFiles) {
                 String relative = root.relativize(p).toString();
                 List<String> lines = Files.readAllLines(p);
+                int depth = 0;
                 for (int i = 0; i < lines.size(); i++) {
-                    Matcher m = TEST_SHAPED.matcher(lines.get(i));
-                    if (!m.matches()) continue;
-                    String name = m.group(1);
-                    if (LIFECYCLE.contains(name)) continue;
-                    if (!hasLiveAnnotation(lines, i)) found.add(relative + ":" + name);
+                    String line = lines.get(i);
+                    Matcher m = TEST_SHAPED.matcher(line);
+                    // depth 1 is the body of the top-level class. Anything deeper
+                    // belongs to a nested class, which JUnit does not run.
+                    if (depth == 1 && m.matches()) {
+                        String name = m.group(1);
+                        if (!LIFECYCLE.contains(name) && !hasLiveAnnotation(lines, i))
+                            found.add(relative + ":" + name);
+                    }
+                    depth += netBraces(line);
                 }
             }
         }
@@ -207,6 +191,63 @@ public class NoVacuousTestsTest {
         assertEquals("These entries in KNOWN_DISABLED are no longer disabled -- remove them, so the "
                 + "ratchet keeps tightening.", "[]", revived.toString());
     }
+
+    /**
+     * How much deeper a line leaves us, in braces.
+     * <p>
+     * NOTE this is what tells a test method from a method of a nested helper class.
+     * The scan had no idea about nesting, so a `Route` or a `Cost` declared inside
+     * a test class had its setters read as tests somebody had disabled. That is
+     * where the `PrimTest.java:setSequence` entries in KNOWN_DISABLED came from:
+     * they were never disabled tests, and listing them there hid the flaw rather
+     * than fixing it.
+     * <p>
+     * Braces inside comments and literals do not count, or a string containing one
+     * would throw the depth off for the rest of the file.
+     *
+     * @param line       one line of the file.
+     * @return the number of braces opened less the number closed.
+     */
+    private int netBraces(String line) {
+        int result = 0;
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (inBlockComment) {
+                if (c == '*' && i + 1 < line.length() && line.charAt(i + 1) == '/') {
+                    inBlockComment = false;
+                    i++;
+                }
+                continue;
+            }
+            if (c == '/' && i + 1 < line.length()) {
+                char next = line.charAt(i + 1);
+                if (next == '/') return result;          // rest of the line is a comment
+                if (next == '*') {
+                    inBlockComment = true;
+                    i++;
+                    continue;
+                }
+            }
+            if (c == '"' || c == '\'') {
+                char quote = c;
+                while (++i < line.length()) {
+                    if (line.charAt(i) == '\\') i++;
+                    else if (line.charAt(i) == quote) break;
+                }
+                continue;
+            }
+            if (c == '{') result++;
+            else if (c == '}') result--;
+        }
+        return result;
+    }
+
+    /**
+     * Whether {@link #netBraces} is part-way through a block comment. An instance
+     * field because the state has to survive from one line to the next; JUnit makes
+     * a fresh instance per test, so it starts false.
+     */
+    private boolean inBlockComment = false;
 
     /**
      * Walk back from a method declaration over its contiguous annotations, comments
