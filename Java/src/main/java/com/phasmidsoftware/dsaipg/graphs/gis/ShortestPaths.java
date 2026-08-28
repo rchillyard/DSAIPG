@@ -5,8 +5,10 @@ import com.phasmidsoftware.dsaipg.graphs.dag.Edge;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.PriorityQueue;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * The ShortestPaths class is designed to compute the shortest paths from a starting vertex
@@ -42,12 +44,28 @@ public class ShortestPaths<V, E extends Number> {
      * returns an empty iterable if no path exists
      */
     public Iterable<Edge<V, E>> pathTo(V target) {
-        Stack<Edge<V, E>> edges = new Stack<>();
+        // NOTE an ArrayDeque, not a java.util.Stack. The walk below goes BACKWARDS
+        // from the target, so pushing is what puts the path back into reading
+        // order -- but java.util.Stack extends Vector and iterates bottom-to-top,
+        // in insertion order, which undoes exactly the reversal that pushing is
+        // for. A path of two edges came out target-first. ArrayDeque.push adds at
+        // the front and iterates front-to-back, so it reverses as intended.
+        Deque<Edge<V, E>> edges = new ArrayDeque<>();
         if (hasPathTo(target)) {
             V v = target;
-            for (Vertex vertex = table.get(v); vertex.edgeTo != null; ) {
+            // NOTE the update clause. The loop used to have none, so vertex kept
+            // whatever it was initialised with: the second time round, edgeTo was
+            // still the edge into the TARGET while v had moved back one step, and
+            // the check below failed. pathTo therefore threw "assertion error" for
+            // every path of more than one edge. No test had ever called it -- all
+            // five ask only about hasPathTo and cost.
+            //
+            // The check itself compared vertices with !=, which is identity, not
+            // equality. Two equal vertices that are not the same object would have
+            // failed it even once the loop was right.
+            for (Vertex vertex = table.get(v); vertex.edgeTo != null; vertex = table.get(v)) {
                 Edge<V, E> edgeTo = vertex.edgeTo;
-                if (edgeTo.getTo() != v) throw new RuntimeException("assertion error");
+                if (!Objects.equals(edgeTo.getTo(), v)) throw new RuntimeException("assertion error");
                 edges.push(edgeTo);
                 v = edgeTo.getFrom();
             }

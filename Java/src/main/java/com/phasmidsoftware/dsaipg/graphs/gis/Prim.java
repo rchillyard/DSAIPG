@@ -8,8 +8,6 @@ import com.phasmidsoftware.dsaipg.adt.pq.PriorityQueue_BinaryHeap;
 import com.phasmidsoftware.dsaipg.graphs.undirected.Edge;
 import com.phasmidsoftware.dsaipg.graphs.undirected.EdgeGraph;
 import com.phasmidsoftware.dsaipg.graphs.undirected.Graph_Edges;
-import com.phasmidsoftware.dsaipg.util.iteration.SizedIterable;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -53,19 +51,6 @@ public class Prim<V, X extends Comparable<X> & Sequenced> extends MST<V, X> impl
             result.addEdge(edge);
         }
         return result;
-    }
-
-    /**
-     * Returns an iterator over the edges in the Minimum Spanning Tree (MST) of the graph.
-     * The edges are iterated in the order they were added to the MST.
-     *
-     * @return an iterator over the edges in the MST of type {@code Edge<V, X>}.
-     */
-    @NotNull
-    public Iterator<Edge<V, X>> iterator() {
-        Collection<Edge<V, X>> result = new ArrayList<>();
-        for (Edge<V, X> edge : mst) result.add(edge);
-        return result.iterator();
     }
 
     /**
@@ -119,7 +104,10 @@ public class Prim<V, X extends Comparable<X> & Sequenced> extends MST<V, X> impl
             if (marked[ui] && marked[wi]) continue;      // lazy, both v and w already scanned
             queue.offer(e);                            // add e to queue
             //weight += e.weight();
-            if (!marked[ui]) scan(v);               // v becomes part of tree
+            // NOTE scan the ENDPOINTS of e, u and w -- not v, which is merely the
+            // vertex this run of Prim started from. Scanning v again would re-offer
+            // its edges and leave u unscanned, and it trips scan's own assertion.
+            if (!marked[ui]) scan(u);               // u becomes part of tree
             if (!marked[wi]) scan(w);               // w becomes part of tree
         }
     }
@@ -144,20 +132,18 @@ public class Prim<V, X extends Comparable<X> & Sequenced> extends MST<V, X> impl
     }
 
     /**
-     * Creates and returns a priority queue of edges based on a specified comparator for their attributes.
-     * The priority queue is initialized with the given edges and configured as a min-priority queue.
-     * This method is copied from Kruskal.java, needed for creating a priority queue of edges
-     * those edges connecting the mst to the fringe vertices
+     * Creates an empty min-priority queue of edges, ordered by attribute, with room
+     * for the given number of edges.
+     * <p>
+     * NOTE the capacity is not advisory. {@link PriorityQueue_BinaryHeap#give}
+     * silently drops an element when the heap is full rather than growing, so a
+     * queue built too small loses edges without saying so.
      *
-     * @param edges the collection of edges to be added to the priority queue.
-     *              The size of this collection defines the initial capacity of the priority queue.
-     * @return a PriorityQueue of type {@code Edge<V, X>} containing all the elements from the input collection,
-     *         ordered by their attributes in ascending order.
+     * @param capacity the greatest number of edges the queue will have to hold.
+     * @return an empty min-priority queue.
      */
-    private PriorityQueue<Edge<V, X>> createPQ(SizedIterable<Edge<V, X>> edges) {
-        PriorityQueue<Edge<V, X>> result = new PriorityQueue_BinaryHeap<>(edges.size(), false, Comparator.comparing(Edge::getAttribute), false);
-        for (Edge<V, X> e : edges) result.give(e);
-        return result;
+    private PriorityQueue<Edge<V, X>> emptyPQ(int capacity) {
+        return new PriorityQueue_BinaryHeap<>(capacity, false, Comparator.comparing(Edge::getAttribute), false);
     }
 
     /**
@@ -175,21 +161,11 @@ public class Prim<V, X extends Comparable<X> & Sequenced> extends MST<V, X> impl
      * @param <X> the attribute type for the edge, typically the weight or cost, which must be comparable.
      */
     private final Queue<Edge<V, X>> queue;
-    /**
-     * Represents an iterable collection of edges that form the Minimum Spanning Tree (MST)
-     * of an edge-weighted graph. Each edge in the collection connects two vertices and
-     * may have an associated attribute (e.g., weight).
-     *
-     * The MST is computed using Prim's algorithm and stored as an iterable object to allow
-     * sequential access to the edges in the order they were added during the algorithm.
-     * This attribute is initialized when the MST computation is executed and can be
-     * accessed for traversal or analysis of the resulting tree structure.
-     *
-     * @param <V> the vertex type of the edges in the MST
-     * @param <X> the attribute type of the edges in the MST; must be comparable to allow
-     *            sorting or prioritization (e.g., by weight)
-     */
-    private Iterable<Edge<V, X>> mst;
+    // NOTE the MST itself lives in the superclass, as MST.mst, and MST.iterator()
+    // reads it. Prim used to declare a private field of the same name that SHADOWED
+    // it, plus an iterator() override identical to the inherited one -- so
+    // MST.mst stayed null for a Prim forever, and anything reaching the inherited
+    // iterator() would have met a NullPointerException.
     /**
      * Priority queue of edges used by Prim's algorithm to construct the minimum spanning tree (MST).
      * This priority queue maintains edges with one endpoint inside the spanning tree and the other outside,

@@ -91,7 +91,7 @@ public class NoVacuousTestsTest {
         Set<String> found = new TreeSet<>();
         try (Stream<Path> paths = Files.walk(root)) {
             List<Path> javaFiles = new ArrayList<>();
-            paths.filter(p -> p.toString().endsWith(".java")).forEach(javaFiles::add);
+            paths.filter(NoVacuousTestsTest::isTestClass).forEach(javaFiles::add);
             for (Path p : javaFiles) {
                 String relative = root.relativize(p).toString();
                 Matcher m = VACUOUS.matcher(Files.readString(p));
@@ -119,10 +119,6 @@ public class NoVacuousTestsTest {
      */
     private static final Set<String> KNOWN_DISABLED = new HashSet<>(Arrays.asList(
             // legitimate: helpers and un-annotated interface overrides
-            "graphs/tunnels/BoruvkaTest.java:setSequence",
-            "graphs/tunnels/KruskalTest.java:setSequence",
-            "graphs/tunnels/PrimTest.java:setSequence",
-            "sort/Benchmarks.java:runBenchmark",
             "sort/counting/RadixSortStepDefinition/RadixSortTest.java:buildIntArrayFromString",
             "sort/generic/SortTest.java:sort",
             "sort/generic/SortTest.java:postProcess",
@@ -187,7 +183,7 @@ public class NoVacuousTestsTest {
         Set<String> found = new TreeSet<>();
         try (Stream<Path> paths = Files.walk(root)) {
             List<Path> javaFiles = new ArrayList<>();
-            paths.filter(p -> p.toString().endsWith(".java")).forEach(javaFiles::add);
+            paths.filter(NoVacuousTestsTest::isTestClass).forEach(javaFiles::add);
             for (Path p : javaFiles) {
                 String relative = root.relativize(p).toString();
                 List<String> lines = Files.readAllLines(p);
@@ -240,6 +236,24 @@ public class NoVacuousTestsTest {
             return false;
         }
         return false;
+    }
+
+    /**
+     * Only a class Surefire would actually run counts as a test class.
+     * <p>
+     * NOTE the walk used to take every .java file under the test tree, which meant
+     * an ordinary helper sitting there -- a shared fixture, say -- had its methods
+     * read as tests that someone had disabled. Surefire's own includes are
+     * {@code **}{@code /*Test.java} and friends, so a method in a class named
+     * anything else can never run whatever it is annotated with, and saying "JUnit
+     * never runs them" of it tells nobody anything.
+     *
+     * @param path a file found under the test tree.
+     * @return true if Surefire would treat it as a test class.
+     */
+    private static boolean isTestClass(Path path) {
+        String name = path.getFileName().toString();
+        return name.endsWith("Test.java") || name.endsWith("Tests.java") || name.startsWith("Test");
     }
 
     /**

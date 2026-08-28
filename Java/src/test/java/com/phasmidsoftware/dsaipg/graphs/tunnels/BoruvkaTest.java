@@ -1,182 +1,90 @@
 package com.phasmidsoftware.dsaipg.graphs.tunnels;
 
 import com.phasmidsoftware.dsaipg.graphs.gis.Boruvka;
-import com.phasmidsoftware.dsaipg.graphs.gis.Sequenced;
 import com.phasmidsoftware.dsaipg.graphs.undirected.Edge;
 import com.phasmidsoftware.dsaipg.graphs.undirected.EdgeGraph;
 import com.phasmidsoftware.dsaipg.graphs.undirected.Graph_Edges;
-import com.phasmidsoftware.dsaipg.util.iteration.SizedIterableImpl;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 
-import static com.phasmidsoftware.dsaipg.graphs.gis.Boruvka.createEdge;
+import static com.phasmidsoftware.dsaipg.graphs.tunnels.MSTFixture.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.junit.Rule;
-import org.junit.rules.TestRule;
-import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
+/**
+ * Tests of Boruvka's algorithm. The graphs and the expected answers are in
+ * {@link MSTFixture}, which explains why they are shared.
+ */
 public class BoruvkaTest {
     @Rule
     public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
-    static class Route implements Comparable<Route>, Sequenced {
-
-        public int getSequence() {
-            return sequence;
-        }
-
-        public void setSequence(int sequence) {
-
-        }
-
-        public int compareTo(Route o) {
-            return Double.compare(cost, o.cost);
-        }
-
-        public Route(double cost) {
-            this.cost = cost;
-        }
-
-        // Added a method  getCost() to get the cost of this route
-        public int getCost() {
-            return (int) this.cost;
-        }
-
-        private final double cost;
-        private int sequence;
-    }
-/*
     @Test
-    public void testBoruvka() {
-        EdgeGraph<String, Route> kalimantan = kalimantan();
-        ArrayList<Edge<String, Route>> edgeList = new ArrayList<>();
-        for (Edge<String, Route> edge : kalimantan.edges()) edgeList.add(edge);
-        Edge<String, Route> edge1 = edgeList.get(5);
-        Edge<String, Route> edge2 = edgeList.get(0);
-        Iterable<Edge<String, Route>> iterable = new Boruvka<>(kalimantan);
-        Iterator<Edge<String, Route>> iterator = iterable.iterator();
-        //assertTrue(iterator.hasNext());
-        //assertEquals(edge1, iterator.next());
-        //assertEquals(edge2, iterator.next());
-        //assertEquals(5, SizedIterableImpl.getSize(iterable.iterator()));
+    public void testBoruvka_kalimantan() {
+        assertMST(KALIMANTAN_MST, 286, new Boruvka<>(kalimantan()));
     }
-*/
 
     @Test
-    public void testBoruvka_kalimantan_with_cost() {
-        // build an edge graph kalimantan, with 6 vertices and 15 edges
-        EdgeGraph<String, BoruvkaTest.Route> kalimantan = kalimantan();
-        // keep all the edges in a list called edgeList
-        ArrayList<Edge<String, BoruvkaTest.Route>> edgeList = new ArrayList<>();
-        for (Edge<String, BoruvkaTest.Route> edge : kalimantan.edges()) edgeList.add(edge);
-        try {
-            Iterable<Edge<String, BoruvkaTest.Route>> iterable = new Boruvka<>(kalimantan);
-            Iterator<Edge<String, BoruvkaTest.Route>> iterator = iterable.iterator();
-            assertTrue(iterator.hasNext());
-            assertEquals(5, SizedIterableImpl.getSize(iterable.iterator()));
-            double cost = 0;
-            for (Edge<String, BoruvkaTest.Route> edge : iterable) {
-                cost += edge.getAttribute().getCost();
-                String v = edge.get(), w = edge.getOther(v);
-                System.out.println("v1= " + v + " v2= " + w + " cost = " + edge.getAttribute().getCost());
-            }
-            System.out.println("Total cost = " + cost);
-        } catch (Exception e) {
-            // NOTE an unwritten exercise reaching here must be rethrown, or this
-            // broad catch turns "you have not written UF_HWQUPC.find yet" into a
-            // silently passing test. CancelOnNotImplemented then reports it as
-            // skipped in the student tree, and it is inert here.
-            CancelOnNotImplemented.rethrowIfUnimplemented(e);
-            e.printStackTrace();
-            // Test will fail due to the uncaught exception.
-        }
+    public void testBoruvka_ChinaShippingCost() {
+        assertMST(CHINA_MST, 9100, new Boruvka<>(chinaShippingCost()));
     }
 
-    private EdgeGraph<String, Route> kalimantan() {
-//        Po	    Pa	Ban	Bal	S	T
-//        Po	 	80	101	123	237	417
-//        Pa	 	 	56	64	83	187
-//        Ban	 	 	 	73	95	203
-//        Bal	 	 	 	 	23	89
-//        S	 	 	 	 	 	63
-//        T
+    /**
+     * A spanning tree of n vertices has n - 1 edges, and getMST() must report the
+     * same tree that iterating reports.
+     */
+    @Test
+    public void testBoruvka_getMST() {
+        EdgeGraph<String, Route> mst = new Boruvka<>(kalimantan()).getMST();
+        assertEquals(5, mst.edges().size());
+        assertEquals(6, mst.vertices().size());
+        assertMST(KALIMANTAN_MST, 286, mst.edges());
+    }
+
+    /**
+     * getMST() numbers the edges in the order the algorithm chose them, which is
+     * what Kml relies on to draw a tunnel network in sequence.
+     */
+    @Test
+    public void testBoruvka_sequencesTheEdges() {
+        List<Integer> sequences = new ArrayList<>();
+        for (Edge<String, Route> edge : new Boruvka<>(kalimantan()).getMST().edges())
+            sequences.add(edge.getAttribute().getSequence());
+        sequences.sort(null);
+        assertEquals(List.of(0, 1, 2, 3, 4), sequences);
+    }
+
+    /**
+     * On a graph that is not connected there is no spanning tree, so what the
+     * algorithm yields is a spanning FOREST: every component spanned, and no edge
+     * joining one component to another.
+     */
+    @Test
+    public void testBoruvka_spansEachComponentOfADisconnectedGraph() {
         Graph_Edges<String, Route> g = new Graph_Edges<>();
-        g.addEdge(createEdge("Po", "Pa", new Route(80.)));
-        g.addEdge(createEdge("Po", "Ban", new Route(101.)));
-        g.addEdge(createEdge("Po", "Bal", new Route(123.)));
-        g.addEdge(createEdge("Po", "S", new Route(237.)));
-        g.addEdge(createEdge("Po", "T", new Route(417.)));
-        g.addEdge(createEdge("Pa", "Ban", new Route(56.)));
-        g.addEdge(createEdge("Pa", "Bal", new Route(64.)));
-        g.addEdge(createEdge("Pa", "S", new Route(83.)));
-        g.addEdge(createEdge("Pa", "T", new Route(187.)));
-        g.addEdge(createEdge("Ban", "Bal", new Route(73.)));
-        g.addEdge(createEdge("Ban", "S", new Route(95.)));
-        g.addEdge(createEdge("Ban", "T", new Route(203.)));
-        g.addEdge(createEdge("Bal", "S", new Route(23.)));
-        g.addEdge(createEdge("Bal", "T", new Route(89.)));
-        g.addEdge(createEdge("S", "T", new Route(63.)));
-        return g;
+        g.addEdge(new Edge<>("A", "B", new Route(1)));
+        g.addEdge(new Edge<>("C", "D", new Route(2)));
+        g.addEdge(new Edge<>("C", "E", new Route(3)));
+        assertMST(List.of("A-B(1)", "C-D(2)", "C-E(3)"), 6, new Boruvka<>(g));
     }
 
-
-    private EdgeGraph<String, Route> ChinaShippingCost() {
-        //          BeiJing  ShangHai  GuangZhou  ShenZhen  XiAn  WuHan  ZhengZhou  FuZhou
-        // BeiJing            3000      5000       5100     3500   3000     1000      5100
-        // ShangHai                    3500       3400     2300   1200     2300      1600
-        // GuangZhou                               400      2800   3200     3200      400
-        // ShenZhen                                          2200   2200     2200      1900
-        // XiAn                                                     3500     2000      3500
-        // WuHan                                                              1100      1500
-        // ZhengZhou
-        // FuZhou
-        Graph_Edges<String, Route> g = new Graph_Edges<>();
-        g.addEdge(createEdge("BeiJing", "ShangHai", new Route(3000.)));
-        g.addEdge(createEdge("BeiJing", "ZhengZhou", new Route(1000.)));
-        g.addEdge(createEdge("XiAn", "BeiJing", new Route(3500.)));
-        g.addEdge(createEdge("XiAn", "ZhengZhou", new Route(2000.)));
-        g.addEdge(createEdge("ZhengZhou", "WuHan", new Route(1100.)));
-        g.addEdge(createEdge("GuangZhou", "XiAn", new Route(2800.)));
-        g.addEdge(createEdge("WuHan", "ShangHai", new Route(1200.)));
-        g.addEdge(createEdge("ShangHai", "ZhengZhou", new Route(2300.)));
-        g.addEdge(createEdge("GuangZhou", "ZhengZhou", new Route(3200.)));
-        g.addEdge(createEdge("GuangZhou", "ShenZhen", new Route(400.)));
-        g.addEdge(createEdge("ShenZhen", "WuHan", new Route(2200.)));
-        g.addEdge(createEdge("ShenZhen", "FuZhou", new Route(1900.)));
-        g.addEdge(createEdge("FuZhou", "ShangHai", new Route(1600.)));
-        g.addEdge(createEdge("FuZhou", "WuHan", new Route(1500.)));
-        return g;
-    }
-
+    /**
+     * The empty case, and the one-vertex case: a tree of one vertex has no edges.
+     */
     @Test
-    public void testBoruvka_ChinaShippingCost_with_cost() {
-        EdgeGraph<String, BoruvkaTest.Route> chinaShippingCost = ChinaShippingCost();
-        ArrayList<Edge<String, BoruvkaTest.Route>> edgeList = new ArrayList<>();
-        for (Edge<String, BoruvkaTest.Route> edge : chinaShippingCost.edges()) edgeList.add(edge);
-        try {
-            Iterable<Edge<String, BoruvkaTest.Route>> iterable = new Boruvka<>(chinaShippingCost);
-            Iterator<Edge<String, BoruvkaTest.Route>> iterator = iterable.iterator();
-            double cost = 0;
-            for (Edge<String, BoruvkaTest.Route> edge : iterable) {
-                cost += edge.getAttribute().getCost();
-                String v = edge.get(), w = edge.getOther(v);
-                System.out.println("v1= " + v + " v2= " + w + " cost = " + edge.getAttribute().getCost());
-            }
-            System.out.println("Total cost = " + cost);
-        } catch (Exception e) {
-            // NOTE an unwritten exercise reaching here must be rethrown, or this
-            // broad catch turns "you have not written UF_HWQUPC.find yet" into a
-            // silently passing test. CancelOnNotImplemented then reports it as
-            // skipped in the student tree, and it is inert here.
-            CancelOnNotImplemented.rethrowIfUnimplemented(e);
-            e.printStackTrace();
-        }
+    public void testBoruvka_degenerateGraphs() {
+        assertTrue("no vertices, no edges", isEmpty(new Boruvka<>(new Graph_Edges<String, Route>())));
+        Graph_Edges<String, Route> one = new Graph_Edges<>();
+        one.addVertex("A");
+        assertTrue("one vertex, no edges", isEmpty(new Boruvka<>(one)));
     }
 
+    private static boolean isEmpty(Iterable<Edge<String, Route>> mst) {
+        return !mst.iterator().hasNext();
+    }
 }
-
-
-

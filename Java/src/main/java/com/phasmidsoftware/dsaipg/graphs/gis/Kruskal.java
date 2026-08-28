@@ -85,6 +85,14 @@ public class Kruskal<V, X extends Comparable<X> & Sequenced> extends MST<V, X> {
         this.size = uf.size();
         try {
             mst = runKruskal();
+        } catch (com.phasmidsoftware.dsaipg.util.general.ImplementationMissing e) {
+            // An unwritten exercise must not be dressed up as an empty MST.
+            // Swallowing it here reported the tunnels tests as genuine failures --
+            // "the MST is empty" -- when the real answer is that UF_HWQUPC.find has
+            // yet to be written. Rethrowing lets CancelOnNotImplemented report them
+            // as skipped, which is the truth. Inert in this tree, where the
+            // exercises are written.
+            throw e;
         } catch (Exception e) {
             e.printStackTrace(); // TODO log this
         }

@@ -37,9 +37,15 @@ public class Graph_EdgesTest {
     }
 
     /**
-     * An edge is stored in the adjacency bag of its "from" vertex only. The "to"
-     * vertex gets a bag so that it counts as a vertex, but that bag stays empty.
-     * That is why edges() does not double-count.
+     * An edge is incident on BOTH of its vertices, so it appears in both adjacency
+     * bags -- and edges() reports it once all the same, by collecting an edge only
+     * from the bag of the vertex Edge.get() returns.
+     * <p>
+     * This test used to assert the opposite: that adjacent(2) was empty, because an
+     * edge went into the "from" bag alone. That made adjacent(v) report the edges
+     * WRITTEN with v first rather than the edges at v, so an algorithm walking by
+     * adjacency saw an arbitrary subset of the graph. Prim returned a spanning
+     * forest with a vertex missing.
      */
     @Test
     public void edgesAreNotDoubleCounted() {
@@ -47,7 +53,21 @@ public class Graph_EdgesTest {
         target.addEdge(new Edge<>(1, 2, 1.0));
         assertEquals(1, target.edges().size());
         assertEquals(1, ((SizedIterable<?>) target.adjacent(1)).size());
-        assertEquals(0, ((SizedIterable<?>) target.adjacent(2)).size());
+        assertEquals("an edge is adjacent to its second vertex too",
+                1, ((SizedIterable<?>) target.adjacent(2)).size());
+    }
+
+    /**
+     * A self-loop is incident on one vertex, so it belongs in one bag once -- and
+     * must not be reported twice by edges() either.
+     */
+    @Test
+    public void aSelfLoopIsHeldOnce() {
+        EdgeGraph<Integer, Double> target = new Graph_Edges<>();
+        target.addEdge(new Edge<>(1, 1, 1.0));
+        assertEquals(1, target.edges().size());
+        assertEquals(1, ((SizedIterable<?>) target.adjacent(1)).size());
+        assertEquals(1, target.vertices().size());
     }
 
     @Test
@@ -92,7 +112,7 @@ public class Graph_EdgesTest {
     public void toStringTest() {
         EdgeGraph<Integer, Double> target = new Graph_Edges<>();
         target.addEdge(1, 2, 1.0);
-        assertEquals("{1=Bag_Array{items=[1-2: 1.0], count=1}, 2=Bag_Array{items=[], count=0}}",
+        assertEquals("{1=Bag_Array{items=[1-2: 1.0], count=1}, 2=Bag_Array{items=[1-2: 1.0], count=1}}",
                 target.toString());
     }
 }

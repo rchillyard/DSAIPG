@@ -4,6 +4,9 @@ import com.phasmidsoftware.dsaipg.graphs.dag.DiGraph;
 import com.phasmidsoftware.dsaipg.graphs.dag.Edge;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Rule;
@@ -113,5 +116,19 @@ public class ShortestPathsTest {
         assertTrue(shortestPaths.hasPathTo("H"));
         assertEquals(7.0, shortestPaths.cost("H"), 0);
     }
-
+    /**
+     * pathTo reports the route, not just what it costs. No test has ever called
+     * it.
+     */
+    @Test
+    public void testPathTo() {
+        DiGraph<String, Double> graph = new DiGraph<>();
+        graph.addEdge(new Edge<>("A", "B", 1.0));
+        graph.addEdge(new Edge<>("B", "C", 2.0));
+        graph.addEdge(new Edge<>("A", "C", 9.0));
+        ShortestPaths<String, Double> shortestPaths = new ShortestPaths<>(graph, "A");
+        List<String> path = new ArrayList<>();
+        for (Edge<String, Double> e : shortestPaths.pathTo("C")) path.add(e.getFrom() + "->" + e.getTo());
+        assertEquals("A to C the long way round is cheaper", List.of("A->B", "B->C"), path);
+    }
 }
