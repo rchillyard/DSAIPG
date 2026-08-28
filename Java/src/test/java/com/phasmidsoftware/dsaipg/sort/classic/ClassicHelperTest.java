@@ -444,12 +444,13 @@ public class ClassicHelperTest {
 
     @Test
     public void testInit() {
-        // NOTE ClassicHelper has no guard here, so it silently accepts a
-        // different n. Every other Helper throws HelperException. Recorded
-        // rather than fixed, so the divergence is visible.
+        // Re-initialising to the SAME n is fine; changing it is not. ClassicHelper
+        // used to have no guard and silently accepted a different n, where every
+        // other Helper throws -- this test recorded that, and its failing was the
+        // signal that the fold had worked.
         helper.init(20);
-        helper.init(3);
-        assertEquals("ClassicHelper allows n to change", 3, helper.getN());
+        assertEquals(20, helper.getN());
+        assertThrows(HelperException.class, () -> helper.init(3));
     }
 
     @Test
@@ -484,13 +485,13 @@ public class ClassicHelperTest {
 
     @Test
     public void cutoff() {
-        // NOTE ClassicHelper does not override cutoff(), so it takes Helper's
-        // default and ignores the configured value. Every other Helper honours
-        // it. Recorded here rather than fixed, so that the divergence is at
-        // least visible.
+        // ClassicHelper now extends the hierarchy, so it honours the configured
+        // cutoff like every other Helper. It used to ignore it and always return
+        // Helper's default of 20 -- this test recorded that divergence, and its
+        // failing was the signal that the fold had worked.
         Config withCutoff = config.copy(HELPER, "cutoff", "8");
         Helper<Integer> h = new ClassicHelper<>("test", Integer::compare, 20, new Random(0L), withCutoff);
-        assertEquals("ClassicHelper ignores the configured cutoff", 20, h.cutoff());
+        assertEquals("the configured cutoff is honoured", 8, h.cutoff());
     }
 
     @Test
