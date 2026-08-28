@@ -25,19 +25,46 @@ class GraphEdges(Generic[V, E], AbstractGraph[V, Edge[V, E]], EdgeGraph[V, E]):
     __slots__ = ()
 
     def edges(self) -> Iterable[Edge[V, E]]:
+        """
+        NOTE an edge sits in the adjacency bag of BOTH its endpoints, so gathering
+        every bag would report each edge twice. An edge is therefore collected only
+        from the bag of the vertex ``Edge.get`` returns, which is one endpoint and
+        not the other. A self-loop occupies one bag once, and is reported once.
+
+        :return: every edge, each appearing exactly once.
+        """
         result: list[Edge[V, E]] = []
-        for bag in self._adjacent_edges.values():
+        for vertex, bag in self._adjacent_edges.items():
             for e in bag:
-                result.append(e)
+                if e.get() == vertex:
+                    result.append(e)
         return result
 
     def add_edge(
         self, edge: Edge[V, E], predicate: Callable[[Edge[V, E]], bool] | None = None
     ) -> None:
+        """
+        Add an edge to both of its vertices, because this graph is undirected and
+        an edge is incident on each of its endpoints alike.
+
+        NOTE it used to go into the bag of the "from" vertex only, the "to" vertex
+        merely being given an empty bag -- faithfully, since the Java did the same.
+        That made ``adjacent(v)`` report not the edges at v but the edges that
+        happened to be WRITTEN with v first, so an algorithm walking the graph by
+        adjacency saw an arbitrary subset of it. Java's Prim did exactly that and
+        returned a spanning forest with a vertex missing.
+
+        :param edge: the edge to add.
+        :param predicate: if given, the edge is added only when this accepts it.
+        """
         if predicate is None or predicate(edge):
             v = edge.get()
+            w = edge.get_other(v)
             self.get_adjacency_bag(v).add(edge)
-            self.get_adjacency_bag(edge.get_other(v))
+            # A self-loop is incident on one vertex, so it belongs in one bag once.
+            if v == w:
+                return
+            self.get_adjacency_bag(w).add(edge)
 
     def __str__(self) -> str:
         return str(self._adjacent_edges)

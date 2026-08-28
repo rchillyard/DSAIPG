@@ -166,16 +166,31 @@ class TestGraphEdges:
                                      lambda e: e.attribute > 2.0)
         assert sorted(e.attribute for e in target.edges()) == [3.0, 4.0]
 
-    def test_an_edge_is_stored_once_but_reaches_both_vertices(self):
-        # The asymmetry worth understanding: unlike GraphSimple, the edge goes
-        # into the "from" vertex's bag only. The "to" vertex gets a bag so that
-        # it counts as a vertex, but the bag stays empty. So edges() must not
-        # double-count -- and does not.
+    def test_an_edge_is_stored_twice_but_reported_once(self):
+        # An edge is incident on both of its vertices, so it appears in both bags
+        # -- and edges() reports it once all the same, by collecting an edge only
+        # from the bag of the vertex Edge.get() returns.
+        #
+        # This test used to assert the opposite, faithfully to the Java: that
+        # adjacent(2) was empty, because an edge went into the "from" bag alone.
+        # That made adjacent(v) report the edges WRITTEN with v first rather than
+        # the edges at v, so an algorithm walking by adjacency saw an arbitrary
+        # subset of the graph. Java's Prim returned a spanning forest with a
+        # vertex missing. Fixed in both trees.
         target = GraphEdges()
         target.add_edge(Edge(1, 2, 1.0))
         assert len(list(target.edges())) == 1
         assert len(list(target.adjacent(1))) == 1
-        assert len(list(target.adjacent(2))) == 0
+        assert len(list(target.adjacent(2))) == 1
+
+    def test_a_self_loop_is_held_once(self):
+        # A self-loop is incident on one vertex, so it belongs in one bag once,
+        # and must not be reported twice by edges() either.
+        target = GraphEdges()
+        target.add_edge(Edge(1, 1, 1.0))
+        assert len(list(target.edges())) == 1
+        assert len(list(target.adjacent(1))) == 1
+        assert len(list(target.vertices())) == 1
 
     def test_edges_gathers_from_every_vertex(self):
         target = GraphEdges()
@@ -188,7 +203,7 @@ class TestGraphEdges:
         target = GraphEdges()
         target.add_edge(Edge(1, 2, 1.0))
         assert str(target) == \
-            "{1: BagArray(items=[1-2: 1.0], count=1), 2: BagArray(items=[], count=0)}"
+            "{1: BagArray(items=[1-2: 1.0], count=1), 2: BagArray(items=[1-2: 1.0], count=1)}"
 
 
 class TestAbstractGraph:
