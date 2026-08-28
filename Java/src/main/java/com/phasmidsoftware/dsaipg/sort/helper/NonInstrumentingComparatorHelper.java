@@ -92,7 +92,32 @@ public class NonInstrumentingComparatorHelper<X> extends BaseComparatorHelper<X>
      * @return a cloned instance of {@code Helper<X>}, specifically a {@code NonInstrumentingComparableHelper}.
      */
     public Helper<X> clone(String description, int N, boolean shareInstrumenter) {
-        return new NonInstrumentingComparatorHelper<>(description, getComparator(), N, config);
+        return clone(description, getComparator(), N, shareInstrumenter);
+    }
+
+    /**
+     * Clone this Helper, giving the copy a different Comparator.
+     * <p>
+     * NOTE this was missing, so this class inherited
+     * {@link BaseComparatorHelper#clone(String, Comparator, int, boolean)}, which
+     * throws {@code SortException("not implementable")}. It is implementable, and
+     * necessary: {@code MSDStringSort} clones its Helper with a
+     * {@link com.phasmidsoftware.dsaipg.util.general.SuffixComparator} to hand the
+     * partition below the cutoff to a three-way quicksort. ClassicHelper carried
+     * its own copy for that reason alone.
+     * <p>
+     * {@code shareInstrumenter} is irrelevant here: this Helper counts nothing, so
+     * there is no instrumenter to share.
+     *
+     * @param description       a description of the clone.
+     * @param comparator        the Comparator for the clone to use.
+     * @param N                 the number of elements expected to be sorted.
+     * @param shareInstrumenter ignored.
+     * @return a new NonInstrumentingComparatorHelper.
+     */
+    @Override
+    public Helper<X> clone(String description, Comparator<X> comparator, int N, boolean shareInstrumenter) {
+        return new NonInstrumentingComparatorHelper<>(description, comparator, N, random, config);
     }
 
     /**
