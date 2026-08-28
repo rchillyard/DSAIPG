@@ -105,7 +105,7 @@ public class SortTest {
         final Helper<Integer> helper = sorter.getHelper();
         final Integer[] xs = helper.random(Integer.class, r -> r.nextInt(1000000));
         final Collection<Integer> list = Arrays.asList(xs);
-        final Iterable<Integer> ys = sorter.sort(list);
+        final Iterable<Integer> ys = sorter.sort(list, Integer.class);
         final Iterator<Integer> iterator = ys.iterator();
         int first = iterator.next();
         int second = iterator.next();

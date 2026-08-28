@@ -78,9 +78,18 @@ class TestAsArray:
         result.append(4)
         assert source == [1, 2, 3]
 
-    def test_empty_collection_raises(self):
-        with pytest.raises(ValueError):
-            as_array([])
+    def test_an_empty_collection_is_fine(self):
+        # This used to assert ValueError, mirroring the Java, which rejected an
+        # empty collection because it guessed the array's component type from the
+        # first element. The Java takes the class now and accepts empty; Python
+        # never had a reason to refuse.
+        assert as_array([]) == []
+
+    def test_a_heterogeneous_collection(self):
+        # The case that motivated the Java change: it built the array from the
+        # first element's class and then threw ArrayStoreException on the rest.
+        # Python lists have no component type, so there is nothing to get wrong.
+        assert as_array([1, 2.5, "three"]) == [1, 2.5, "three"]
 
 
 class TestFillRandomArray:

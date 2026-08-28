@@ -60,12 +60,18 @@ public interface Sort<X> extends AutoCloseable {
     /**
      * Method to take a Collection of X and return an Iterable of X in order.
      *
-     * @param xs the collection of X elements.
+     * NOTE the class must be passed in: Java erases X, so there is no way to work
+     * out what kind of array to sort in. Deriving it from the first element, as
+     * this used to, is wrong for any collection whose elements are not all of that
+     * exact class -- see Utilities.asArray.
+     *
+     * @param xs    the collection of X elements.
+     * @param clazz the class of X.
      * @return a sorted iterable of X.
      */
-    default Iterable<X> sort(Collection<X> xs) {
+    default Iterable<X> sort(Collection<X> xs, Class<X> clazz) {
         if (xs.isEmpty()) return xs;
-        final X[] array = Utilities.asArray(xs);
+        final X[] array = Utilities.asArray(xs, clazz);
         mutatingSort(array);
         return Arrays.asList(array);
     }

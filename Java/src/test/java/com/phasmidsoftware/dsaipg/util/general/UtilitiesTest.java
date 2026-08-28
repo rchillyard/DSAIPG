@@ -48,16 +48,47 @@ public class UtilitiesTest {
     @Test
     public void testAsArrayValidCollection() {
         Collection<String> collection = List.of("A", "B", "C");
-        String[] array = Utilities.asArray(collection);
+        String[] array = Utilities.asArray(collection, String.class);
         assertEquals(3, array.length);
         assertEquals("A", array[0]);
         assertEquals("B", array[1]);
         assertEquals("C", array[2]);
     }
 
+    /**
+     * An empty collection is fine now. The old version rejected it, because it
+     * derived the component type from the first element and an empty collection
+     * has none.
+     */
     @Test
     public void testAsArrayEmptyCollection() {
         Collection<String> collection = List.of();
-        assertThrows(RuntimeException.class, () -> Utilities.asArray(collection));
+        String[] array = Utilities.asArray(collection, String.class);
+        assertEquals(0, array.length);
+    }
+
+    /**
+     * The reason for passing the class. Deriving the component type from the first
+     * element gave an Integer[] here and then threw ArrayStoreException on the
+     * Double — and the other way round if the Double came first, so neither
+     * ordering was safe. Any collection whose static type is a supertype of its
+     * contents was at risk, which is exactly what Sort.sort deals in.
+     */
+    @Test
+    public void testAsArrayHeterogeneousCollection() {
+        Collection<Number> collection = List.of(1, 2.5, 3L);
+        Number[] array = Utilities.asArray(collection, Number.class);
+        assertEquals(3, array.length);
+        assertEquals(Number[].class, array.getClass());
+        assertEquals(1, array[0]);
+        assertEquals(2.5, array[1]);
+        assertEquals(3L, array[2]);
+    }
+
+    @Test
+    public void testAsArrayComponentTypeIsTheOneAskedFor() {
+        // Not the runtime class of the elements: a Number[] holding Integers.
+        Number[] array = Utilities.asArray(List.of(1, 2), Number.class);
+        assertEquals(Number[].class, array.getClass());
     }
 }

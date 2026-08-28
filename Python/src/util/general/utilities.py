@@ -14,17 +14,21 @@ def as_array(ts: Collection[T]) -> list[T]:
     """
     Return the given collection as a list.
 
-    NOTE this exists only for parity with the Java original, where it works
-    around the fact that an ``Object[]`` can be cast to an ``Item[]`` internally
-    but not externally.  Python has no such problem, so a caller may as well
-    write ``list(ts)``.
+    NOTE this exists only for parity with the Java original, where the caller has
+    to say what component type the array should have -- Java erases the element
+    type, so ``Collection<T>`` carries nothing to build a ``T[]`` from. Python
+    lists are heterogeneous and have no component type, so there is nothing to
+    pass and a caller may as well write ``list(ts)``.
 
-    :param ts: a non-empty collection.
+    NOTE this used to reject an empty collection "as the Java version does". The
+    Java rejected it because it guessed the component type from the first element
+    and an empty collection has none; guessing that way was wrong for a collection
+    whose elements are not all of one class, so the Java now takes the class and
+    accepts empty. There was never a reason for Python to refuse.
+
+    :param ts: a collection.
     :return: the elements of ts, as a list.
-    :raises ValueError: if ts is empty, as the Java version does.
     """
-    if not ts:
-        raise ValueError("ts may not be empty")
     return list(ts)
 
 
