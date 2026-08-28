@@ -103,6 +103,11 @@ public class Timer {
      */
     public double meanLapTime() {
         if (running) throw new TimerException();
+        // NOTE without this guard, no laps gives ticks/0 -- Infinity, silently, as
+        // the answer to "how long did each run take". repeat(0, ...) does exactly
+        // that. A benchmark reporting Infinity is better than one reporting a
+        // number nobody checks, but an exception is better still.
+        if (laps <= 0) throw new TimerException("meanLapTime: no laps were recorded");
         return toMillisecs(ticks) / laps;
     }
 

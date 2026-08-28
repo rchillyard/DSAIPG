@@ -135,10 +135,18 @@ class Timer:
     def mean_lap_time(self) -> float:
         """
         :return: the average milliseconds used by each lap.
-        :raises TimerException: if this Timer is running.
+        :raises TimerException: if this Timer is running, or if no lap was
+                                recorded -- zero laps have no mean.
         """
         if self._running:
             raise TimerException()
+        # NOTE without this guard the Java gave ticks/0, which is Infinity, as the
+        # answer to "how long did each run take"; Python would raise
+        # ZeroDivisionError, which is at least loud but says nothing useful.
+        # repeat(0, ...) reaches it. The Java's test accepted the Infinity,
+        # because it asserted only that the time was >= 0.
+        if self._laps <= 0:
+            raise TimerException("mean_lap_time: no laps were recorded")
         return _to_millisecs(self._ticks) / self._laps
 
     def pause_and_lap(self) -> None:

@@ -174,3 +174,10 @@ def _timer_without_a_clock(shown: list) -> Timer:
     timer = Timer.__new__(Timer)
     timer._show_progress = shown.append
     return timer
+
+
+def test_mean_lap_time_with_no_laps():
+    # Zero laps have no mean. The Java used to return Infinity here and its test
+    # accepted it, asserting only that the result was >= 0.
+    with pytest.raises(TimerException, match="no laps"):
+        Timer(lambda s: None).repeat(0, lambda: 1, lambda x: x)

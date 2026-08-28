@@ -5,6 +5,7 @@ import com.phasmidsoftware.dsaipg.adt.bqs.Bag_Array;
 import com.phasmidsoftware.dsaipg.util.iteration.SizedIterable;
 import com.phasmidsoftware.dsaipg.util.iteration.SizedIterableImpl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +44,16 @@ abstract public class AbstractGraph<V, Adj> implements Graph<V, Adj> {
      * @return an Iterable containing the adjacent entities for the given vertex.
      */
     public Iterable<Adj> adjacent(V v) {
-        return adjacentEdges.get(v);
+        // NOTE an unknown vertex gives an empty Iterable, not the map's null.
+        // Every caller here iterates the result -- Prim, ShortestPaths and
+        // DiGraph's depth-first search all do -- so returning null handed each of
+        // them a NullPointerException in waiting. Returning empty is also what
+        // the Python port does.
+        //
+        // The result is NOT attached to the graph: it is immutable and asking
+        // about a vertex does not create it. Use getAdjacencyBag for that.
+        Bag<Adj> bag = adjacentEdges.get(v);
+        return bag != null ? bag : Collections.emptyList();
     }
 
     /**

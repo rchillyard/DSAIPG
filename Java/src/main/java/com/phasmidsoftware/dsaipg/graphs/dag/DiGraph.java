@@ -74,7 +74,7 @@ public class DiGraph<V, E> extends AbstractGraph<V, Edge<V, E>> {
      */
     protected Stack<V> reversePostOrderDFS() {
         Stack<V> postOrderStack = new Stack_LinkedList<>();
-        new DepthFirstSearch(new TreeSet<>(), null, postOrderStack::push).innerDfs();
+        new DepthFirstSearch(new HashSet<>(), null, postOrderStack::push).innerDfs();
         return postOrderStack;
     }
 
@@ -90,7 +90,7 @@ public class DiGraph<V, E> extends AbstractGraph<V, Edge<V, E>> {
      */
     DAG<Kernel<V>, E> kernelDAG() {
         final DAG_Impl<Kernel<V>, E> result = new DAG_Impl<>(new Random(0L));
-        final TreeSet<V> marked = new TreeSet<>();
+        final Set<V> marked = new HashSet<>();
         for (V vertex : reverse().reversePostOrderDFS()) {
             Kernel<V> kernel = new Kernel<>();
             new DepthFirstSearch(marked, kernel::add, null).innerDfs(vertex);
@@ -126,12 +126,12 @@ public class DiGraph<V, E> extends AbstractGraph<V, Edge<V, E>> {
          * The traversal allows optional pre-order and post-order Consumer functions to be
          * executed on vertices during traversal. Either one of the Consumers (pre or post) must be non-null.
          *
-         * @param marked a TreeSet to keep track of visited vertices to prevent cycles and revisits.
+         * @param marked a Set to keep track of visited vertices to prevent cycles and revisits.
          * @param pre    a Consumer function that is executed on each vertex before visiting its adjacent vertices (pre-order action).
          * @param post   a Consumer function that is executed on each vertex after all its adjacent vertices have been visited (post-order action).
          * @throws RuntimeException if both pre and post Consumers are null.
          */
-        public DepthFirstSearch(TreeSet<V> marked, Consumer<V> pre, Consumer<V> post) {
+        public DepthFirstSearch(Set<V> marked, Consumer<V> pre, Consumer<V> post) {
             this.pre = pre;
             this.post = post;
             this.marked = marked;
@@ -176,14 +176,14 @@ public class DiGraph<V, E> extends AbstractGraph<V, Edge<V, E>> {
             if (marked.contains(v)) return;
             marked.add(v);
             if (pre != null) pre.accept(v);
-            for (Edge<V, E> e : adjacentEdges.get(v)) {
+            for (Edge<V, E> e : adjacent(v)) {
                 V v1 = e.getTo();
                 if (!marked.contains(v1)) innerDfs(v1);
             }
             if (post != null) post.accept(v);
         }
 
-        private final TreeSet<V> marked;
+        private final Set<V> marked;
         private final Consumer<V> pre;
         private final Consumer<V> post;
     }

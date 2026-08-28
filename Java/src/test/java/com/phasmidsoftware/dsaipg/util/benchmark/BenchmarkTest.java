@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
@@ -188,11 +189,13 @@ public class BenchmarkTest {
         // Create an instance of Benchmark_Timer
         Benchmark_Timer<Integer> timer = new Benchmark_Timer<>("Zero Iterations Test", Config.getConfig(BenchmarkTest.class), fRun);
 
-        // Execute the runFromSupplier method with zero iterations
-        double time = timer.runFromSupplier(supplier, 0);
-
-        // Assert that execution does not break and returns a valid time
-        assertTrue(time >= 0);
+        // Zero runs has no mean, so asking for one is a caller error.
+        //
+        // NOTE this used to assert `assertTrue(time >= 0)` on the result, which
+        // passed — because the result was Infinity, and Infinity >= 0 is true.
+        // The test looked like it checked something while accepting a meaningless
+        // number as the time each run had taken.
+        assertThrows(Timer.TimerException.class, () -> timer.runFromSupplier(supplier, 0));
     }
 
 }

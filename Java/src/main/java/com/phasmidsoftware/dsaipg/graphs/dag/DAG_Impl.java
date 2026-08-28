@@ -5,7 +5,7 @@ import com.phasmidsoftware.dsaipg.adt.bqs.Bag_Array;
 import com.phasmidsoftware.dsaipg.util.iteration.SizedIterable;
 
 import java.util.Random;
-import java.util.TreeSet;
+import java.util.HashSet;
 import java.util.function.Consumer;
 
 /**
@@ -26,7 +26,7 @@ public class DAG_Impl<V, E> extends DiGraph<V, E> implements DAG<V, E> {
      * @param post   a consumer function that is executed on each vertex after all its neighbors have been visited.
      */
     public void dfs(V vertex, Consumer<V> pre, Consumer<V> post) {
-        new DepthFirstSearch(new TreeSet<>(), pre, post).innerDfs(vertex);
+        new DepthFirstSearch(new HashSet<>(), pre, post).innerDfs(vertex);
     }
 
     /**

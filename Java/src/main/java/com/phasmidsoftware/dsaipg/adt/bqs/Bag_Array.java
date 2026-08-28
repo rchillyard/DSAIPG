@@ -110,8 +110,14 @@ public class Bag_Array<Item> implements Bag<Item> {
      * @return true if the item is found in the bag, otherwise false
      */
     public boolean contains(Item item) {
-        for (Item i : items) {
-            if (i != null && i.equals(item))
+        // NOTE the first count entries only. Scanning the whole backing array
+        // meant that after clear(), which resets count and nothing else, this
+        // still answered true for items the bag no longer held -- while
+        // multiplicity, which happens to start with an isEmpty() guard, answered
+        // zero. Two methods disagreeing about the same question.
+        for (int i = 0; i < count; i++) {
+            Item x = items[i];
+            if (x != null && x.equals(item))
                 return true;
         }
         return false;
@@ -125,9 +131,9 @@ public class Bag_Array<Item> implements Bag<Item> {
      */
     public int multiplicity(Item item) {
         int result = 0;
-        if (isEmpty()) return 0;
-        for (Item i : items) {
-            if (i != null && i.equals(item))
+        for (int i = 0; i < count; i++) {
+            Item x = items[i];
+            if (x != null && x.equals(item))
                 result++;
         }
         return result;

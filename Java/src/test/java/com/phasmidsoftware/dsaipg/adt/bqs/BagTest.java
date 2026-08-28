@@ -125,13 +125,40 @@ public class BagTest {
     }
 
     /**
-     * Growth: the only thing which still needs growFrom.
-     * <p>
-     * The constructor and {@link Bag_Array#of} allocate their storage directly, so
-     * a bag can now be built and used without the exercise being written. These
-     * are what guard it instead -- and they are worth having in their own right,
-     * since growth used to be covered only incidentally by testBagAdd2.
+     * clear() resets the count and nothing else, so contains used to scan past it
+     * and still answer true for items the bag no longer held — while multiplicity
+     * answered zero, because it happened to have an isEmpty() guard that contains
+     * lacked. Two methods disagreeing about the same question.
      */
+    @Test
+    public void clearReallyForgetsTheItems() {
+        Bag<String> bag = new Bag_Array<>();
+        bag.add("x");
+        bag.add("y");
+        bag.clear();
+        assertTrue(bag.isEmpty());
+        assertEquals(0, bag.size());
+        assertFalse("contains must not see past the count", bag.contains("x"));
+        assertEquals(0, bag.multiplicity("x"));
+    }
+
+    /**
+     * The staleness was position-dependent, which would have made a bug report
+     * baffling: adding one item overwrote slot 0, so the old first element stopped
+     * being found while the second was still there.
+     */
+    @Test
+    public void noStaleEntryIsVisibleAfterReuse() {
+        Bag<String> bag = new Bag_Array<>();
+        bag.add("x");
+        bag.add("y");
+        bag.clear();
+        bag.add("z");
+        assertTrue(bag.contains("z"));
+        assertFalse(bag.contains("x"));
+        assertFalse(bag.contains("y"));
+    }
+
     /**
      * Growth DOUBLES the capacity, which is what makes the amortized cost of an
      * addition O(1) rather than O(n).

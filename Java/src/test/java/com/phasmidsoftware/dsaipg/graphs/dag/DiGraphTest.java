@@ -139,6 +139,29 @@ public class DiGraphTest {
         return graph;
     }
 
+    /**
+     * The depth-first search used a TreeSet for its marked vertices, which
+     * silently required V to be Comparable — a constraint the type does not
+     * express, so a perfectly ordinary vertex type failed at runtime with a
+     * ClassCastException. It is a HashSet now, which asks only for equals and
+     * hashCode.
+     */
+    @Test
+    public void aVertexTypeNeedNotBeComparable() {
+        record Point(int x, int y) {
+        }
+        DiGraph<Point, Integer> graph = new DiGraph<>();
+        Point a = new Point(0, 0), b = new Point(1, 1), c = new Point(2, 2);
+        graph.addEdge(new Edge<>(a, b, 1));
+        graph.addEdge(new Edge<>(b, c, 2));
+        assertEquals(3, graph.vertices().size());
+        assertEquals(3, graph.kernelDAG().vertices().size());
+        // Stack has no size(), so count what comes off it.
+        int popped = 0;
+        for (Point ignored : graph.reversePostOrderDFS()) popped++;
+        assertEquals(3, popped);
+    }
+
     @Test
     public void testToString() {
         DiGraph<String, Integer> graph = new DiGraph<>();

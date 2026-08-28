@@ -82,9 +82,10 @@ def test_growth_preserves_the_items_and_their_order():
 
 
 def test_growth_leaves_the_new_slots_empty():
-    # The unused tail must be None, not stale references. Anything else would
-    # keep objects alive and confuse contains/multiplicity, which scan the whole
-    # backing store rather than stopping at _count.
+    # The unused tail must be None, not stale references, so that nothing the bag
+    # no longer holds is kept alive by it. (contains and multiplicity now stop at
+    # _count, so they no longer see the tail either way -- which is the fix for
+    # the clear() staleness below.)
     b = BagArray()
     for i in range(INITIAL_CAPACITY + 1):
         b.add(i)
@@ -207,6 +208,44 @@ def test_clear():
     b.clear()
     assert b.is_empty()
     assert b.as_array() == []
+
+
+def test_clear_really_forgets_the_items():
+    # clear() only resets the count, so contains used to scan past it and still
+    # answer True for items the bag no longer held -- while multiplicity answered
+    # zero, because it happened to have an is_empty() guard that contains lacked.
+    b = BagArray()
+    b.add("x")
+    b.add("y")
+    b.clear()
+    assert b.is_empty()
+    assert b.as_array() == []
+    assert not b.contains("x")
+    assert b.multiplicity("x") == 0
+
+
+def test_contains_and_multiplicity_agree_after_clear():
+    # The two must answer the same question the same way.
+    b = BagArray()
+    for item in ["x", "y", "x"]:
+        b.add(item)
+    b.clear()
+    for item in ["x", "y"]:
+        assert b.contains(item) == (b.multiplicity(item) > 0)
+
+
+def test_a_stale_slot_is_not_visible_after_reuse():
+    # The staleness was position-dependent, which would have made a bug report
+    # baffling: adding one item overwrote slot 0, so the old first element
+    # stopped being found while the second was still there.
+    b = BagArray()
+    b.add("x")
+    b.add("y")
+    b.clear()
+    b.add("z")
+    assert b.as_array() == ["z"]
+    assert not b.contains("x")
+    assert not b.contains("y")
 
 
 def test_contains_and_multiplicity():

@@ -90,8 +90,13 @@ class BagArray(Bag[Item]):
         self._count = 0
 
     def contains(self, item: Item) -> bool:
+        # NOTE the first _count entries only. Scanning the whole backing list
+        # meant that after clear(), which resets the count and nothing else, this
+        # still answered True for items the bag no longer held -- while
+        # multiplicity, which happens to start with an is_empty() guard, answered
+        # zero. Two methods disagreeing about the same question.
         assert self._items is not None
-        for i in self._items:
+        for i in self._items[: self._count]:
             if i is not None and i == item:
                 return True
         return False
@@ -104,9 +109,7 @@ class BagArray(Bag[Item]):
         Return the number of instances of item in this bag.
         """
         assert self._items is not None
-        if self.is_empty():
-            return 0
-        return sum(1 for i in self._items if i is not None and i == item)
+        return sum(1 for i in self._items[: self._count] if i is not None and i == item)
 
     def as_array(self) -> list[Item]:
         """

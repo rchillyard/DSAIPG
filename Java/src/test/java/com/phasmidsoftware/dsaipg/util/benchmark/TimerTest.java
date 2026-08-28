@@ -195,4 +195,14 @@ public class TimerTest {
     public static final int HUNDREDTH = 10;
     private Config config;
 
+
+    /**
+     * Zero laps used to give ticks/0 — Infinity — as the mean time per run, with
+     * nothing to indicate that no run had been timed. repeat(0, ...) reached it.
+     */
+    @Test(expected = Timer.TimerException.class)
+    public void meanLapTimeWithNoLaps() {
+        new Timer(s -> {
+        }).repeat(0, () -> 1, x -> x);
+    }
 }
