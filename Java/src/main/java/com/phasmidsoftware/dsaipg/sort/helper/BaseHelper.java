@@ -356,9 +356,6 @@ public abstract class BaseHelper<X> implements Helper<X> {
      * which is deliberate: an instrumented run is gathering statistics rather than
      * timings, so the check costs it nothing that matters.
      * <p>
-     * NOTE ClassicHelper keeps its own copy of this flag because it implements
-     * NonComparableHelper directly rather than extending BaseHelper. Folding it
-     * into the hierarchy would remove the last duplicate.
      */
     protected final boolean checkSorted;
 

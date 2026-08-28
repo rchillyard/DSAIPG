@@ -1,6 +1,5 @@
 package com.phasmidsoftware.dsaipg.sort.helper;
 
-import com.phasmidsoftware.dsaipg.sort.classic.ClassicHelper;
 import com.phasmidsoftware.dsaipg.util.config.Config;
 
 import java.util.Comparator;
@@ -73,7 +72,7 @@ public class HelperFactory {
 
     /**
      * Factory method to create a Helper.
-     * At present, the only concrete extender of Helper is ClassicHelper.
+     * At present this yields a NonInstrumentingComparatorHelper.
      *
      * @param <X>         the underlying type.
      * @param description the description of the Helper.
@@ -87,7 +86,7 @@ public class HelperFactory {
         if (isInstrumented(config))
             return new InstrumentedComparatorHelper<>(description, comparator, nElements, getSeed(config), nRuns, config);
         else
-            return new ClassicHelper<>(description, comparator, nElements, new Random(getSeed(config)), config);
+            return new NonInstrumentingComparatorHelper<>(description, comparator, nElements, new Random(getSeed(config)), config);
     }
 
 }

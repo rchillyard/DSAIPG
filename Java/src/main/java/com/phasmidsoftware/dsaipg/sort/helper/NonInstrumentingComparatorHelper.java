@@ -103,8 +103,8 @@ public class NonInstrumentingComparatorHelper<X> extends BaseComparatorHelper<X>
      * throws {@code SortException("not implementable")}. It is implementable, and
      * necessary: {@code MSDStringSort} clones its Helper with a
      * {@link com.phasmidsoftware.dsaipg.util.general.SuffixComparator} to hand the
-     * partition below the cutoff to a three-way quicksort. ClassicHelper carried
-     * its own copy for that reason alone.
+     * partition below the cutoff to a three-way quicksort. ClassicHelper carried a
+     * copy of its own for that reason alone, and has since been deleted.
      * <p>
      * {@code shareInstrumenter} is irrelevant here: this Helper counts nothing, so
      * there is no instrumenter to share.
