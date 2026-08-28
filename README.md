@@ -49,10 +49,19 @@ The `pom.xml` sets both the source and target release to 21,
 so an earlier JDK will not build the project.
 
 To test the installation, run all the tests in `src/test/java`.
-There are about a thousand active tests, of which two-thirds should run green.
-Don't worry about the failing tests--they fail because there are stubs in the code
-that you need to replace with functioning code in many places
-(see above in Navigation).
+You should see about 1350 tests: rather over a thousand green,
+close to 300 skipped, and **nothing red**.
+
+A skipped test is one which reached a method you have not written yet--
+a stub you are meant to replace with working code (see above in Navigation).
+It will turn green once you have written it.
+Run with `-Dsurefire.useFile=false`, or read the reports in `target/surefire-reports`,
+and each skip names the file and line waiting for you.
+
+Anything red is a real problem, not an unfinished exercise:
+either a mistake in your own code or something wrong with your installation.
+That is the point of the skips--they keep red and green meaning something
+while the work is unfinished.
 
 There are also functional tests in the `src/it/java` directory.
 However, these take significantly longer to run and are really not necessary. 
@@ -75,7 +84,7 @@ If you would rather not use `uv`, a plain virtual environment works just as well
     .venv/bin/pip install pytest ruff
     .venv/bin/python -m pytest
 
-Either way you should see 362 tests: 298 green and 64 skipped, and nothing red.
+Either way you should see 1617 tests: 1420 green and 197 skipped, and nothing red.
 A skipped test is one which reached a method you have not written yet,
 and it will turn green once you have written it.
 Anything red is a real problem, not an unfinished exercise.
@@ -92,9 +101,13 @@ There is a linter configured, which is worth running before you submit anything:
 
 It should report no problems on a clean checkout.
 
-Note that the Python tree covers only part of the material in the Java tree.
-At present it mirrors `adt`, `compression`, `graphs` (union-find and Dijkstra only) and `select`.
-There is no Python equivalent yet of `sort`, `util`, `misc`, `adt/threesum` or the team project,
-so Chapters 7 and 8 in particular are Java-only.
+The Python tree now mirrors nearly all of the Java one:
+`adt` (including `threesum`), `compression`, `graphs` (all of it), `select`,
+`sort` and `util`.
+What is still Java-only is `misc` (Chapters 1 and 2) and the team project.
 The package names are the Python spelling of the Java ones:
 `adt.symbol_table` for `adt.symbolTable`, `selection` for `select`, and so on.
+
+Where the two trees differ on purpose, the Python says so in its own docstring,
+with the reason. The Java tree remains the reference: where they differ by
+accident, Java is what the book describes.
