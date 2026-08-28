@@ -6,6 +6,7 @@ package com.phasmidsoftware.dsaipg.adt.bqs;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -77,11 +78,87 @@ public class BagTest {
         for (int i = 1; i <= 4; i++)
             bag.add(i);
         assertEquals(4, bag.size());
-        // NOTE we can (successfully) cast an individual object but not an array.
+        // NOTE an individual element casts successfully; the array does not. That
+        // is why asArray is declared Object[] -- see the next test.
         Object[] integers = bag.asArray();
         int sum = 0;
         for (Object x : integers) sum += (Integer) x;
         assertEquals(10, sum);
+    }
+
+    /**
+     * asArray returns Object[], and says so.
+     * <p>
+     * It used to be declared Item[] while returning an Object[], because Item is
+     * erased and there is nothing at runtime to say what kind of array to make.
+     * Every use of the result at the declared type therefore threw
+     * ClassCastException — including {@code asArray().length} and a for-each with
+     * the element type — since the compiler inserts a checkcast wherever it knows
+     * what Item is. Only widening to Object[] worked, which is why every caller
+     * already did. Now the declaration matches, and these ordinary uses are simply
+     * legal.
+     */
+    @Test
+    public void asArrayIsHonestlyAnObjectArray() {
+        Bag<Integer> bag = Bag_Array.of(1, 2, 3);
+        assertEquals(3, bag.asArray().length);
+        assertEquals(Object[].class, bag.asArray().getClass());
+        int sum = 0;
+        for (Object x : bag.asArray()) sum += (Integer) x;
+        assertEquals(6, sum);
+    }
+
+    /**
+     * The typed alternative. This is the one that gives back a real Integer[],
+     * because the supplied array's runtime class says what to allocate — the
+     * information Item's erasure destroys.
+     */
+    @Test
+    public void asArrayWithASuppliedArrayIsTyped() {
+        Bag<Integer> bag = Bag_Array.of(1, 2, 3);
+        Integer[] a = bag.asArray(new Integer[0]);
+        assertEquals(Integer[].class, a.getClass());
+        assertArrayEquals(new Integer[]{1, 2, 3}, a);
+        // and, unlike asArray(), usable at its declared type
+        assertEquals(3, a.length);
+        int sum = 0;
+        for (Integer x : a) sum += x;
+        assertEquals(6, sum);
+    }
+
+    @Test
+    public void asArrayFillsAnArrayWhichIsBigEnough() {
+        Bag<Integer> bag = Bag_Array.of(1, 2, 3);
+        Integer[] supplied = new Integer[5];
+        Arrays.fill(supplied, 9);
+        Integer[] a = bag.asArray(supplied);
+        assertSame("a big enough array is filled and returned, not replaced", supplied, a);
+        assertEquals(Integer.valueOf(3), a[2]);
+        assertNull("the slot past the contents marks the end", a[3]);
+    }
+
+    @Test
+    public void asArrayAllocatesWhenTheSuppliedArrayIsTooSmall() {
+        Bag<Integer> bag = Bag_Array.of(1, 2, 3);
+        Integer[] supplied = new Integer[1];
+        Integer[] a = bag.asArray(supplied);
+        assertNotSame(supplied, a);
+        assertEquals(3, a.length);
+        assertEquals(Integer[].class, a.getClass());
+    }
+
+    @Test
+    public void asArrayOfAnEmptyBag() {
+        Bag<Integer> bag = Bag_Array.of();
+        assertEquals(0, bag.asArray(new Integer[0]).length);
+    }
+
+    @Test
+    public void asArrayIsACopy() {
+        Bag<Integer> bag = Bag_Array.of(1, 2, 3);
+        Object[] a = bag.asArray();
+        a[0] = 99;
+        assertEquals(1, bag.asArray()[0]);
     }
 
     @Test

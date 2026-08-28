@@ -46,7 +46,26 @@ public interface Bag<Item> extends SizedIterable<Item> {
      *
      * @return this Bag as an array of Objects.
      */
-    Item[] asArray();
+    Object[] asArray();
+
+    /**
+     * Method to get this Bag as an array of the same component type as the one
+     * supplied.
+     * <p>
+     * The array carries the type information that {@link #asArray()} cannot: Item
+     * is erased, so there is nothing at runtime to say what kind of array to
+     * allocate, and the caller supplying one settles it. This is exactly
+     * {@link java.util.Collection#toArray(Object[])}, and for exactly the same
+     * reason — call it with {@code new Item[0]} to get a genuinely typed array
+     * back.
+     *
+     * @param a   an array of the desired component type. It is filled and returned
+     *            if it is big enough; otherwise a new one of the same type is
+     *            allocated.
+     * @param <T> the component type.
+     * @return this Bag as an array of T.
+     */
+    <T> T[] asArray(T[] a);
 
     /**
      * Empty out this Bag

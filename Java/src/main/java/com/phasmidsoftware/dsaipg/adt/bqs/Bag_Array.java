@@ -4,6 +4,7 @@
 
 package com.phasmidsoftware.dsaipg.adt.bqs;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
@@ -146,22 +147,62 @@ public class Bag_Array<Item> implements Bag<Item> {
      */
     public Iterator<Item> iterator() {
         assert items != null; // Should be not-null any time after construction.
-        return new UnorderedIterator<>(asArray(), random);
+        // NOTE the cast is safe HERE and nowhere else. Inside a generic class Item
+        // erases to Object, so this compiles to nothing at all; it is only at a
+        // call site which knows what Item is that the compiler emits a checkcast
+        // and the Object[] is caught out. That asymmetry is what the old asArray
+        // javadoc was reaching for.
+        @SuppressWarnings("unchecked") Item[] typed = (Item[]) asArray();
+        return new UnorderedIterator<>(typed, random);
     }
 
     /**
      * Method to get this Bag as an array.
      * <p>
-     * Internally, Object[] can be cast as an Item[] but it is not valid externally.
-     * Hence, the arraycopy.
-     * This is a quirk of Java Generics.
+     * NOTE Object[], not Item[], and deliberately. Item is erased, so there is
+     * nothing at runtime to say what kind of array to allocate; the array really
+     * is an Object[] however it is declared. Declaring it Item[] promised
+     * something unobtainable — every use of the result at that type threw
+     * ClassCastException, including {@code asArray().length} and a for-each with
+     * the element type, because the compiler inserts a checkcast wherever it knows
+     * what Item is. Only widening to Object[] worked, which is why every caller
+     * already does. The old javadoc credited the arraycopy with fixing this; it
+     * did not, since it copied into another Object[].
+     * <p>
+     * {@link java.util.Collection#toArray()} returns Object[] for the same reason,
+     * and offers {@link java.util.Collection#toArray(Object[])} for a caller who
+     * has somewhere typed to put the result. Add the equivalent here if one is
+     * ever wanted.
      *
      * @return this Bag as an array.
      */
-    public Item[] asArray() {
-        @SuppressWarnings("unchecked") Item[] items = (Item[]) new Object[count];
-        System.arraycopy(this.items, 0, items, 0, count);
-        return items;
+    public Object[] asArray() {
+        Object[] result = new Object[count];
+        System.arraycopy(items, 0, result, 0, count);
+        return result;
+    }
+
+    /**
+     * Method to get this Bag as an array of the supplied array's component type.
+     * <p>
+     * Follows {@link java.util.Collection#toArray(Object[])}: the supplied array is
+     * filled and returned if it is big enough, and the element just past the
+     * contents is set to null so a caller can find the end; otherwise a new array
+     * of the same component type is allocated. Passing {@code new Item[0]} is the
+     * usual idiom and always allocates.
+     *
+     * @param a   an array of the desired component type.
+     * @param <T> the component type.
+     * @return this Bag as an array of T.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T[] asArray(T[] a) {
+        T[] result = a.length >= count
+                ? a
+                : (T[]) Array.newInstance(a.getClass().getComponentType(), count);
+        System.arraycopy(items, 0, result, 0, count);
+        if (result.length > count) result[count] = null;
+        return result;
     }
 
     @Override
