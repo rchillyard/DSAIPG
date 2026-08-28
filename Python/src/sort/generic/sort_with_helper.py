@@ -18,6 +18,7 @@ from typing import TypeVar
 
 from src.sort.generic.sort import ProcessingSort
 from src.sort.helper.helper import Helper
+from src.sort.helper.helper_exception import HelperException
 from src.sort.helper.helper_factory import create
 from src.util.config.config import Config
 from src.util.logging.lazy_logger import LazyLogger
@@ -80,13 +81,24 @@ class SortWithHelper(ProcessingSort[X], ABC):
         Hand the sorted list to the Helper, which checks it and gathers the
         statistics.
 
-        NOTE a failure here is logged, not raised, following the Java. That
-        means an instrumented Helper's check that the list really is sorted
-        cannot fail a caller -- it only leaves a line in the log. Tests that
-        care therefore assert is_sorted themselves rather than relying on this.
+        A HelperException means the Helper found the result unacceptable -- in
+        practice, that the list is not in order -- and is re-raised. A sort which
+        did not sort must not be able to look like a success.
+
+        Anything else came from the post-processing itself rather than from the
+        sort, so it is logged and swallowed.
+
+        NOTE this used to log everything, following the Java, which made the
+        check unreachable: "array is not sorted" was reported at INFO level while
+        the test passed. Both trees now re-raise.
+
+        :param xs: the sorted list.
+        :raises HelperException: if the Helper found the result unacceptable.
         """
         try:
             self.helper.post_process(xs)
+        except HelperException:
+            raise
         except Exception as e:
             # NOTE the message is built here, not inside the lambda: Python
             # unbinds the exception variable when the except block ends, so a

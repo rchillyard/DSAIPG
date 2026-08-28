@@ -2,6 +2,7 @@ package com.phasmidsoftware.dsaipg.sort.classic;
 
 import com.phasmidsoftware.dsaipg.sort.generic.SortException;
 import com.phasmidsoftware.dsaipg.sort.helper.Helper;
+import com.phasmidsoftware.dsaipg.sort.helper.HelperException;
 import com.phasmidsoftware.dsaipg.util.config.Config;
 import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 import org.junit.Before;
@@ -520,10 +521,34 @@ public class ClassicHelperTest {
         assertSame(xs, helper.preProcess(xs));
     }
 
+    /**
+     * checksorted is true in test/resources/config.ini, so an unsorted array is
+     * rejected. That is the point of setting it there: a test must not be able to
+     * pass on a sort which did not sort.
+     * <p>
+     * NOTE this test used to assert the opposite — "checksorted is not set in
+     * config.ini, so nothing is checked" — which was true, and was the problem.
+     */
     @Test
     public void postProcess() {
-        // checksorted is not set in config.ini, so nothing is checked.
-        helper.postProcess(new Integer[]{1, 3, 2});
+        assertThrows(HelperException.class,
+                () -> helper.postProcess(new Integer[]{1, 3, 2}));
+    }
+
+    @Test
+    public void postProcessAcceptsASortedArray() {
+        helper.postProcess(new Integer[]{1, 2, 3});
+    }
+
+    /**
+     * With the flag off — as in main/resources/config.ini, so that benchmarks do
+     * not measure the check — nothing is verified.
+     */
+    @Test
+    public void postProcessIsSilentWhenNotAsked() {
+        Config notChecking = config.copy(HELPER, "checksorted", "");
+        Helper<Integer> h = new ClassicHelper<>("test", Integer::compare, 20, new Random(0L), notChecking);
+        h.postProcess(new Integer[]{1, 3, 2});
     }
 
     @Test

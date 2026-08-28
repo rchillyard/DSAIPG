@@ -12,6 +12,7 @@ from src.sort.elementary.insertion_sort_comparator import (
 )
 from src.sort.elementary.selection_sort import SelectionSort
 from src.sort.helper.helper import natural_comparison
+from src.sort.helper.helper_exception import HelperException
 from src.sort.helper.instrumented_helper import count_inversions
 from src.util.config.config_benchmark import setup_config, setup_config_fixes
 
@@ -296,11 +297,14 @@ class TestLifecycle:
         s.init(3)
         s.post_process([1, 2, 3])
 
-    def test_post_process_logs_rather_than_raises(self):
-        # NOTE this follows the Java: SortWithHelper catches whatever
-        # helper.post_process throws and logs it. The Helper's check that the
-        # list came out sorted therefore cannot fail a caller, which is why the
-        # tests above assert sortedness directly.
+    def test_post_process_raises_on_an_unsorted_list(self):
+        # NOTE this used to assert the opposite -- that SortWithHelper caught
+        # whatever the Helper threw and merely logged it -- which meant the
+        # Helper's check could not fail a caller and the tests above had to
+        # assert sortedness for themselves. Both trees now re-raise
+        # HelperException, so a sort which did not sort cannot pass.
         s = sorter(InsertionSort, 3, INSTRUMENTED)
         s.init(3)
-        s.post_process([1, 3, 2])
+        with pytest.raises(HelperException, match="not sorted"):
+            s.post_process([1, 3, 2])
+

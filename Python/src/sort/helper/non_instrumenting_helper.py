@@ -19,13 +19,11 @@ from src.sort.helper.helper import Helper
 from src.sort.helper.helper_exception import HelperException
 from src.sort.helper.instrumenter_dummy import InstrumenterDummy
 from src.util.config.config import Config
-from src.util.config.config_benchmark import HELPER
 
 X = TypeVar("X")
 
 #: The [helper] option which turns on the after-the-fact check. It only applies
 #: when instrument is false; an instrumented Helper always checks.
-CHECKSORTED = "checksorted"
 
 
 class NonInstrumentingHelper(BaseHelper[X]):
@@ -44,7 +42,6 @@ class NonInstrumentingHelper(BaseHelper[X]):
         :param random: the source of random elements.
         """
         super().__init__(description, config, comparator, n, random, InstrumenterDummy())
-        self.check_sorted = config.get_boolean(HELPER, CHECKSORTED)
 
     def instrumented(self) -> bool:
         return False

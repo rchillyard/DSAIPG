@@ -22,6 +22,12 @@ public class Config_Benchmark {
     public static final String SEED = "seed";
     public static final String CUTOFF = "cutoff";
     public static final String MSDCUTOFF = "msdcutoff";
+    /**
+     * Whether a Helper's postProcess should verify that the array really is sorted.
+     * Left false for benchmarks, so that an O(n) check per sort is not measured
+     * along with the sort; set true in test/resources/config.ini.
+     */
+    public static final String CHECKSORTED = "checksorted";
     public static final int CUTOFF_DEFAULT = 20;
 
     /**

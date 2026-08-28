@@ -293,6 +293,7 @@ public abstract class BaseHelper<X> implements Helper<X> {
         this.n = n;
         this.cutoff = config.getInt(HELPER, CUTOFF, CUTOFF_DEFAULT);
         this.MSDcutoff = config.getInt(HELPER, MSDCUTOFF, MSD_CUTOFF_DEFAULT);
+        this.checkSorted = config.getBoolean(HELPER, CHECKSORTED);
     }
 
     /**
@@ -342,6 +343,25 @@ public abstract class BaseHelper<X> implements Helper<X> {
      * when instrumented, so the measurements described a different algorithm
      * from the one that normally ran.
      */
+    /**
+     * Whether postProcess should verify that the array really is sorted.
+     * <p>
+     * Off for production and benchmark runs, where an O(n) check per sort would be
+     * measured along with the sort. On for tests, where a sort which did not sort
+     * must not be able to pass. That split is expressed by the two config.ini
+     * files: the one in test/resources sets it true, the shipped one leaves it
+     * false.
+     * <p>
+     * NOTE an instrumented Helper checks unconditionally and ignores this flag,
+     * which is deliberate: an instrumented run is gathering statistics rather than
+     * timings, so the check costs it nothing that matters.
+     * <p>
+     * NOTE ClassicHelper keeps its own copy of this flag because it implements
+     * NonComparableHelper directly rather than extending BaseHelper. Folding it
+     * into the hierarchy would remove the last duplicate.
+     */
+    protected final boolean checkSorted;
+
     protected final int MSDcutoff;
     /**
      * Keep track of the random array that was generated. This is available via the InstrumentedHelper class.

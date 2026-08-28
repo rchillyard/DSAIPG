@@ -134,7 +134,6 @@ public class NonInstrumentingComparatorHelper<X> extends BaseComparatorHelper<X>
      */
     public NonInstrumentingComparatorHelper(String description, Comparator<X> comparator, int n, Random random, Config config) {
         super(description, comparator, n, random, new InstrumenterDummy(), config);
-        checkSorted = config.getBoolean(HELPER, "checksorted");
     }
 
     /**
@@ -174,31 +173,5 @@ public class NonInstrumentingComparatorHelper<X> extends BaseComparatorHelper<X>
      * Keep track of the random array that was generated. This is available via the InstrumentedHelper class.
      */
     protected X[] randomArray;
-
-    private final boolean checkSorted;
-
-    /**
-     * A custom runtime exception used within the context of helper-related operations.
-     * HelperException is intended to signal specific runtime errors that occur within
-     * the functionalities of the NonInstrumentingComparableHelper class or its associated methods.
-     */
-    public static class HelperException extends RuntimeException {
-
-        public HelperException(String message) {
-            super(message);
-        }
-
-        public HelperException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public HelperException(Throwable cause) {
-            super(cause);
-        }
-
-        public HelperException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-            super(message, cause, enableSuppression, writableStackTrace);
-        }
-    }
 
 }

@@ -33,6 +33,10 @@ INSTRUMENT = "instrument"
 SEED = "seed"
 CUTOFF = "cutoff"
 MSDCUTOFF = "msdcutoff"
+#: Whether a Helper's post_process should verify that the list really is
+#: sorted. Left off in config.ini so benchmarks do not measure the check;
+#: setup_config turns it on, so every test gets it.
+CHECKSORTED = "checksorted"
 
 #: The cutoff below which a linearithmic sort hands over to insertion sort.
 #: 20 is the value benchmarking settled on for merge sort and dual-pivot
@@ -82,7 +86,8 @@ def setup_config(instrumenting: str, fixes: str, seed: str, inversions: str,
     :return: the Config.
     """
     return Config.from_text(_ini_text({
-        HELPER: {INSTRUMENT: instrumenting, SEED: seed, CUTOFF: cutoff},
+        HELPER: {INSTRUMENT: instrumenting, SEED: seed, CUTOFF: cutoff,
+                 CHECKSORTED: "true"},
         INSTRUMENTING: {
             INVERSIONS: inversions,
             SWAPS: instrumenting,
@@ -117,7 +122,8 @@ def setup_config2(instrumenting: str, seed: str, inversions: str, cutoff: str,
     :return: the Config.
     """
     return Config.from_text(_ini_text({
-        HELPER: {INSTRUMENT: instrumenting, SEED: seed, CUTOFF: cutoff},
+        HELPER: {INSTRUMENT: instrumenting, SEED: seed, CUTOFF: cutoff,
+                 CHECKSORTED: "true"},
         MERGESORT: {INSURANCE: insurance, NOCOPY: no_copy},
         INSTRUMENTING: {
             INVERSIONS: inversions,

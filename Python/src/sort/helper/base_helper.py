@@ -24,7 +24,7 @@ from src.sort.helper.helper_exception import HelperException
 from src.sort.helper.instrument import Instrument
 from src.util.benchmark.stat_pack import StatPack
 from src.util.config.config import Config
-from src.util.config.config_benchmark import CUTOFF, CUTOFF_DEFAULT, HELPER, MSDCUTOFF
+from src.util.config.config_benchmark import CHECKSORTED, CUTOFF, CUTOFF_DEFAULT, HELPER, MSDCUTOFF
 from src.util.general.utilities import fill_random_array
 
 X = TypeVar("X")
@@ -54,6 +54,16 @@ class BaseHelper(Helper[X]):
         :param instrumenter: the Instrument to count into.
         """
         self.description = description
+        #: Whether post_process should verify that the list really is sorted.
+        #: Off for benchmarks, where an O(n) check per sort would be measured
+        #: along with the sort; on for tests, so that a sort which did not sort
+        #: cannot pass. setup_config turns it on, which is where every test's
+        #: configuration comes from.
+        #:
+        #: NOTE an instrumented Helper checks unconditionally and ignores this,
+        #: deliberately: an instrumented run gathers statistics rather than
+        #: timings, so the check costs it nothing that matters.
+        self.check_sorted = config.get_boolean(HELPER, CHECKSORTED)
         self.config = config
         self.comparator = comparator if comparator is not None else natural_comparison
         self.n = n

@@ -470,9 +470,21 @@ class TestPostProcess:
         helper.post_process([1, 2])
         assert helper.get_compares() == 0, "gathering resets the counters"
 
-    def test_a_plain_helper_checks_only_when_asked(self):
-        helper = plain()
-        helper.post_process([1, 3, 2])  # checksorted is not set, so no complaint
+    def test_a_plain_helper_checks_by_default_under_a_test_config(self):
+        # setup_config sets checksorted, which is what every test's configuration
+        # comes from -- the analogue of the Java's test/resources/config.ini.
+        # A test must not be able to pass on a list which is not sorted.
+        with pytest.raises(HelperException, match="not sorted"):
+            plain().post_process([1, 3, 2])
+
+    def test_a_plain_helper_accepts_a_sorted_list(self):
+        plain().post_process([1, 2, 3])
+
+    def test_a_plain_helper_is_silent_when_the_check_is_off(self):
+        # As in the shipped config.ini, so that a benchmark does not measure an
+        # O(n) check on every run.
+        config = setup_config("false", "", "0", "0", "", "").copy("helper", "checksorted", "")
+        NonInstrumentingHelper("test", config, n=3).post_process([1, 3, 2])
 
     def test_a_plain_helper_checks_when_asked(self):
         config = setup_config("false", "", "0", "0", "", "").copy("helper", "checksorted", "true")

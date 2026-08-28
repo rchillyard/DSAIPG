@@ -1,5 +1,6 @@
 package com.phasmidsoftware.dsaipg.sort.classic;
 
+import com.phasmidsoftware.dsaipg.sort.helper.HelperException;
 import com.phasmidsoftware.dsaipg.sort.helper.*;
 import com.phasmidsoftware.dsaipg.util.benchmark.StatPack;
 import com.phasmidsoftware.dsaipg.util.config.Config;
@@ -334,7 +335,7 @@ public class ClassicHelper<X> implements NonComparableHelper<X> {
     public void postProcess(X[] xs) {
         NonComparableHelper.super.postProcess(xs);
         if (checkSorted && !isSorted(xs))
-            throw new NonInstrumentingComparatorHelper.HelperException("ClassicHelper.postProcess: array is not sorted");
+            throw new HelperException("ClassicHelper.postProcess: array is not sorted");
     }
 
     /**

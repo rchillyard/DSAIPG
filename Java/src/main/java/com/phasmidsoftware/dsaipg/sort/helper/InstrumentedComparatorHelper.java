@@ -433,7 +433,7 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
         if (countInversions-- > 0) {
             if (instrumenter.getStatPack() != null)
                 instrumenter.getStatPack().add(Instrumenter.INVERSIONS, inversions(result));
-            else throw new RuntimeException("InstrumentedComparableHelper.postProcess: no StatPack");
+            else throw new HelperException("InstrumentedComparableHelper.postProcess: no StatPack");
         }
         return result;
     }
