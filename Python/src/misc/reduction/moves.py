@@ -53,19 +53,29 @@ class Moves1(Moves):
         :param tx: the target's x coordinate.
         :param ty: the target's y coordinate.
         """
-        self.tx = tx
-        self.ty = ty
+        self.t = Point(tx, ty)
 
     def valid(self, p: Point) -> bool:
         """
+        NOTE the in-bounds test is the base case for FAILURE, and it is the only
+        reason this terminates. Without it the search walks q1, q1, q1, ... for
+        ever, never reaching its second recursive call, and can only ever return
+        True -- and then only if the target happens to lie on that one path.
+
         :param p: the point to start from.
         :return: whether the target can be reached from it.
         """
-        if p.x == self.tx and p.y == self.ty:
-            return True
-        if p.x > self.tx or p.y > self.ty:
-            return False
-        return self.valid(Point(p.x, p.x + p.y)) or self.valid(Point(p.x + p.y, p.y))
+        return self.in_bounds(p) and (
+            p == self.t or self.valid(self.move(p, True)) or self.valid(self.move(p, False))
+        )
+
+    def in_bounds(self, p: Point) -> bool:
+        """
+        :param p: a point.
+        :return: whether neither coordinate has passed the target's. Both only ever
+                 grow, so once either has, that path is dead.
+        """
+        return p.x <= self.t.x and p.y <= self.t.y
 
     def valid_xy(self, x: int, y: int) -> bool:
         """
@@ -75,17 +85,13 @@ class Moves1(Moves):
         """
         return self.valid(Point(x, y))
 
-    def move(self, p: Point, which: bool) -> Point | None:
+    def move(self, p: Point, which: bool) -> Point:
         """
-        NOTE returns None, as the Java does. Moves1 implements the interface but
-        searches by recursion rather than by asking for a move, so this is never
-        called.
-
-        :param p: ignored.
-        :param which: ignored.
-        :return: None.
+        :param p: the point to move from.
+        :param which: True to grow y, False to grow x.
+        :return: where that move lands.
         """
-        return None
+        return Point(p.x, p.x + p.y) if which else Point(p.x + p.y, p.y)
 
 
 class Moves2:
@@ -134,26 +140,133 @@ class Moves2:
 
     def _inner(self, points: deque[Point], result: bool) -> bool:
         """
-        NOTE a loop where the Java recurses. The Java's recursion is in tail
-        position, which Java does not eliminate and neither does Python -- but the
-        Java gets away with it because the JVM's stack is deeper than the search,
-        while Python's default limit of 1000 is not. See ``TailCall`` for the
-        general way round this.
+        Take the next point off the queue, and recurse.
+
+        NOTE it recurses, as the Java does and as the case study writes it. That is
+        the point: moving the work still to be done onto a queue does not by itself
+        make an algorithm an iteration, and the stack still runs out. The depth is
+        the number of points EXAMINED, not the length of the path found -- the queue
+        holds the outstanding work and the stack then holds it a second time.
+
+        Python's ceiling is far lower than Java's. The Java answers the case study's
+        fifth condition, 1,1 to 99,100, examining some twelve thousand points; here
+        the default recursion limit is 1000, so the same call raises RecursionError.
+        Same lesson, met sooner. ``Moves2A`` is the search written as a real
+        iteration and has no such limit.
 
         :param points: the points still to consider.
         :param result: the answer so far.
         :return: whether the target was reached.
         """
+        if not points:
+            return result
+        x = points.popleft()
+        if x == self.t:
+            return True
+        if x.x > self.t.x or x.y > self.t.y:
+            return self._inner(points, False)
+        points.append(self.move(x, True))
+        points.append(self.move(x, False))
+        return self._inner(points, result)
+
+
+class Moves2A(Moves):
+    """
+    The forward search with the two improvements that suggest themselves once the
+    plain queue search has been written, and as a real iteration.
+
+    The first is that ``Moves2`` puts both successors on the queue without troubling
+    over which should be dealt with first, though it can make a great difference
+    which path is followed. So the successor nearer the target goes on first.
+
+    The second is to remember the points already eliminated, in a set, so that no
+    point is examined twice.
+
+    NOTE both are worth measuring rather than assuming, and the tests measure them.
+    The cache NEVER hits: from a given start every reachable point has exactly one
+    predecessor -- of (x-y, y) and (x, y-x) only one can have both coordinates
+    positive -- so no point can be arrived at twice. That is the same observation
+    which makes ``Moves3`` work, met here as an improvement worth nothing. The
+    ordering changes nothing either, a queue being level-by-level: whichever
+    successor goes on first, both are dealt with before anything they lead to.
+
+    What the iteration does buy is a ceiling: this cannot run out of stack, where
+    ``Moves2`` can. It still gets nowhere near the sixth condition.
+    """
+
+    def __init__(self, t: Point) -> None:
+        """
+        :param t: the target.
+        """
+        self.t = t
+        self.examined = 0
+        self.cache_hits = 0
+
+    @staticmethod
+    def of(x: int, y: int) -> Moves2A:
+        """
+        NOTE named separately because Python cannot overload; the Java has this as
+        a second constructor.
+
+        :param x: the target's x coordinate.
+        :param y: the target's y coordinate.
+        :return: a Moves2A aiming at that point.
+        """
+        return Moves2A(Point(x, y))
+
+    def move(self, p: Point, which: bool) -> Point:
+        """
+        :param p: the point to move from.
+        :param which: True to grow y, False to grow x.
+        :return: where that move lands.
+        """
+        return Point(p.x, p.y + p.x) if which else Point(p.x + p.y, p.y)
+
+    def valid(self, p: Point) -> bool:
+        """
+        :param p: the point to start from.
+        :return: whether the target can be reached from it.
+        """
+        self.examined = 0
+        self.cache_hits = 0
+        points: deque[Point] = deque([p])
+        eliminated: set[Point] = set()
         while points:
-            x = points.popleft()
-            if x == self.t:
+            self.examined += 1
+            q = points.popleft()
+            if q == self.t:
                 return True
-            if x.x > self.t.x or x.y > self.t.y:
-                result = False
+            if q.x > self.t.x or q.y > self.t.y:
+                continue  # overshot: this path is dead
+            if q in eliminated:
+                self.cache_hits += 1
                 continue
-            points.append(self.move(x, True))
-            points.append(self.move(x, False))
-        return result
+            eliminated.add(q)
+            a, b = self.move(q, True), self.move(q, False)
+            # the nearer of the two goes on first
+            if self._distance(a) <= self._distance(b):
+                points.append(a)
+                points.append(b)
+            else:
+                points.append(b)
+                points.append(a)
+        return False
+
+    def valid_xy(self, x: int, y: int) -> bool:
+        """
+        :param x: the starting x coordinate.
+        :param y: the starting y coordinate.
+        :return: whether the target can be reached from there.
+        """
+        return self.valid(Point(x, y))
+
+    def _distance(self, p: Point) -> int:
+        """
+        :param p: a point not beyond the target.
+        :return: how far it is from the target, counting the units still to cover
+                 in each direction.
+        """
+        return (self.t.x - p.x) + (self.t.y - p.y)
 
 
 class Moves3(Moves):
