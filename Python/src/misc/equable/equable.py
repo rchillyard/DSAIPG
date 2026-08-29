@@ -24,10 +24,9 @@ class Equable:
 
     def __eq__(self, other: object) -> bool:
         """
-        NOTE the length check comes first. The Java walked only its OWN elements, so
-        a shorter Equable matching a prefix of a longer one ran out and reported
-        equal, while the longer one compared with the shorter did not -- equality
-        was not symmetric. Fixed in both trees.
+        Two Equables are equal when they hold the same elements in the same order.
+        Note the length check: equality must be symmetric, so a shorter Equable
+        matching a prefix of a longer one is NOT equal to it.
 
         :param other: what to compare with.
         :return: whether both hold the same elements in the same order.

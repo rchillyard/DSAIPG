@@ -88,9 +88,8 @@ class SortWithHelper(ProcessingSort[X], ABC):
         Anything else came from the post-processing itself rather than from the
         sort, so it is logged and swallowed.
 
-        NOTE this used to log everything, following the Java, which made the
-        check unreachable: "array is not sorted" was reported at INFO level while
-        the test passed. Both trees now re-raise.
+        NOTE a HelperException is re-raised rather than logged, so that a sort
+        which did not sort cannot pass quietly.
 
         :param xs: the sorted list.
         :raises HelperException: if the Helper found the result unacceptable.

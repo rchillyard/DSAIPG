@@ -174,10 +174,9 @@ class BucketSort(ClassificationSorter[X, None]):
 
     def _check_buckets(self, expected: int) -> None:
         """
-        NOTE compared against the size of the range being sorted, not the length
-        of the whole list. It used to be the latter, so sorting any sub-range
-        raised: sort_range(xs, 1, 4) on five elements gave "incorrect number of
-        buckets: 3, 5".
+        Every element of the range must have landed in some bucket. The count is
+        compared against the size of the RANGE being sorted, not the length of the
+        whole list, so that sorting a sub-range works.
 
         :param expected: the number of elements that should have been distributed.
         :raises RuntimeError: if the buckets do not hold exactly that many.

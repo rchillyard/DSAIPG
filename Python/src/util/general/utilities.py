@@ -20,11 +20,9 @@ def as_array(ts: Collection[T]) -> list[T]:
     lists are heterogeneous and have no component type, so there is nothing to
     pass and a caller may as well write ``list(ts)``.
 
-    NOTE this used to reject an empty collection "as the Java version does". The
-    Java rejected it because it guessed the component type from the first element
-    and an empty collection has none; guessing that way was wrong for a collection
-    whose elements are not all of one class, so the Java now takes the class and
-    accepts empty. There was never a reason for Python to refuse.
+    NOTE an empty collection is fine, and gives an empty list. The Java needs a
+    component type to make an array of and takes it as a parameter; Python has no
+    such need, which is the whole of the difference.
 
     :param ts: a collection.
     :return: the elements of ts, as a list.

@@ -47,12 +47,10 @@ class GraphEdges(Generic[V, E], AbstractGraph[V, Edge[V, E]], EdgeGraph[V, E]):
         Add an edge to both of its vertices, because this graph is undirected and
         an edge is incident on each of its endpoints alike.
 
-        NOTE it used to go into the bag of the "from" vertex only, the "to" vertex
-        merely being given an empty bag -- faithfully, since the Java did the same.
-        That made ``adjacent(v)`` report not the edges at v but the edges that
-        happened to be WRITTEN with v first, so an algorithm walking the graph by
-        adjacency saw an arbitrary subset of it. Java's Prim did exactly that and
-        returned a spanning forest with a vertex missing.
+        Both bags, so that ``adjacent(v)`` reports the edges AT v rather than the
+        edges that happen to have been written with v first -- which is what an
+        algorithm walking the graph by adjacency needs. ``edges`` still reports
+        each edge once; see there for how.
 
         :param edge: the edge to add.
         :param predicate: if given, the edge is added only when this accepts it.

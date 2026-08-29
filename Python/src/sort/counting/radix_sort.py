@@ -7,10 +7,8 @@ linear and stable, and stability is what makes the whole thing work: a later
 pass may only reorder elements that differ at that digit, leaving the order the
 earlier passes established for everything else.
 
-NOTE ``to`` is EXCLUSIVE, as everywhere else in this tree. It used to be
-inclusive here, alone among the sorts, so a caller following the usual
-convention silently left the last element of the range unsorted. Note also that
-only non-negative values work: a negative number gives a negative digit and so a
+NOTE ``to`` is EXCLUSIVE, as everywhere else in this tree. Note also that only
+non-negative values work: a negative number gives a negative digit and so a
 negative bucket.
 """
 

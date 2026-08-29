@@ -87,9 +87,8 @@ class Coins:
     book's "no complication due to cycles" -- and descending order is a topological
     order, so one memoised pass suffices. Time and space are both Theta(v).
 
-    NOTE the dependencies used to be implicit in the recursion, which looped over
-    the denominations directly. Building the graph makes the structure the book
-    draws into something a caller can inspect, which `graph` exposes.
+    The graph is built rather than left implicit in the recursion, so that the
+    structure the book draws is something a caller can inspect: see `graph`.
     """
 
     def __init__(self, coins: list[int] | None = None) -> None:

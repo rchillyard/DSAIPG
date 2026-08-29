@@ -23,8 +23,8 @@ class TestBinarySearch:
         assert binary_search(self.xs, 0, len(self.xs), 3) == 2
 
     def test_every_element_is_findable(self):
-        # including the first, which the Java could not find: it narrowed hi to
-        # mid - 1, the inclusive-hi update, while searching a half-open range
+        # including the first and the last, which is what pins down the half-open
+        # range: narrowing to mid - 1 rather than mid would lose the low end
         for i, x in enumerate(self.xs):
             assert binary_search(self.xs, 0, len(self.xs), x) == i, f"looking for {x}"
 
