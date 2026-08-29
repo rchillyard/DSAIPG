@@ -169,14 +169,9 @@ class TestGraphEdges:
     def test_an_edge_is_stored_twice_but_reported_once(self):
         # An edge is incident on both of its vertices, so it appears in both bags
         # -- and edges() reports it once all the same, by collecting an edge only
-        # from the bag of the vertex Edge.get() returns.
-        #
-        # This test used to assert the opposite, faithfully to the Java: that
-        # adjacent(2) was empty, because an edge went into the "from" bag alone.
-        # That made adjacent(v) report the edges WRITTEN with v first rather than
-        # the edges at v, so an algorithm walking by adjacency saw an arbitrary
-        # subset of the graph. Java's Prim returned a spanning forest with a
-        # vertex missing. Fixed in both trees.
+        # from the bag of the vertex Edge.get() returns. An algorithm walking the
+        # graph by adjacency needs the edges AT v, not the edges written with v
+        # first.
         target = GraphEdges()
         target.add_edge(Edge(1, 2, 1.0))
         assert len(list(target.edges())) == 1

@@ -115,9 +115,8 @@ class Statistics:
     def __str__(self) -> str:
         """
         NOTE "n" is the number of values added, not the capacity of the store.
-        The Java original reported the capacity until this was corrected; the two
-        differ whenever fewer than n_runs values have been added, and again once
-        the store has grown.
+        The two differ whenever fewer than n_runs values have been added, and
+        again once the store has grown.
         """
         if not self._updated:
             return f"{self._property}: <unset>"

@@ -43,9 +43,8 @@ class TestLucasFamily:
         assert Pell().get(50) == 4866752642924153522
 
     def test_pell_beyond_a_64_bit_long(self):
-        # The Java's PellTest used to assert get(90) == 7052354271195710746, which
-        # is NOT the 90th Pell number but what a long holds once that value has
-        # wrapped. Both trees use arbitrary precision now and assert this value.
+        # A 64-bit long would wrap well before here and hold 7052354271195710746
+        # instead. Python's integers and the Java's BigInteger have no ceiling.
         assert Pell().get(90) == 9960168529794442859224531878561050
         assert Pell().get(90) > 2 ** 63 - 1
 

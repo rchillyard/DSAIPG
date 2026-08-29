@@ -298,11 +298,9 @@ class TestLifecycle:
         s.post_process([1, 2, 3])
 
     def test_post_process_raises_on_an_unsorted_list(self):
-        # NOTE this used to assert the opposite -- that SortWithHelper caught
-        # whatever the Helper threw and merely logged it -- which meant the
-        # Helper's check could not fail a caller and the tests above had to
-        # assert sortedness for themselves. Both trees now re-raise
-        # HelperException, so a sort which did not sort cannot pass.
+        # A sort which did not sort must not pass quietly: SortWithHelper
+        # re-raises the HelperException rather than logging it, so the Helper's
+        # check can fail a caller.
         s = sorter(InsertionSort, 3, INSTRUMENTED)
         s.init(3)
         with pytest.raises(HelperException, match="not sorted"):

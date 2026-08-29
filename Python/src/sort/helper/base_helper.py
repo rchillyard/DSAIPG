@@ -121,11 +121,9 @@ class BaseHelper(Helper[X]):
         """
         :return: the cutoff below which MSD radix sort hands over to quicksort.
 
-        NOTE this lives here, not on the instrumented Helper, so that it is the
-        same whether or not we are counting. While the Java had it only on the
-        instrumented one, MSD cut over at 20 for an ordinary run and at 256 when
-        instrumented, so the measurements described a different algorithm from
-        the one that normally ran.
+        NOTE this lives here, not on the instrumented Helper, so that the cutoff
+        is the same whether or not we are counting -- otherwise the measurements
+        would describe a different algorithm from the one that normally runs.
         """
         return self.configured_msd_cutoff
 

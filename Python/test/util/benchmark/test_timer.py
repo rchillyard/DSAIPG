@@ -177,7 +177,7 @@ def _timer_without_a_clock(shown: list) -> Timer:
 
 
 def test_mean_lap_time_with_no_laps():
-    # Zero laps have no mean. The Java used to return Infinity here and its test
-    # accepted it, asserting only that the result was >= 0.
+    # Zero laps have no mean, so this raises rather than returning Infinity --
+    # which is >= 0, and would satisfy a test that only checked the sign.
     with pytest.raises(TimerException, match="no laps"):
         Timer(lambda s: None).repeat(0, lambda: 1, lambda x: x)

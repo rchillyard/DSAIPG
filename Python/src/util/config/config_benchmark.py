@@ -108,9 +108,8 @@ def setup_config2(instrumenting: str, seed: str, inversions: str, cutoff: str,
     nocopy options.
 
     NOTE insurance and nocopy go in [mergesort], which is where MergeSort reads
-    them. The Java put them in [helper], so both always came back false and the
-    four combinations these arguments describe were all the same run; fixed in
-    both trees.
+    them. Put them in [helper] and both come back false, so the four combinations
+    these arguments describe would all be the same run.
 
     :param instrumenting: "true" to instrument.
     :param seed: the seed for random numbers.

@@ -52,9 +52,8 @@ class RandomSort(SortWithHelper[X]):
         instrumented = helper.instrumented()
         inversions = helper.inversions(xs) if instrumented else 0
         if n > CUTOFF:
-            # NOTE built here, not above. QuickRandom rejects a range of zero, so
-            # building it before this test meant an empty list raised rather than
-            # sorting trivially.
+            # NOTE built here, not above: QuickRandom rejects a range of zero,
+            # and a list this short is already sorted.
             r = QuickRandom(n, 0)
             m = int(FACTOR * lg(n) * n)
             for _ in range(m):

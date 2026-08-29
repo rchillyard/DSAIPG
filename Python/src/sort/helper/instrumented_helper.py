@@ -166,9 +166,8 @@ class InstrumentedHelper(BaseHelper[X]):
         Move xs[j] down to index i: one swap, one fix for each element shifted
         up, and a hit for the final assignment.
 
-        NOTE the copies are counted by copy_block, not here. Counting them in
-        both places made every half-swap report twice as many copies as it
-        performed, which is what the Java did until this was corrected.
+        NOTE the copies are counted by copy_block, not here, so that a half-swap
+        reports what it performs rather than twice it.
         """
         if x is _UNSET:
             x = self.get(xs, j)

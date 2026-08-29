@@ -79,10 +79,8 @@ class TestAsArray:
         assert source == [1, 2, 3]
 
     def test_an_empty_collection_is_fine(self):
-        # This used to assert ValueError, mirroring the Java, which rejected an
-        # empty collection because it guessed the array's component type from the
-        # first element. The Java takes the class now and accepts empty; Python
-        # never had a reason to refuse.
+        # An empty collection gives an empty list. The Java needs a component
+        # type to make an array of and takes it as a parameter; Python does not.
         assert as_array([]) == []
 
     def test_a_heterogeneous_collection(self):

@@ -95,9 +95,9 @@ class TestEveryMergeSortSorts:
 
 class TestMergeSortOptions:
     """
-    The no-copy and insurance options, which the Java's setupConfig2 wrote into
-    the wrong section, so all four combinations were the same run until that was
-    fixed.
+    The no-copy and insurance options. Both must reach the [mergesort] section,
+    which is where MergeSort reads them; anywhere else and all four combinations
+    below are the same run.
     """
 
     @pytest.mark.parametrize("insurance", ["false", "true"])

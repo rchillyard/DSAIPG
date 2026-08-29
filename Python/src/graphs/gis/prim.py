@@ -28,13 +28,10 @@ class Prim(Generic[V, X], MST[V, X]):
     Run from every unreached vertex in turn, so a graph that is not connected
     yields a spanning forest rather than nothing.
 
-    NOTE the Java's priority queue is created with a fixed capacity, and its give()
-    DROPS an element rather than growing when full. That mattered: the queue was
-    built from an empty iterable, so its capacity was zero and every edge offered
-    to the fringe was silently discarded -- the Java Prim returned an empty MST for
-    every graph. Python's PriorityQueueBinaryHeap simply appends, so it has no
-    capacity to get wrong and this port cannot reproduce that fault. Both are
-    right now; the Java takes its capacity from the number of edges.
+    NOTE the fringe starts empty but must have room for every edge that can join
+    it. Python's PriorityQueueBinaryHeap simply appends, so there is no capacity to
+    get wrong here; the Java's takes a fixed one, and its give() drops an element
+    rather than growing when full.
     """
 
     def __init__(self, graph: EdgeGraph[V, X]) -> None:
