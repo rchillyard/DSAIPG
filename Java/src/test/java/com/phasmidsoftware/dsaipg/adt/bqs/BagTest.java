@@ -89,13 +89,13 @@ public class BagTest {
     /**
      * asArray returns Object[], and says so.
      * <p>
-     * It used to be declared Item[] while returning an Object[], because Item is
-     * erased and there is nothing at runtime to say what kind of array to make.
-     * Every use of the result at the declared type therefore threw
-     * ClassCastException — including {@code asArray().length} and a for-each with
-     * the element type — since the compiler inserts a checkcast wherever it knows
-     * what Item is. Only widening to Object[] worked, which is why every caller
-     * already did. Now the declaration matches, and these ordinary uses are simply
+     * It cannot be declared Item[], because Item is erased and there is nothing at
+     * runtime to say what kind of array to make. Declaring it so and returning an
+     * Object[] makes every use at the declared type throw ClassCastException —
+     * including {@code asArray().length} and a for-each with the element type —
+     * since the compiler inserts a checkcast wherever it knows what Item is. Only
+     * Object[] works, which is why every caller declares it that way. So these
+     * ordinary uses are simply
      * legal.
      */
     @Test
@@ -202,10 +202,10 @@ public class BagTest {
     }
 
     /**
-     * clear() resets the count and nothing else, so contains used to scan past it
-     * and still answer true for items the bag no longer held — while multiplicity
-     * answered zero, because it happened to have an isEmpty() guard that contains
-     * lacked. Two methods disagreeing about the same question.
+     * clear() resets the count and nothing else, so contains and multiplicity must
+     * both stop at it. Scanning the whole backing array answers true for items the
+     * bag no longer holds — and leaves the two methods disagreeing about the same
+     * question, since multiplicity has an isEmpty() guard.
      */
     @Test
     public void clearReallyForgetsTheItems() {

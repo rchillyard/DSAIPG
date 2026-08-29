@@ -29,12 +29,10 @@ import java.util.Objects;
  * is a topological order, so a single memoised pass suffices. Time and space are
  * both Theta(v), as the book says.
  * <p>
- * NOTE the dependencies used to be implicit in the recursion, which looped over
- * the denominations directly. Building the graph makes the structure the book
- * draws into something a caller can inspect and a test can assert about; see
- * {@link #getGraph}. It also removes a wasted case: the old code called
- * {@code mu(amount - c)} for every denomination including those too large, and
- * relied on a null solution coming back. An edge exists only where the coin fits.
+ * NOTE the graph is built rather than left implicit in the recursion, so that the
+ * structure the book draws is something a caller can inspect and a test can assert
+ * about; see {@link #getGraph}. An edge exists only where the coin fits, so no
+ * sub-problem is visited for a denomination too large to use.
  * <p>
  * NOTE the book presents this as an improvement on "applying the Bellman-Ford
  * algorithm naively", which is O(vw). The improvement is not in avoiding the graph
@@ -193,10 +191,9 @@ public class Coins {
     /**
      * @return a count of zero for each denomination.
      * <p>
-     * NOTE this used to return {@code new int[]{0, 0, 0, 0}} regardless of how many
-     * denominations there were, so any coin list other than a four-element one gave
-     * an ArrayIndexOutOfBoundsException from Solution.increment. Only the US list
-     * was ever used, so it never showed.
+     * NOTE one entry per denomination, however many there are. A fixed length
+     * would give an ArrayIndexOutOfBoundsException from Solution.increment for any
+     * coin list of a different size.
      */
     int[] zeros() {
         return new int[coins.size()];

@@ -183,8 +183,8 @@ public class HeapSortTest {
 
 
     /**
-     * HeapSort used to ignore from and to, working on array.length throughout, so
-     * sorting part of an array silently sorted all of it.
+     * Only xs[from..to) may be touched. The heap indices are relative to from, so
+     * working on array.length throughout would silently sort the whole array.
      */
     @Test
     public void testSortSubRange() {

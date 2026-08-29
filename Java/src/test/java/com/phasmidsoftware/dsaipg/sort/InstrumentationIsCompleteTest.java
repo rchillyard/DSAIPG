@@ -167,9 +167,9 @@ public class InstrumentationIsCompleteTest {
     }
 
     /**
-     * TimSortWrapper is the reason this test exists. It used to be asserted here as
-     * it BEHAVED rather than as it should, so that finishing the instrumentation
-     * would make the recording fail and say so -- which is what happened.
+     * TimSortWrapper is the reason this test exists: it wraps the JDK's sort, so
+     * every array access has to be routed through the Helper deliberately rather
+     * than falling out of the implementation.
      */
     @Test
     public void testTimSortWrapper() {

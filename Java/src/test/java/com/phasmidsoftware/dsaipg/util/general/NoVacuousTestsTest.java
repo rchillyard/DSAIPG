@@ -281,12 +281,11 @@ public class NoVacuousTestsTest {
     /**
      * Only a class Surefire would actually run counts as a test class.
      * <p>
-     * NOTE the walk used to take every .java file under the test tree, which meant
-     * an ordinary helper sitting there -- a shared fixture, say -- had its methods
-     * read as tests that someone had disabled. Surefire's own includes are
-     * {@code **}{@code /*Test.java} and friends, so a method in a class named
-     * anything else can never run whatever it is annotated with, and saying "JUnit
-     * never runs them" of it tells nobody anything.
+     * NOTE not every .java file under the test tree. An ordinary helper sitting
+     * there -- a shared fixture, say -- would have its methods read as tests that
+     * someone had disabled. Surefire's own includes are {@code **}{@code /*Test.java}
+     * and friends, so a method in a class named anything else can never run
+     * whatever it is annotated with.
      *
      * @param path a file found under the test tree.
      * @return true if Surefire would treat it as a test class.

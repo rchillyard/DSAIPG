@@ -67,12 +67,12 @@ public class ClassicSort<X extends Classify<X>> extends GenericSortWithHelper<X>
         // NOTE the classes must be put in order explicitly. The keySet of a HashMap
         // comes out in bucket order, which is ascending only while every class is
         // smaller than the table -- true of dense classes but not of sparse ones,
-        // and classify() may return any int. With classes {100, 5, 20} the bags
-        // used to be emitted as 100, 20, 5, because 100 and 20 collide in bucket 4.
+        // and classify() may return any int. Classes {100, 5, 20} come out of the
+        // keySet as 100, 20, 5, because 100 and 20 collide in bucket 4.
         // This is not cosmetic: the point of classifying first is that a following
         // insertion sort has little left to do, and that only holds if the classes
         // are in order. Measured over 2,000 elements in 8 sparse classes, the wrong
-        // order left 806,848 inversions for the second pass against 124,863.
+        // order leaves 806,848 inversions for the second pass against 124,863.
         // The ordering is done once over the distinct classes, not once per element:
         // k log k comparisons of ints, where k is at most the number of elements and
         // usually far smaller. A sorted map would instead compare on every insertion,

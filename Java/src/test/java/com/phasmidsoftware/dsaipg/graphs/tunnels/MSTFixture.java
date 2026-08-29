@@ -15,12 +15,8 @@ import static org.junit.Assert.assertEquals;
  * The graphs and the assertions shared by {@link PrimTest}, {@link KruskalTest}
  * and {@link BoruvkaTest}.
  * <p>
- * NOTE those three classes each used to carry their own copy of the Route class
- * and of both graphs below -- the same code three times over. Worse, two of the
- * three tests named for their own algorithm actually constructed a Boruvka, so
- * Prim and Kruskal were each exercised by exactly one test, and that test asserted
- * nothing at all. Prim consequently returned an empty spanning tree for every
- * graph for as long as it has existed, with the suite green throughout.
+ * NOTE shared, so that the three algorithms are asked the same questions about
+ * the same graphs, and each is exercised by a test that names it.
  * <p>
  * Every weight in both graphs is distinct, which means each has exactly ONE
  * minimum spanning tree. So the answer can be asserted outright, and the same
@@ -39,9 +35,8 @@ class MSTFixture {
         }
 
         /**
-         * NOTE this used to have an EMPTY body in all three copies, so the sequence
-         * numbers that getMST assigns went nowhere and getSequence always answered
-         * zero.
+         * NOTE this must actually record the value: getMST assigns the sequence
+         * numbers through it, and Kml draws the network in that order.
          *
          * @param sequence the sequence number to record.
          */

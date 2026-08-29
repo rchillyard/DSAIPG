@@ -41,11 +41,9 @@ public class Graph_EdgesTest {
      * bags -- and edges() reports it once all the same, by collecting an edge only
      * from the bag of the vertex Edge.get() returns.
      * <p>
-     * This test used to assert the opposite: that adjacent(2) was empty, because an
-     * edge went into the "from" bag alone. That made adjacent(v) report the edges
+     * Putting it in the "from" bag alone would make adjacent(v) report the edges
      * WRITTEN with v first rather than the edges at v, so an algorithm walking by
-     * adjacency saw an arbitrary subset of the graph. Prim returned a spanning
-     * forest with a vertex missing.
+     * adjacency — Prim does — would see an arbitrary subset of the graph.
      */
     @Test
     public void edgesAreNotDoubleCounted() {

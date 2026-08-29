@@ -63,13 +63,10 @@ public class Moves2 {
      * @return true if the target point is reachable, false otherwise
      */
     private boolean inner(Queue<Point> points, boolean result) {
-        // NOTE a loop, where this used to recurse once per point taken off the
-        // queue. Java does not eliminate a tail call, so the depth was the number
-        // of points examined and the search died of StackOverflowError long before
-        // it ran out of points -- for (1,1) to (99,100) it managed about fifteen
-        // milliseconds. That is why MovesTest.test2_4 had its @Test commented out.
-        // The queue was always doing the remembering; the stack was along for the
-        // ride.
+        // NOTE a loop, not a recursion. Java does not eliminate a tail call, so
+        // recursing once per point taken off the queue makes the depth the number
+        // of points examined, and the search dies of StackOverflowError long
+        // before the queue empties. The queue does the remembering either way.
         while (!points.isEmpty()) {
             Point x = points.poll();
             if (x.equals(t)) return true;

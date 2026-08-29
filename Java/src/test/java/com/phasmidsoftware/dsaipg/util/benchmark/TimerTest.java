@@ -218,8 +218,8 @@ public class TimerTest {
 
 
     /**
-     * Zero laps used to give ticks/0 — Infinity — as the mean time per run, with
-     * nothing to indicate that no run had been timed. repeat(0, ...) reached it.
+     * Zero laps have no mean, so this throws rather than returning ticks/0 —
+     * Infinity — with nothing to say that no run was timed. repeat(0, ...) reaches it.
      */
     @Test(expected = Timer.TimerException.class)
     public void meanLapTimeWithNoLaps() {

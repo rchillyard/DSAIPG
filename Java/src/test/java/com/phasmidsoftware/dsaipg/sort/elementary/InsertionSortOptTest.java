@@ -99,9 +99,8 @@ public class InsertionSortOptTest {
         //   i=1: one read, one probe                              =  2
         //   i=2: one read, two probes, then a move of 2 (1 + 2*2) =  8
         //   i=3: one read, two probes, then a move of 3 (1 + 2*3) = 10
-        // NOTE 20, not 17: copyBlock now charges 2n for a same-array block move
-        // rather than n + 1, because 2n is what such a move actually costs. The
-        // two moves above used to be charged 3 and 4 instead of 4 and 6.
+        // NOTE copyBlock charges 2n for a same-array block move, not n + 1,
+        // because 2n is what such a move costs: the two moves above are 4 and 6.
         assertEquals(20, hits);
         final int compares = (int) statPack.getStatistics(COMPARES).mean();
         // NOTE n + 1, not n, since swapIntoSorted became stable -- see sort0.
@@ -159,13 +158,10 @@ public class InsertionSortOptTest {
         final int inversions = (int) statPack.getStatistics(ConfigTest.INVERSIONS).mean();
         final int fixes = (int) statPack.getStatistics(FIXES).mean();
         System.out.println(statPack);
-        // The fixes are now exactly the inversions, with no fudge factor.
-        // There used to be one of -32 here, with a TODO asking why the fixes were
-        // coming out wrong. This was why: swapIntoSorted was not stable, so it
-        // moved each element past the ones equal to it, and every one of those
-        // pointless moves was counted as an inversion fixed. Making the search
-        // find the upper bound removed the extra moves and the discrepancy with
-        // them.
+        // The fixes are exactly the inversions, with no fudge factor -- which is
+        // the check that swapIntoSorted is stable. An unstable one moves each
+        // element past the ones equal to it, and every such pointless move is
+        // counted as an inversion fixed, so the two stop agreeing.
         assertEquals(inversions, fixes);
 
     }

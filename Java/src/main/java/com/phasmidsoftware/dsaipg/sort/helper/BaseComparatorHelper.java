@@ -39,13 +39,10 @@ public abstract class BaseComparatorHelper<X> extends BaseHelper<X> implements N
     /**
      * Creates and returns a clone of the Helper with the specified Comparator.
      * <p>
-     * NOTE abstract, not a throwing implementation. It used to throw
-     * SortException("not implementable"), which turned "this subclass has not
-     * implemented clone" from a compile error into a runtime one — and that is
-     * exactly what happened: NonInstrumentingComparatorHelper never overrode it,
-     * inherited the throw, and nobody noticed until ClassicHelper stopped carrying
-     * a copy of its own. A class holding a Comparator can always clone itself with
-     * a different one, so there is nothing here to refuse.
+     * NOTE abstract, not a throwing implementation, so that a subclass which has
+     * not implemented clone is a compile error rather than a runtime one. A class
+     * holding a Comparator can always clone itself with a different one, so there
+     * is nothing here to refuse.
      *
      * @param description       a description of the Helper.
      * @param comparator        the Comparator of type X to be used for comparisons.

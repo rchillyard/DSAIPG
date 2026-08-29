@@ -12,8 +12,8 @@ public class TimeLoggerTest {
     public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     /**
-     * The pattern used to end in "#" rather than "0", so that a value below one
-     * lost its leading zero and 0.5 was rendered as ".5000".
+     * The pattern's integer part must end in "0", not "#", or a value below one
+     * loses its leading zero and 0.5 renders as ".5000".
      */
     @Test
     public void testFormatTimeBelowOne() {

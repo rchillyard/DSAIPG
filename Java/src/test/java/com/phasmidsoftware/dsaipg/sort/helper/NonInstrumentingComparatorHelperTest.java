@@ -445,9 +445,8 @@ public class NonInstrumentingComparatorHelperTest {
 
     @Test
     public void testInit() {
-        // Re-initialising to the SAME n is fine; changing it is not. ClassicHelper
-        // used to have no guard and silently accepted a different n; this test
-        // recorded that, and its failing was the signal that the fold had worked.
+        // Re-initialising to the SAME n is fine; changing it is not, since the
+        // Helper's arrays and statistics are sized by it.
         helper.init(20);
         assertEquals(20, helper.getN());
         assertThrows(HelperException.class, () -> helper.init(3));
@@ -485,9 +484,7 @@ public class NonInstrumentingComparatorHelperTest {
 
     @Test
     public void cutoff() {
-        // The configured cutoff is honoured. ClassicHelper used to ignore it and
-        // always return Helper's default of 20; this test recorded that
-        // divergence, and its failing was the signal that the fold had worked.
+        // The configured cutoff is honoured, rather than Helper's default of 20.
         Config withCutoff = config.copy(HELPER, "cutoff", "8");
         Helper<Integer> h = new NonInstrumentingComparatorHelper<>("test", Integer::compare, 20, new Random(0L), withCutoff);
         assertEquals("the configured cutoff is honoured", 8, h.cutoff());
@@ -495,10 +492,9 @@ public class NonInstrumentingComparatorHelperTest {
 
     @Test
     public void MSDCutoff() {
-        // The documented default, from config.ini. This used to be 20 here,
-        // because MSDCutoff() was overridden only on the instrumented Helper,
-        // so an uninstrumented MSDStringSort cut over to quicksort far earlier
-        // than an instrumented one.
+        // The documented default, from config.ini. It must be the same here as on
+        // the instrumented Helper, or MSDStringSort cuts over to quicksort at a
+        // different point depending on whether anyone is counting.
         assertEquals(256, helper.MSDCutoff());
         Config withMSD = config.copy(HELPER, "msdcutoff", "64");
         Helper<Integer> h = new NonInstrumentingComparatorHelper<>("test", Integer::compare, 20, new Random(0L), withMSD);
@@ -525,9 +521,6 @@ public class NonInstrumentingComparatorHelperTest {
      * checksorted is true in test/resources/config.ini, so an unsorted array is
      * rejected. That is the point of setting it there: a test must not be able to
      * pass on a sort which did not sort.
-     * <p>
-     * NOTE this test used to assert the opposite — "checksorted is not set in
-     * config.ini, so nothing is checked" — which was true, and was the problem.
      */
     @Test
     public void postProcess() {

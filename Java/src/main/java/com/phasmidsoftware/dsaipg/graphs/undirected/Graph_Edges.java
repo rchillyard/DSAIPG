@@ -43,15 +43,11 @@ public class Graph_Edges<V, E> extends AbstractGraph<V, Edge<V, E>> implements E
      * The edge is added to the adjacency bag of BOTH its vertices, because this
      * graph is undirected and an edge is incident on each of its endpoints alike.
      * <p>
-     * NOTE it used to go into the bag of the "from" vertex only, the "to" vertex
-     * merely being given an empty bag. That made {@code adjacent(v)} report not the
-     * edges at v but the edges that happened to be WRITTEN with v first -- so an
-     * algorithm walking the graph by adjacency saw an arbitrary subset of it.
-     * {@code Prim} did exactly that and returned a spanning forest missing a
-     * vertex. Kruskal and Boruvka were unaffected only because they read
-     * {@link #edges} instead.
-     * {@link Graph_Simple#addEdge} always recorded both directions, so this now
-     * agrees with it.
+     * NOTE both bags, so that {@code adjacent(v)} reports the edges AT v rather
+     * than the edges that happen to have been written with v first -- which is what
+     * an algorithm walking the graph by adjacency needs. {@link #edges} reports
+     * each edge once all the same; see there for how.
+     * {@link Graph_Simple#addEdge} records both directions too.
      *
      * @param edge      the edge to be added, defined by its two vertices and optional attributes.
      * @param predicate a condition that determines whether the edge should be added to the graph.

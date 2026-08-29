@@ -59,8 +59,9 @@ public class PellTest {
     }
 
     /**
-     * The value the test used to assert, kept as the thing that must NOT come
-     * back: a long's worth of it, and nothing like the real number.
+     * The 90th Pell number does not fit in a long. What a long holds instead is
+     * 7052354271195710746 — nothing like the real value — so that is asserted as
+     * the thing which must NOT come back.
      */
     @Test
     public void testGet4IsNoLongerTheWrappedValue() {

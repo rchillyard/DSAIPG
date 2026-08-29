@@ -125,10 +125,9 @@ public class CoinsTest {
     /**
      * A denomination list of a size other than four.
      * <p>
-     * zeros() used to return {@code new int[]{0, 0, 0, 0}} whatever the
-     * denominations were, so Solution.increment threw
-     * ArrayIndexOutOfBoundsException for any list longer than four. Only the US
-     * list was ever used, so it never showed.
+     * zeros() must give one count per denomination, however many there are: a
+     * fixed length of four makes Solution.increment throw
+     * ArrayIndexOutOfBoundsException for any longer list.
      */
     @Test
     public void aCoinListOfADifferentSize() {

@@ -7,11 +7,9 @@ import java.util.List;
 /**
  * The Fibonacci numbers, memoised: 1, 1, 2, 3, 5, 8, ...
  * <p>
- * NOTE these are BigIntegers. They used to be ints, which overflow silently at
- * n = 47 — fib(47) is 4,807,526,976 against an int maximum of 2,147,483,647 — and
- * the test stopped at get(7), so nothing ever showed it. A sequence class whose
- * whole purpose is to produce large terms should not have a ceiling it does not
- * mention, and the Python port has none, its integers being arbitrary precision.
+ * NOTE these are BigIntegers, so there is no ceiling. An int would overflow at
+ * n = 47: fib(47) is 4,807,526,976 against an int maximum of 2,147,483,647. The
+ * Python port needs nothing special, its integers being arbitrary precision.
  */
 public class Fibonacci {
 

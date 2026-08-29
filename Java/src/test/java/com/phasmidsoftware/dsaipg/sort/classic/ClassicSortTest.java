@@ -65,9 +65,9 @@ public class ClassicSortTest {
      * <p>
      * The bags are collected in a HashMap, whose keySet comes out in bucket order.
      * That is ascending only while every class is smaller than the table, which is
-     * why mutatingSort above never caught this: it uses classes 0..99 in a table
-     * grown to 256. Here 100 and 20 collide in bucket 4, and the result used to be
-     * [100, 20, 5].
+     * why mutatingSort above cannot catch this: it uses classes 0..99 in a table
+     * grown to 256. Here 100 and 20 collide in bucket 4, so the keySet offers
+     * [100, 20, 5] and the sort has to put them in order itself.
      */
     @Test
     public void testSortSparseClasses() throws IOException {

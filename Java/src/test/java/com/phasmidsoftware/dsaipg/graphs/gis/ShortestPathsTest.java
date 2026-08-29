@@ -117,8 +117,8 @@ public class ShortestPathsTest {
         assertEquals(7.0, shortestPaths.cost("H"), 0);
     }
     /**
-     * pathTo reports the route, not just what it costs. No test has ever called
-     * it.
+     * pathTo reports the route itself, not just what it costs, and in reading
+     * order — start first.
      */
     @Test
     public void testPathTo() {

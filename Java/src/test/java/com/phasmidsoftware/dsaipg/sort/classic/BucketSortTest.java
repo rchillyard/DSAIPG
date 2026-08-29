@@ -166,11 +166,10 @@ public class BucketSortTest {
     }
 
     /**
-     * A sub-range must sort, leaving the rest alone. Three things stopped this:
-     * checkBuckets compared against the whole array's length, unloadBuckets wrote
-     * from index 0, and the numeric classifier looked at the array from index 0.
-     * sort(xs, 1, 4) on five elements used to throw "incorrect number of buckets:
-     * 3, 5".
+     * A sub-range must sort, leaving the rest alone. Three things have to respect
+     * {@code from} for that: checkBuckets counts against the range's length rather
+     * than the whole array's, unloadBuckets writes from {@code from}, and the
+     * numeric classifier reads from {@code from}.
      */
     @Test
     public void testSortSubRange() throws IOException {

@@ -79,17 +79,16 @@ public class ComparableEquableTest {
     }
 
     /**
-     * compareTo used to walk only this one's elements, so the "same length" rule
-     * fired only when this was the longer. The shorter compared with the longer ran
-     * out and reported 0 -- equal -- so the relation disagreed with itself
-     * depending on which way round it was asked.
+     * The "same length" rule must hold whichever way round the two are given, or
+     * the relation disagrees with itself: walking only this one's elements would
+     * let the shorter compared with the longer run out and report 0, equal.
      */
     @Test
     public void testCompareToDifferentLengthsEitherWayRound() {
         ComparableEquable shorter = new ComparableEquable(Arrays.asList(1, 2));
         ComparableEquable longer = new ComparableEquable(Arrays.asList(1, 2, 3));
         assertThrows(ComparableEquableException.class, () -> longer.compareTo(shorter));
-        assertThrows("and this is the direction that used to answer 0",
+        assertThrows("and this is the direction that would otherwise answer 0",
                 ComparableEquableException.class, () -> shorter.compareTo(longer));
     }
 

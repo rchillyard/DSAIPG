@@ -90,9 +90,7 @@ public class RadixSort {
     /**
      * Sort the range, one decimal digit at a time, least significant first.
      * <p>
-     * NOTE {@code to} is EXCLUSIVE, as everywhere else in this tree. It used to be
-     * inclusive here, alone among the sorts, so a caller following the usual
-     * convention silently left the last element of the range unsorted.
+     * NOTE {@code to} is EXCLUSIVE, as everywhere else in this tree.
      * <p>
      * NOTE only non-negative values work: a negative value yields a negative digit
      * and so a negative bucket index.

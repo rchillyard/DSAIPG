@@ -207,10 +207,8 @@ public class BucketSort<X extends Comparable<X>> extends ClassificationSorter<X,
             @SuppressWarnings("unchecked") int size = ((List<X>) b).size();
             count += size;
         }
-        // NOTE compared against the size of the range being sorted, not the length
-        // of the whole array. It used to be the latter, so sorting any sub-range
-        // threw: sort(xs, 1, 4) on five elements gave "incorrect number of
-        // buckets: 3, 5".
+        // NOTE compared against the size of the RANGE being sorted, not the length
+        // of the whole array, so that sorting a sub-range works.
         if (count != expected) throw new RuntimeException("incorrect number of buckets: " + count + ", " + expected);
     }
 

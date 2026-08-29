@@ -17,11 +17,10 @@ import static org.junit.Assert.assertThrows;
  * <p>
  * NOTE there is Cucumber glue for this class in the RadixSortStepDefinition
  * sub-package, but nothing executes it: RadixSortTestRunner is commented out in
- * its entirety, and the glue class has no {@code @Test} methods. So until now
- * RadixSort had no test that ran.
+ * its entirety, and the glue class has no {@code @Test} methods. These are the
+ * tests that run.
  * <p>
- * {@code to} is EXCLUSIVE here, as everywhere else in this tree. It used to be
- * inclusive, alone among the sorts.
+ * {@code to} is EXCLUSIVE here, as everywhere else in this tree.
  */
 public class RadixSortTest {
     @Rule
@@ -81,7 +80,7 @@ public class RadixSortTest {
 
     @Test
     public void testSortWholeArrayIsNowLegal() throws Exception {
-        // to == length is in range when to is exclusive, and used to throw.
+        // to == length is in range, since to is exclusive.
         int[] xs = {3, 1, 2};
         sorter.sort(xs, 0, 3);
         assertArrayEquals(new int[]{1, 2, 3}, xs);

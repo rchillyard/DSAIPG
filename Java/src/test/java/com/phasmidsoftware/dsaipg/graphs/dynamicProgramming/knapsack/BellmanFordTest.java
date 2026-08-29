@@ -106,12 +106,11 @@ public class BellmanFordTest {
     /**
      * An edge may be added without declaring its source first.
      * <p>
-     * The Graph this used to run on could not do that. Its addEdge read
-     * {@code adjacent.getOrDefault(u, new LinkedList<>()).add(...)} -- and
-     * getOrDefault returns the default WITHOUT putting it in the map, so an edge
-     * whose source had not been addVertex'd was added to a throwaway list and
-     * silently lost. E++ still counted it, so the graph reported an edge it did
-     * not have. Every test called addVertex first, so it never showed.
+     * Worth asserting, because it is easy to get wrong: writing addEdge as
+     * {@code adjacent.getOrDefault(u, new LinkedList<>()).add(...)} looks right and
+     * is not — getOrDefault returns the default WITHOUT putting it in the map, so
+     * an edge whose source has not been added goes into a throwaway list and is
+     * lost, while the edge count still counts it.
      */
     @Test
     public void anEdgeNeedsNoPriorAddVertex() {

@@ -48,11 +48,10 @@ public class DiGraphTest {
      * A vertex with no edge at either end must survive reverse(), and must appear
      * in the kernel DAG as a component of its own.
      * <p>
-     * reverse() used to rebuild the graph from its edges alone, so such a vertex
-     * simply vanished — and because kernelDAG() walks
-     * reverse().reversePostOrderDFS(), it was then missing from the
-     * strongly-connected-component decomposition too. A graph consisting of one
-     * lone vertex produced no kernels at all. It went unnoticed because every
+     * Rebuilding from the edges alone would lose it — and since kernelDAG() walks
+     * reverse().reversePostOrderDFS(), it would then be missing from the
+     * strongly-connected-component decomposition too, leaving a graph of one lone
+     * vertex with no kernels at all. Worth asserting on its own, because every
      * other test graph here has an edge at every vertex.
      */
     @Test
