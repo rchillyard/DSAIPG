@@ -37,9 +37,9 @@ public class BinarySearch {
      * @return the index of the element whose value is <code>key</code>, or null if there is no such element.
      */
     static int binarySearch(int[] a, int from, int to, int key) {
-        int lo = from;
-        int hi = to;
-        while (hi > lo) {
+        int _from = from;
+        int _to = to;
+        while (_to > _from) {
             // TO BE IMPLEMENTED  : implement binary search
                         throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         }
