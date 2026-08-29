@@ -105,7 +105,6 @@ public class NoVacuousTestsTest {
             "adt/symbolTable/tree/BSTBenchmarkTest.java:testRunBenchmarkWithValidSupplier",
             "adt/symbolTable/tree/BSTBenchmarkTest.java:testRunBenchmarkWithEmptyArray",
             "adt/symbolTable/tree/BSTBenchmarkTest.java:testRunBenchmarkWithLargeInput",
-            "misc/reduction/MovesTest.java:test2_4",
             "misc/reduction/MovesTest.java:test2_5",
             "projects/life/base/MatrixTest.java:testConstructor3",
             "select/EntropyTest.java:testGetEntropy0",

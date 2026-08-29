@@ -60,5 +60,14 @@ public class BinarySearchTest {
         for (int x : xs) sum += x;
         return sum / length;
     }
-}
 
+    /**
+     * Every element of a sorted array must be findable, including the first.
+     */
+    @Test
+    public void testEveryElement() {
+        int[] xs = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        for (int i = 0; i < xs.length; i++)
+            assertEquals("looking for " + xs[i], i, BinarySearch.binarySearch(xs, 0, xs.length, xs[i]));
+    }
+}

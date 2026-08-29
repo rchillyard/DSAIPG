@@ -14,7 +14,10 @@ public class BinarySearch {
      */
     public static void main(String[] args) {
         int[] ar = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-        int res1 = binarySearch(ar, 0, ar.length - 1, 3);
+        // NOTE ar.length, not ar.length - 1: to is exclusive, as it is throughout
+        // this repository and as every test here passes it. main had it the other
+        // way, so it could not have found the last element.
+        int res1 = binarySearch(ar, 0, ar.length, 3);
         System.out.println(res1);
         int res2 = Arrays.binarySearch(ar, 0, ar.length, 3);
         System.out.println(res2);

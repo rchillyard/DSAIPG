@@ -63,13 +63,24 @@ public class Moves2 {
      * @return true if the target point is reachable, false otherwise
      */
     private boolean inner(Queue<Point> points, boolean result) {
-        if (points.isEmpty()) return result;
-        Point x = points.poll();
-        if (x.equals(t)) return true;
-        if (x.x > t.x || x.y > t.y) return inner(points, false);
-        points.offer(move(x, true));
-        points.offer(move(x, false));
-        return inner(points, result);
+        // NOTE a loop, where this used to recurse once per point taken off the
+        // queue. Java does not eliminate a tail call, so the depth was the number
+        // of points examined and the search died of StackOverflowError long before
+        // it ran out of points -- for (1,1) to (99,100) it managed about fifteen
+        // milliseconds. That is why MovesTest.test2_4 had its @Test commented out.
+        // The queue was always doing the remembering; the stack was along for the
+        // ride.
+        while (!points.isEmpty()) {
+            Point x = points.poll();
+            if (x.equals(t)) return true;
+            if (x.x > t.x || x.y > t.y) {
+                result = false;
+                continue;
+            }
+            points.offer(move(x, true));
+            points.offer(move(x, false));
+        }
+        return result;
     }
 
     /**

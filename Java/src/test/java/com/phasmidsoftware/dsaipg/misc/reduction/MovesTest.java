@@ -30,12 +30,28 @@ public class MovesTest {
         assertTrue(new Moves2(1, 1).valid(1, 1));
     }
 
-    //    @Test
+    /**
+     * Reinstated. It was disabled because Moves2's search recursed once per point
+     * and overflowed the stack; it is a loop now, and this passes in milliseconds.
+     */
+    @Test
     public void test2_4() {
         System.out.println("test3: 1,1->99,100");
         assertTrue(new Moves2(99, 100).valid(1, 1));
     }
 
+    /**
+     * Left disabled, and it must stay that way -- this one is not a stack problem.
+     * Searching FORWARDS from (35,13) towards a target of about 4.5 x 10^8 reaches
+     * more than 11 million points without exhausting the queue, and the queue is
+     * still growing. No amount of fixing Moves2 will help, because the tree it
+     * walks is exponential.
+     * <p>
+     * That is the entire point of this package. test3_5 asks Moves3 the identical
+     * question and it answers immediately, because running the moves BACKWARDS
+     * from the target leaves no choice at any step: the search collapses into the
+     * subtractive Euclidean algorithm.
+     */
     //    @Test
     public void test2_5() {
         System.out.println("test3: 35,13->455955547,420098884");
