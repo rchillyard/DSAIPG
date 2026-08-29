@@ -7,11 +7,10 @@ from src.adt.bqs.bag_array import INITIAL_CAPACITY, BagArray
 # `_grow_from` is `TO BE IMPLEMENTED`, so the tests below which push a bag past
 # its initial capacity are reported as skipped until that exercise is written.
 # The rest run, because neither the constructor nor `of` goes through it -- they
-# allocate their storage directly. That is deliberate: the constructor used to
-# grow from empty to 32, which meant a bag could not be built at all until the
-# exercise was done, and 22 tests of graphs and classification sorts were held
-# hostage to it. Only genuine growth depends on it now, and the growth tests
-# below are what guard it.
+# allocate their storage directly, so that a bag can be built before the exercise
+# is written. Otherwise 22 tests of graphs and classification sorts would be held
+# hostage to it. Only genuine growth depends on it, and the growth tests below
+# are what guard that.
 #
 # One deliberate divergence: BagTest.testBagAdd2 asserts that a Random seeded
 # with 1 yields 15 as the first item. That value is specific to Java's RNG, so
@@ -211,9 +210,9 @@ def test_clear():
 
 
 def test_clear_really_forgets_the_items():
-    # clear() only resets the count, so contains used to scan past it and still
-    # answer True for items the bag no longer held -- while multiplicity answered
-    # zero, because it happened to have an is_empty() guard that contains lacked.
+    # clear() only resets the count, so contains and multiplicity must both stop
+    # at it. Scanning the whole backing array reports items the bag no longer
+    # holds.
     b = BagArray()
     b.add("x")
     b.add("y")

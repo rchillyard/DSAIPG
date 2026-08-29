@@ -131,7 +131,8 @@ class TestDiGraph:
         assert set(target.reverse().vertices()) == set(target.vertices())
 
     def test_reverse_keeps_a_vertex_with_no_edges(self):
-        # The case reverse() used to drop, since it rebuilt from the edges alone.
+        # A vertex with no edge at either end must survive: reversing carries the
+        # vertices over as well as turning the edges round.
         target: DiGraph = DiGraph()
         target.add_edge(Edge("A", "B", 1))
         target.add_vertex("Z")
@@ -193,10 +194,9 @@ class TestKernelDAG:
         assert all(len(k.vertices) == 1 for k in kernels)
 
     def test_a_single_isolated_vertex_is_its_own_kernel(self):
-        # kernel_dag walks the reversed graph, so this used to produce NO kernels
-        # at all: reverse() rebuilt from edges alone and lost the vertex. It went
-        # unnoticed because every test graph in this package, in both trees, has
-        # an edge at every vertex.
+        # kernel_dag walks the reversed graph, so a lone vertex only becomes a
+        # kernel if reversing keeps it. Worth asserting on its own, because every
+        # other test graph here has an edge at every vertex.
         target: DiGraph = DiGraph()
         target.add_vertex("A")
         assert [k.vertices for k in target.kernel_dag().vertices()] == [["A"]]

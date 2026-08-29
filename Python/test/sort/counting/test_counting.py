@@ -71,7 +71,7 @@ class TestRadixSort:
         assert xs == [3, 1, 2]
 
     def test_the_whole_list_is_now_legal(self):
-        # to == len is in range when to is exclusive, and used to raise.
+        # to == len is in range, since to is exclusive.
         xs = [3, 1, 2]
         radix_sort.sort(xs, 0, 3)
         assert xs == [1, 2, 3]

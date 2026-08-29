@@ -50,9 +50,9 @@ class TestMoves2:
     def test_reachable(self):
         assert Moves2.of(3, 5).valid(1, 1)
         assert Moves2.of(1, 1).valid(1, 1)
-        # NOTE the Java had this case disabled: its search recursed once per point
-        # taken off the queue and overflowed the stack. A loop has no such limit.
-        # Fixed in the Java too, and its test2_4 is reinstated.
+        # NOTE this is the case that needs the search to be a loop: recursing
+        # once per point taken off the queue overflows the stack long before the
+        # queue empties.
         assert Moves2.of(99, 100).valid(1, 1)
 
     def test_unreachable(self):

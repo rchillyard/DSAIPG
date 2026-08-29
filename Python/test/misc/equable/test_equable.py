@@ -29,10 +29,9 @@ class TestEquable:
         assert Equable([1, 2]) != Equable([2, 1])
 
     def test_equality_is_symmetric(self):
-        # The Java walked only its OWN elements, so a shorter Equable matching a
-        # prefix of a longer one ran out and reported equal, while the longer one
-        # compared with the shorter did not. Object.equals must be symmetric, and
-        # every hash-based collection relies on it. Fixed in both trees.
+        # Equality must be symmetric -- every hash-based collection relies on it
+        # -- so a shorter Equable matching a prefix of a longer one is not equal
+        # to it, whichever way round the question is asked.
         shorter, longer = Equable([1, 2]), Equable([1, 2, 3])
         assert shorter != longer
         assert longer != shorter

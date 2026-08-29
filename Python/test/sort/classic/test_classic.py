@@ -142,9 +142,8 @@ class TestBucketSort:
                == ["urchin", "vole", "wren", "yak", "zoo"]
 
     def test_it_sorts_a_sub_range(self):
-        # Three things used to stop this: the check compared against the whole
-        # list's length, unloading wrote from index 0, and the numeric classifier
-        # looked at the list from index 0.
+        # Three things have to respect from_ for this to work: the bucket count
+        # check, where unloading writes to, and where the classifier reads from.
         xs = ["zulu", "bravo", "charlie", "alpha", "delta"]
         bucket(5, classify_string_initial).sort_range(xs, 1, 4)
         assert xs == ["zulu", "alpha", "bravo", "charlie", "delta"]

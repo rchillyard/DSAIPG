@@ -220,9 +220,9 @@ class TestTheRealConfigIni:
         assert config.get_int("benchmarkintegersorters", "mode", -1) == 4
 
     def test_words_and_runs_parse_as_numbers(self):
-        # These used to carry an inline comment, which ini4j keeps as part of the
-        # value, so that reading either as a number threw. The comments now sit
-        # on their own lines.
+        # Neither may carry an inline comment: ini4j keeps one as part of the
+        # value, and reading that as a number throws. Comments sit on their own
+        # lines.
         config = Config.load()
         assert config.get_int("benchmarkstringsorters", "words", -1) == 1000
         assert config.get_int("benchmarkstringsorters", "runs", -1) == 1000

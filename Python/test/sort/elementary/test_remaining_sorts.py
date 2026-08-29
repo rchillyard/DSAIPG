@@ -83,8 +83,8 @@ class TestEverySortSorts:
 
 class TestHeapSort:
     def test_it_honours_the_range_it_is_given(self):
-        # It used to use len(xs) throughout and never look at from_ or to, so
-        # sorting part of a list silently sorted all of it.
+        # Only xs[from_:to] may be touched; the elements on either side must be
+        # left exactly as they were.
         xs = [9, 3, 1, 2, 9]
         sorter(HeapSort, 5).sort_range(xs, 1, 4)
         assert xs == [9, 1, 2, 3, 9]
