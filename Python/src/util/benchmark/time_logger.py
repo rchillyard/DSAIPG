@@ -50,7 +50,7 @@ def format_time(time: float) -> str:
 
     This matches the Java, whose DecimalFormat pattern is "#####0.0000". The
     final "0" of the integer part is what puts the leading zero on a value below
-    one; the pattern used to end in "#", and 0.5 came out as ".5000".
+    one, so a half second reads "0.5000" rather than ".5000".
 
     :param time: the time to format.
     :return: the formatted time.

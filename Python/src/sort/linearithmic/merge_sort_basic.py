@@ -67,8 +67,7 @@ class MergeSortBasic(SortWithHelper[X], HasAdditionalMemory):
             self.insertion_sort.sort_range(xs, from_, to)
             return
         # NOTE aux is normally allocated by sort, but this is the method the Sort
-        # interface requires, so a caller may reach it directly -- and used to get
-        # a NullPointerException from the copy_block below when it did.
+        # interface requires, so a caller may reach it directly. Allocate here too.
         if self.aux is None or len(self.aux) < len(xs):
             self.aux = list(xs)
         n = to - from_

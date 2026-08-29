@@ -29,8 +29,7 @@ class HeapSort(SortWithHelper[X]):
         Sort xs between from_ and to.
 
         NOTE the heap occupies xs[from_:to], so heap index k is xs[from_ + k].
-        This used to ignore from_ and to and work on the whole list, so asking it
-        to sort part of one silently sorted all of it.
+        Only that range is touched; the rest of the list is left alone.
 
         :param xs: the list to sort.
         :param from_: the index of the first element to sort.

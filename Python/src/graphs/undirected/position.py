@@ -14,9 +14,9 @@ class Position(Protocol):
     Anything with an x and a y.
 
     NOTE the Java's Position is an *interface*, and its implementers -- Building
-    in graphs/tunnels, Position_Spherical in graphs/gis -- are otherwise
-    unrelated classes which happen to have coordinates. The Python tree used to
-    have Position as a concrete value class, which cannot serve that purpose.
+    in graphs/tunnels, Position_Spherical in graphs/gis -- are otherwise unrelated
+    classes which happen to have coordinates. So this must be something they can
+    satisfy without inheriting from it, not a value class of its own.
 
     A Protocol rather than an ABC, for two reasons. It matches how the interface
     is actually used: implementers only need to *have* coordinates, not to

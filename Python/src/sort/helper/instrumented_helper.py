@@ -100,11 +100,8 @@ class InstrumentedHelper(BaseHelper[X]):
         Copy a block: n copies, and a hit for each element read and written.
 
         NOTE 2n whether or not the source and target are the same list: n
-        elements are read and n are written either way. This used to charge
-        n + 1 for the same-list case, following the Java, whose comment asked
-        whether that was right. It was not -- counting the accesses a list
-        actually performs shows 2n, and InsertionSortOpt, which is nothing but
-        block moves, was reporting 55% of the accesses it made.
+        elements are read and n are written either way. It matters most to
+        InsertionSortOpt, which is nothing but block moves.
         """
         super().copy_block(source, i, target, j, n)
         self.instrumenter.increment_copies(n)
