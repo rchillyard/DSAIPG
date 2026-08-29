@@ -84,7 +84,7 @@ If you would rather not use `uv`, a plain virtual environment works just as well
     .venv/bin/pip install pytest ruff
     .venv/bin/python -m pytest
 
-Either way you should see 1617 tests: 1420 green and 197 skipped, and nothing red.
+Either way you should see 1854 tests: 1607 green and 247 skipped, and nothing red.
 A skipped test is one which reached a method you have not written yet,
 and it will turn green once you have written it.
 Anything red is a real problem, not an unfinished exercise.
@@ -101,10 +101,9 @@ There is a linter configured, which is worth running before you submit anything:
 
 It should report no problems on a clean checkout.
 
-The Python tree now mirrors nearly all of the Java one:
-`adt` (including `threesum`), `compression`, `graphs` (all of it), `select`,
-`sort` and `util`.
-What is still Java-only is `misc` (Chapters 1 and 2) and the team project.
+The Python tree mirrors the Java one: `adt` (including `threesum`), `compression`,
+`graphs`, `misc`, `projects` (the team project), `select`, `sort` and `util`.
+Every package in the Java tree has a counterpart.
 The package names are the Python spelling of the Java ones:
 `adt.symbol_table` for `adt.symbolTable`, `selection` for `select`, and so on.
 

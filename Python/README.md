@@ -25,7 +25,7 @@ Without it:
     .venv/bin/pip install pytest ruff
     .venv/bin/python -m pytest
 
-You should see 1617 tests: 1420 green and 197 skipped, and nothing red.
+You should see 1854 tests: 1607 green and 247 skipped, and nothing red.
 
 ## The skipped tests are the point
 
@@ -107,7 +107,8 @@ including when your IDE runs a single test on its own.
 
 ## Coverage relative to Java
 
-The Python tree is nearly a complete port. It currently covers:
+The Python tree is a complete port: every package in the Java tree has a
+counterpart here. It covers:
 
 | Package | Chapters |
 | --- | --- |
@@ -115,11 +116,10 @@ The Python tree is nearly a complete port. It currently covers:
 | `compression` | - |
 | `graphs` (dag, dijkstra, dynamic_programming, gis, traversal, tunnels, undirected, union_find) | 9-10 |
 | `selection` | - |
+| `misc` (assessment, coupling, equable, functions, greedy, lab_1, randomwalk, reduction) | 1-2 |
+| `projects/mcts` | the team project |
 | `sort` (classic, counting, elementary, generic, helper, linearithmic, par) | 7-8 |
 | `util` | - |
-
-Not yet ported: `misc` (Chapters 1 and 2) and the team project (`projects/mcts`).
-Use the Java tree for those.
 
 A few classes are deliberately absent rather than pending, and say so in their
 own docstrings where a reader would look for them. The clearest case is
