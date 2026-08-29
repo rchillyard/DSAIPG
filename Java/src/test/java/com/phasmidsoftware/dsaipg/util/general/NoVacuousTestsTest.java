@@ -46,8 +46,6 @@ public class NoVacuousTestsTest {
      */
     private static final Set<String> KNOWN = new HashSet<>(Arrays.asList(
             "compression/HuffmanCodingTest.java:testAdd",
-            "projects/mcts/tictactoe/PositionTest.java:testReflect",
-            "projects/mcts/tictactoe/PositionTest.java:testRotate",
             "sort/classic/BucketSortTest.java:init",
             "sort/classic/BucketSortTest.java:postProcess",
             "sort/classic/BucketSortTest.java:close",

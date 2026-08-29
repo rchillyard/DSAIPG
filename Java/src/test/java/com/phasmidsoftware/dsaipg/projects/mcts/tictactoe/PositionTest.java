@@ -58,12 +58,34 @@ public class PositionTest {
         assertArrayEquals(new int[]{2, 1}, moves.get(5));
     }
 
+    /**
+     * NOTE an asymmetric position, so that the two axes and a rotation are all
+     * distinguishable. On a symmetric one -- "X . .\n. . .\n. . O", say --
+     * reflect(0) and rotate() give the same board, and the test proves nothing.
+     */
     @Test
     public void testReflect() {
+        Position target = Position.parsePosition("X O .\n. . .\n. . .", 0);
+        assertEquals("about the middle row", ". . .\n. . .\nX O .", target.reflect(0).render());
+        assertEquals("about the middle column", ". O X\n. . .\n. . .", target.reflect(1).render());
+        assertEquals("twice is none", target, target.reflect(0).reflect(0));
+        assertEquals("a reflection moves nothing on or off the board",
+                target.render().replaceAll("[^XO]", "").length(),
+                target.reflect(0).render().replaceAll("[^XO]", "").length());
+    }
+
+    @Test
+    public void testReflectAboutAnUnknownAxis() {
+        Position target = Position.parsePosition("X O .\n. . .\n. . .", 0);
+        assertThrows(RuntimeException.class, () -> target.reflect(2));
     }
 
     @Test
     public void testRotate() {
+        Position target = Position.parsePosition("X O .\n. . .\n. . .", 0);
+        assertEquals(". . .\nO . .\nX . .", target.rotate().render());
+        assertEquals(". . .\n. . .\n. O X", target.rotate().rotate().render());
+        assertEquals("four quarter turns is none", target, target.rotate().rotate().rotate().rotate());
     }
 
     @Test
