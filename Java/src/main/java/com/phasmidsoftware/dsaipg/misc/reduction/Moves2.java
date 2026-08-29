@@ -63,21 +63,21 @@ public class Moves2 {
      * @return true if the target point is reachable, false otherwise
      */
     private boolean inner(Queue<Point> points, boolean result) {
-        // NOTE a loop, not a recursion. Java does not eliminate a tail call, so
-        // recursing once per point taken off the queue makes the depth the number
-        // of points examined, and the search dies of StackOverflowError long
-        // before the queue empties. The queue does the remembering either way.
-        while (!points.isEmpty()) {
-            Point x = points.poll();
-            if (x.equals(t)) return true;
-            if (x.x > t.x || x.y > t.y) {
-                result = false;
-                continue;
-            }
-            points.offer(move(x, true));
-            points.offer(move(x, false));
-        }
-        return result;
+        // NOTE this recurses once for every point taken off the queue, and Java
+        // does not eliminate a tail call, so the depth of the recursion is the
+        // number of points EXAMINED -- not the length of the path found. A queue
+        // examines the whole frontier, so that number grows exponentially, and
+        // this dies of StackOverflowError somewhere around a target of 2584,4181.
+        // Moving the work still to be done onto a queue is therefore not by itself
+        // what makes an algorithm an iteration: see Moves2A, which is the same
+        // search written as one.
+        if (points.isEmpty()) return result;
+        Point x = points.poll();
+        if (x.equals(t)) return true;
+        if (x.x > t.x || x.y > t.y) return inner(points, false);
+        points.offer(move(x, true));
+        points.offer(move(x, false));
+        return inner(points, result);
     }
 
     /**
