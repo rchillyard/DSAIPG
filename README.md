@@ -111,6 +111,21 @@ Where the two trees differ on purpose, the Python says so in its own docstring,
 with the reason. The Java tree remains the reference: where they differ by
 accident, Java is what the book describes.
 
+## Acknowledgements
+
+The Python tree exists because of work by four students, and this section is here
+because a merged branch or a closed pull request is an easy place for a name to
+get lost:
+
+* **Ashish Nevan** — the original Python port, from which the current tree descends.
+* **Rakshith Narayanaswamy** — the Python port, and bringing it forward so that it
+  was there to build on.
+* **Neha Devarapalli** — the Python port, and in the Java tree the ThreeSum test
+  corrections.
+* **Gaurav Popat Gunjal** — the Python port, and in the Java tree the fix for
+  reading the corpus files, which failed for anyone whose home directory contained
+  a space.
+
 ## Comparing the two
 
 Having the same algorithms twice makes it possible to ask what survives a change
