@@ -32,3 +32,8 @@ Java/src/test/java/edu/neu/coe/info6205/admin/TicketTest.java
 **/.ruff_cache
 
 .DS_Store
+
+# Generated javadoc. .idea/misc.xml points IntelliJ's javadoc output here, so it
+# reappears whenever the docs are regenerated; it does not belong in git, where
+# it went stale unnoticed for eighteen months.
+apiJava/
