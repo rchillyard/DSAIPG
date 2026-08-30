@@ -161,11 +161,10 @@ public class Prim<V, X extends Comparable<X> & Sequenced> extends MST<V, X> impl
      * @param <X> the attribute type for the edge, typically the weight or cost, which must be comparable.
      */
     private final Queue<Edge<V, X>> queue;
-    // NOTE the MST itself lives in the superclass, as MST.mst, and MST.iterator()
-    // reads it. Prim used to declare a private field of the same name that SHADOWED
-    // it, plus an iterator() override identical to the inherited one -- so
-    // MST.mst stayed null for a Prim forever, and anything reaching the inherited
-    // iterator() would have met a NullPointerException.
+    // NOTE the MST itself lives in the superclass, as MST.mst, which MST.iterator()
+    // reads. Do not declare a field of that name here: it would shadow the
+    // superclass's, leaving MST.mst null and the inherited iterator() with nothing
+    // to report.
     /**
      * Priority queue of edges used by Prim's algorithm to construct the minimum spanning tree (MST).
      * This priority queue maintains edges with one endpoint inside the spanning tree and the other outside,

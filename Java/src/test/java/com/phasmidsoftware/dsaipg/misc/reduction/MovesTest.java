@@ -110,8 +110,9 @@ public class MovesTest {
 
     /**
      * A target BELOW the start is never reachable, since both coordinates only ever
-     * grow. Moves3 used to say otherwise whenever the target was aligned with the
-     * start: the aligned rules divide by a modulus, and (-1) % 1 is 0.
+     * grow. The aligned rules must not be reached for such a target: they divide by
+     * a modulus, and a modulus ignores sign, so (-1) % 1 is 0 and the rule would
+     * report it reachable.
      */
     @Test
     public void test3_belowTheStart() {
@@ -123,9 +124,8 @@ public class MovesTest {
 
     /**
      * The reduction must agree with the brute-force search everywhere, not merely
-     * on the six conditions. Over 8x8 starts and 60x60 targets that is 230,400
-     * questions, and they used to disagree on 114 of them -- every one a target
-     * below its start.
+     * on the six conditions of the case study, which all begin at 1,1 or below
+     * their target. Over 8x8 starts and 60x60 targets that is 230,400 questions.
      */
     @Test
     public void test3_agreesWithBruteForceEverywhere() {

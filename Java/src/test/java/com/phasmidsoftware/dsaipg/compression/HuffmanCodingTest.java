@@ -3,11 +3,15 @@ package com.phasmidsoftware.dsaipg.compression;
 import org.junit.Test;
 
 import java.io.PrintWriter;
+import java.util.PriorityQueue;
+import java.util.Set;
 import java.io.StringWriter;
 
 import static com.phasmidsoftware.dsaipg.compression.HuffmanCoding.showTree;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
@@ -23,16 +27,49 @@ public class HuffmanCodingTest {
         assertNotNull(tree);
     }
 
+    /**
+     * add puts a Node into the priority queue, which orders by frequency, so the
+     * rarest symbol comes out first however the nodes went in. That is what makes
+     * the tree Huffman's: the two least frequent symbols are always the pair
+     * combined next.
+     * <p>
+     * NOTE asserted by identity, since Node keeps its symbol and frequency private.
+     */
     @Test
     public void testAdd() {
+        PriorityQueue<HuffmanCoding.Node> queue = new PriorityQueue<>();
+        HuffmanCoding huffmanCoding = new HuffmanCoding(queue);
+        HuffmanCoding.Node e = new HuffmanCoding.Node("E", 120);
+        HuffmanCoding.Node z = new HuffmanCoding.Node("Z", 1);
+        HuffmanCoding.Node t = new HuffmanCoding.Node("T", 90);
+        huffmanCoding.add(e);
+        huffmanCoding.add(z);
+        huffmanCoding.add(t);
+        assertEquals(3, queue.size());
+        assertSame("the rarest symbol is at the head", z, queue.poll());
+        assertSame(t, queue.poll());
+        assertSame(e, queue.poll());
+        assertTrue(queue.isEmpty());
     }
 
+    /**
+     * Nodes of equal frequency may come out in either order -- compareTo looks only
+     * at the frequency -- but both must come out, and before anything commoner.
+     */
     @Test
-    public void testCreateHuffmanCoding() {
-        HuffmanCoding huffmanCoding = HuffmanCoding.createHuffmanCoding();
-        assertNotNull(huffmanCoding);
+    public void testAddEqualFrequencies() {
+        PriorityQueue<HuffmanCoding.Node> queue = new PriorityQueue<>();
+        HuffmanCoding huffmanCoding = new HuffmanCoding(queue);
+        HuffmanCoding.Node a = new HuffmanCoding.Node("A", 5);
+        HuffmanCoding.Node b = new HuffmanCoding.Node("B", 5);
+        HuffmanCoding.Node c = new HuffmanCoding.Node("C", 9);
+        huffmanCoding.add(a);
+        huffmanCoding.add(b);
+        huffmanCoding.add(c);
+        Set<HuffmanCoding.Node> firstTwo = Set.of(queue.poll(), queue.poll());
+        assertEquals(Set.of(a, b), firstTwo);
+        assertSame(c, queue.poll());
     }
-
     @Test
     public void testShowTree() {
         HuffmanCoding huffmanCoding = HuffmanCoding.createHuffmanCoding();

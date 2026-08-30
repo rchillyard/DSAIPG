@@ -305,10 +305,11 @@ public class QuickSort3WayTest {
     private static Config config;
 
     /**
-     * The partition method has two branches: an instrumented one which compares through
-     * the Helper, and an uninstrumented one which used to compare with compareTo --
-     * ignoring the Helper's comparator entirely, so an uninstrumented sort with a custom
-     * comparator came out in the natural ordering instead.
+     * The partition method has two branches, an instrumented one and an uninstrumented
+     * one, and BOTH must compare through the Helper. Comparing with compareTo on the
+     * uninstrumented path ignores the Helper's comparator, so a sort asked for a custom
+     * ordering silently delivers the natural one whenever instrumenting is off -- which
+     * is the default.
      * <p>
      * This is the case that exposed it: MSDStringSort cuts over to QuickSort_3way with a
      * SuffixComparator, and produced "Arab" before "abroad" -- uppercase first, which is

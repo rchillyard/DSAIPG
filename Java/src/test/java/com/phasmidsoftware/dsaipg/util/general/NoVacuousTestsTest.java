@@ -45,15 +45,6 @@ public class NoVacuousTestsTest {
      * area of the tree is next worked on.
      */
     private static final Set<String> KNOWN = new HashSet<>(Arrays.asList(
-            "compression/HuffmanCodingTest.java:testAdd",
-            "sort/classic/BucketSortTest.java:init",
-            "sort/classic/BucketSortTest.java:postProcess",
-            "sort/classic/BucketSortTest.java:close",
-            "sort/linearithmic/MergeSortBasicTest.java:testSort",
-            "sort/linearithmic/MergeSortBasicTest.java:mutatingSort",
-            "sort/linearithmic/MergeSortBasicTest.java:testSort1",
-            "sort/linearithmic/MergeSortBasicTest.java:testSort2",
-            "sort/linearithmic/MergeSortBasicTest.java:testSort3"
     ));
 
     /**

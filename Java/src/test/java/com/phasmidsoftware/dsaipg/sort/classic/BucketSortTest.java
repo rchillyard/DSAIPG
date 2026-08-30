@@ -7,6 +7,7 @@ package com.phasmidsoftware.dsaipg.sort.classic;
 import com.google.common.collect.ImmutableList;
 import com.phasmidsoftware.dsaipg.sort.generic.Sort;
 import com.phasmidsoftware.dsaipg.sort.helper.Helper;
+import com.phasmidsoftware.dsaipg.sort.helper.HelperException;
 import com.phasmidsoftware.dsaipg.sort.helper.InstrumentedComparableHelper;
 import com.phasmidsoftware.dsaipg.sort.helper.NonInstrumentingComparableHelper;
 import com.phasmidsoftware.dsaipg.util.config.Config;
@@ -113,16 +114,45 @@ public class BucketSortTest {
         assertEquals(inversions, helper.getFixes());
     }
 
+    /**
+     * init(n) passes the length through to the Helper, which sizes its statistics by
+     * it. Re-initialising to the same n is fine; changing it is not.
+     */
     @Test
-    public void init() {
+    public void init() throws IOException {
+        Config config = Config.load(BucketSortTest.class);
+        BucketSort<String> sorter = new BucketSort<>(BucketSortTest::classifyString, 3, 5, config);
+        assertEquals("N is passed to the Helper by the constructor", 5, sorter.getHelper().getN());
+        sorter.init(5);
+        assertEquals("the same n again is harmless", 5, sorter.getHelper().getN());
+        assertThrows("a different n is not", HelperException.class, () -> sorter.init(3));
     }
 
+    /**
+     * postProcess rejects an array which is not sorted, since checksorted is true in
+     * test/resources/config.ini -- a test must not pass on a sort which did not sort.
+     */
     @Test
-    public void postProcess() {
+    public void postProcess() throws IOException {
+        Config config = Config.load(BucketSortTest.class);
+        BucketSort<String> sorter = new BucketSort<>(BucketSortTest::classifyString, 3, 5, config);
+        // NOTE N -- the constructor's third argument -- has already initialised the
+        // Helper to 5, and re-initialising to a different value is rejected.
+        sorter.postProcess(new String[]{"Able", "Bravo", "Campion"});
+        assertThrows(HelperException.class,
+                () -> sorter.postProcess(new String[]{"Campion", "Able", "Bravo"}));
     }
 
+    /**
+     * close() is idempotent: a second call does nothing rather than closing the
+     * Helper twice.
+     */
     @Test
-    public void close() {
+    public void close() throws IOException {
+        Config config = Config.load(BucketSortTest.class);
+        BucketSort<String> sorter = new BucketSort<>(BucketSortTest::classifyString, 3, 5, config);
+        sorter.close();
+        sorter.close();
     }
 
     private static Integer classifyString(String s) {

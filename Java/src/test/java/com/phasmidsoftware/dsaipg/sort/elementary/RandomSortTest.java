@@ -158,9 +158,8 @@ public class RandomSortTest {
 
 
     /**
-     * RandomSort used to build its QuickRandom before testing the cutoff, and
-     * QuickRandom rejects a range of zero, so an empty array threw rather than
-     * sorting trivially.
+     * An empty array sorts trivially. QuickRandom rejects a range of zero, so it
+     * must not be built until after the cutoff test.
      */
     @Test
     public void testSortEmpty() throws IOException {
