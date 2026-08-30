@@ -4,7 +4,17 @@ from src.graphs.union_find.uf import UF
 
 
 class UF_HWQUPC(UF):
-    """Height-weighted Quick Union with optional path compression."""
+    """Height-weighted Quick Union with optional path compression.
+
+    NOTE path compression can be switched off, which makes this a good place to measure
+    what an optimisation is actually worth. Over two million random pairs on a million
+    sites it halves the time in Java -- and makes no difference whatever here. What it
+    costs is a couple of list accesses, nearly free in Java beside the cache miss they
+    save, but interpreted here and so costing about what the traversal step it saves
+    costs. An optimisation's payoff is the ratio of what it saves to what it costs, and
+    that ratio belongs to the implementation rather than to the algorithm.
+    See docs/Java vs Python.md.
+    """
 
     def __init__(self, n: int, path_compression: bool = True):
         if n < 0:

@@ -173,7 +173,8 @@ class HuffmanDecoder:
         value: int
     ) -> Node | None:
         """Decode a single 64-bit value."""
-        # TO BE IMPLEMENTED
+        # TO BE IMPLEMENTED  consume all 64 bits of value, one per step down the tree,
+        # emitting a symbol at each leaf
         raise NotImplementedError("TO BE IMPLEMENTED")
 
 

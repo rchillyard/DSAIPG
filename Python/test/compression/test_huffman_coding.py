@@ -48,19 +48,38 @@ def test_encode2():
     strings = HuffmanCoding.parse_lin(board)
     assert len(strings) == 186
     longs = encoder.encode(strings)
-    # Tree structure may differ from Java due to priority queue tie-breaking,
-    # so we verify correctness via round-trip encoding/decoding instead of exact values
     assert len(longs) == 15
-    # Note: The Java test expects longs[0] == 0x69652F2A1DCFC350, but this depends on
-    # exact tree structure which may vary. Instead, verify the encoding is valid by decoding.
+
+    # NOTE the Java asserts on longs[0], which this cannot do: Node.compareTo there
+    # compares frequency alone, so its PriorityQueue orders equal-frequency nodes
+    # arbitrarily, while Node here breaks the tie by insertion order. Both codes are
+    # optimal and of the same expected length, but they are not the same code. Round
+    # tripping tests the property that matters and does not depend on the tie.
     decoded = decoder.decode(longs)
-    # The decoded string should match the original (accounting for emoji selectors on S,H,D,C)
-    # Since the tree uses S️, H️, D️, C️ (with \uFE0F), decoded will have these
-    # We normalize by removing the emoji selector for comparison
-    normalized_decoded = decoded.replace('\uFE0F', '')
-    normalized_strings = ''.join(s if s is not None else '' for s in strings)
-    # The decoded output ends at the null symbol, so it may be shorter
-    assert normalized_decoded.startswith(normalized_strings[:len(normalized_decoded)])
+    # Encoding is many-to-one -- the suits are held with a U+FE0F variation selector,
+    # and "S" finds "S️" -- so a round trip returns the selector whether or not the
+    # input had it. Strip it before comparing.
+    expected = ''.join(s for s in strings if s is not None)
+    assert decoded.replace('️', '') == expected
+
+
+def test_encode_across_word_boundary():
+    """
+    A code split across a 64-bit word boundary comes back whole.
+
+    NOTE every other encode and decode test here stays inside a single word, which is
+    why they can all pass while the packing and the unpacking disagree about what to do
+    at a boundary. Varying the padding puts the split at a different point within the
+    code each time round.
+    """
+    tree = HuffmanCoding.create_default().build_tree()
+    encoder = HuffmanEncoder(tree)
+    decoder = HuffmanDecoder(tree)
+    for pad in range(12):
+        # XX is the rarest symbol, so it carries the longest code.
+        symbols = ["P"] * pad + ["XX"] * (39 - pad)
+        longs = encoder.encode(symbols + [None])
+        assert decoder.decode(longs).replace('️', '') == ''.join(symbols), f"at pad {pad}"
 
 
 def test_parse_lin():

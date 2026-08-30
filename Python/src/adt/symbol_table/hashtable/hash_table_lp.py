@@ -8,6 +8,13 @@ Value = TypeVar('Value')
 class HashTableLP(HashTable[Key, Value]):
     """
     Class which implements ST (symbol table) by using Linear Probing (Open Addressing).
+
+    NOTE a million puts and gets take 1.73s here, against 0.29s for the built-in dict --
+    which implements the same idea, but with its inner loop in C. The Java version of this
+    class takes 0.056s, and java.util.HashMap 0.059s. So the cost of writing a hash table
+    rather than calling one is about 6x in Python and nothing at all in Java. That is the
+    reason idiomatic Python leans so hard on its libraries, and why the standard Python
+    optimisation is to move the inner loop out of Python. See docs/Java vs Python.md.
     """
 
     class HashTableException(Exception):

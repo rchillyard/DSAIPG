@@ -84,7 +84,7 @@ If you would rather not use `uv`, a plain virtual environment works just as well
     .venv/bin/pip install pytest ruff
     .venv/bin/python -m pytest
 
-Either way you should see 1854 tests: 1607 green and 247 skipped, and nothing red.
+Either way you should see 1855 tests: 1607 green and 248 skipped, and nothing red.
 A skipped test is one which reached a method you have not written yet,
 and it will turn green once you have written it.
 Anything red is a real problem, not an unfinished exercise.
@@ -110,3 +110,14 @@ The package names are the Python spelling of the Java ones:
 Where the two trees differ on purpose, the Python says so in its own docstring,
 with the reason. The Java tree remains the reference: where they differ by
 accident, Java is what the book describes.
+
+## Comparing the two
+
+Having the same algorithms twice makes it possible to ask what survives a change
+of language and what does not.
+`docs/Java vs Python.md` records some measurements and what they show:
+that a growth rate belongs to the algorithm rather than to the language,
+that a constant factor of forty buys you about five hundred elements,
+that there is no single ratio between the two languages -- these range from 5 to 100 --
+and that an optimisation which halves the time in one language can be worth nothing in the other.
+It also says how to repeat the measurements for yourself, which is more use than reading them.

@@ -25,7 +25,7 @@ Without it:
     .venv/bin/pip install pytest ruff
     .venv/bin/python -m pytest
 
-You should see 1854 tests: 1607 green and 247 skipped, and nothing red.
+You should see 1855 tests: 1607 green and 248 skipped, and nothing red.
 
 ## The skipped tests are the point
 
