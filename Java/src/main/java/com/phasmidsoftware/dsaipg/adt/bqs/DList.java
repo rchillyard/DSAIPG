@@ -89,7 +89,7 @@ public class DList<Item> implements Iterable<Item> {
      */
     public void addBeforeElement(Item item, D_Element next) {
         // TO BE IMPLEMENTED 
-                throw new RuntimeException("implementation missing");
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**
@@ -100,7 +100,7 @@ public class DList<Item> implements Iterable<Item> {
      */
     public void addAfterElement(Item item, D_Element prev) {
         // TO BE IMPLEMENTED 
-                throw new RuntimeException("implementation missing");
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**
@@ -110,19 +110,17 @@ public class DList<Item> implements Iterable<Item> {
      */
     public void remove(D_Element element) {
         // TO BE IMPLEMENTED 
-                throw new RuntimeException("implementation missing");
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     public D_Element findFirst(Item item) {
         // TO BE IMPLEMENTED 
-         return null;
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     public D_Element findLast(Item item) {
         // TO BE IMPLEMENTED 
-         return null;
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**

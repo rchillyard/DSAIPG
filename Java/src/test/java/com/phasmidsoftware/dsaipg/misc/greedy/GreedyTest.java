@@ -8,8 +8,13 @@ import java.util.Iterator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class GreedyTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     /**
      * Class to model Zeckendorf's theorem.

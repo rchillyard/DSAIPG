@@ -10,8 +10,13 @@ import java.util.Random;
 import java.util.function.Function;
 
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class BaseComparableHelperTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     public static final String xA = "a";
     public static final String xB = "b";
@@ -68,7 +73,7 @@ public class BaseComparableHelperTest {
             if (!isSorted(xs)) throw new HelperException("Array is not sorted");
         }
 
-        public Helper<X> clone(String description, int N) {
+        public Helper<X> clone(String description, int N, boolean shareInstrumenter) {
             return null;
         }
     }

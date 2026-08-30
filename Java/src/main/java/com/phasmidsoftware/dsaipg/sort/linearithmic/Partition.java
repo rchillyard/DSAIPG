@@ -1,5 +1,9 @@
 package com.phasmidsoftware.dsaipg.sort.linearithmic;
 
+import com.phasmidsoftware.dsaipg.sort.helper.Helper;
+
+import java.util.Arrays;
+
 /**
  * Class representing a partition of an array for sorting or manipulation purposes.
  * The partition is defined by a range of indices within the array, specified by
@@ -22,6 +26,18 @@ public class Partition<X extends Comparable<X>> {
     }
 
     /**
+     * Checks if the elements within the specified range of the array are sorted.
+     *
+     * @param helper a {@code Helper<X>} instance providing utility methods for array sorting
+     *               and validation, including the {@code isSorted} method.
+     * @return {@code true} if the elements in the range [{@code from}, {@code to}) are sorted
+     *         in non-decreasing order, {@code false} otherwise.
+     */
+    public boolean isSorted(Helper<X> helper) {
+        return helper.isSorted(xs, from, to);
+    }
+
+    /**
      * Returns a string representation of the Partition object.
      * <p>
      * The representation includes the number of elements in the array,
@@ -30,10 +46,13 @@ public class Partition<X extends Comparable<X>> {
      * @return a string in the format "Partition{xs: <number of elements> elements, from=<start index>, to=<end index>}".
      */
     public String toString() {
+        if (from >= to)
+            return "Empty Partition at {" + (to-1)+ "}";
+        X[] elements = Arrays.copyOfRange(xs, from, to);
         return "Partition{" +
-                "xs: " + xs.length + " elements" +
-                ", from=" + from +
-                ", to=" + to +
+                "from=" + from +
+                ", to=" + to + " elements: " +
+                Arrays.toString(elements) +
                 '}';
     }
 

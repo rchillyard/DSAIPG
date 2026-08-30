@@ -17,8 +17,13 @@ import java.util.List;
 import static com.phasmidsoftware.dsaipg.sort.helper.Instrument.COMPARES;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.setupConfig;
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class InstrumentedComparableHelperTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     public static final String xA = "a";
     public static final String xB = "b";

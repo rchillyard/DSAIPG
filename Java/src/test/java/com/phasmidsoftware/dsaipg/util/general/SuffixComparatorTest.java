@@ -5,8 +5,13 @@ import org.junit.Test;
 import java.util.Comparator;
 
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class SuffixComparatorTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     /**
      * Test 1: Verify compare method where suffixes are identical and prefix length is ignored (prefixLength = 0).

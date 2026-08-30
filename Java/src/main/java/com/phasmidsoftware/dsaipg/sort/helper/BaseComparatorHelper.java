@@ -37,18 +37,20 @@ public abstract class BaseComparatorHelper<X> extends BaseHelper<X> implements N
     }
 
     /**
-     * Creates and returns a clone of the Helper with the specified configuration.
-     * This implementation always throws SortException.
+     * Creates and returns a clone of the Helper with the specified Comparator.
+     * <p>
+     * NOTE abstract, not a throwing implementation, so that a subclass which has
+     * not implemented clone is a compile error rather than a runtime one. A class
+     * holding a Comparator can always clone itself with a different one, so there
+     * is nothing here to refuse.
      *
-     * @param description a description of the Helper.
-     * @param comparator  the Comparator of type X to be used for comparisons.
-     * @param N           the number of elements expected to be sorted.
+     * @param description       a description of the Helper.
+     * @param comparator        the Comparator of type X to be used for comparisons.
+     * @param N                 the number of elements expected to be sorted.
+     * @param shareInstrumenter
      * @return a cloned instance of Helper parameterized with type X.
-     * @throws SortException if the operation is not implementable.
      */
-    public Helper<X> clone(String description, Comparator<X> comparator, int N) {
-        throw new SortException("not implementable");
-    }
+    public abstract Helper<X> clone(String description, Comparator<X> comparator, int N, boolean shareInstrumenter);
 
     /**
      * Constructor for explicit random number generator.

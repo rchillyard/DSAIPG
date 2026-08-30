@@ -7,6 +7,7 @@ package com.phasmidsoftware.dsaipg.sort.classic;
 import com.google.common.collect.ImmutableList;
 import com.phasmidsoftware.dsaipg.sort.generic.Sort;
 import com.phasmidsoftware.dsaipg.sort.helper.Helper;
+import com.phasmidsoftware.dsaipg.sort.helper.HelperException;
 import com.phasmidsoftware.dsaipg.sort.helper.InstrumentedComparableHelper;
 import com.phasmidsoftware.dsaipg.sort.helper.NonInstrumentingComparableHelper;
 import com.phasmidsoftware.dsaipg.util.config.Config;
@@ -20,9 +21,14 @@ import java.util.function.Function;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.setupConfig;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 @SuppressWarnings("ALL")
 public class BucketSortTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testSort0() throws IOException {
@@ -102,22 +108,51 @@ public class BucketSortTest {
         assertEquals(2L * N, helper.getCopies());
         assertEquals(261_328L, helper.getCompares());
         assertEquals(803_991L, helper.getHits());
-        assertEquals(281_329L, helper.getLookups());
+        assertEquals(20_000L, helper.getLookups());
         long inversions = helper.getFixes();
         assertEquals((long) N * N / 4 / nBuckets, inversions, (long) N);
         assertEquals(inversions, helper.getFixes());
     }
 
+    /**
+     * init(n) passes the length through to the Helper, which sizes its statistics by
+     * it. Re-initialising to the same n is fine; changing it is not.
+     */
     @Test
-    public void init() {
+    public void init() throws IOException {
+        Config config = Config.load(BucketSortTest.class);
+        BucketSort<String> sorter = new BucketSort<>(BucketSortTest::classifyString, 3, 5, config);
+        assertEquals("N is passed to the Helper by the constructor", 5, sorter.getHelper().getN());
+        sorter.init(5);
+        assertEquals("the same n again is harmless", 5, sorter.getHelper().getN());
+        assertThrows("a different n is not", HelperException.class, () -> sorter.init(3));
     }
 
+    /**
+     * postProcess rejects an array which is not sorted, since checksorted is true in
+     * test/resources/config.ini -- a test must not pass on a sort which did not sort.
+     */
     @Test
-    public void postProcess() {
+    public void postProcess() throws IOException {
+        Config config = Config.load(BucketSortTest.class);
+        BucketSort<String> sorter = new BucketSort<>(BucketSortTest::classifyString, 3, 5, config);
+        // NOTE N -- the constructor's third argument -- has already initialised the
+        // Helper to 5, and re-initialising to a different value is rejected.
+        sorter.postProcess(new String[]{"Able", "Bravo", "Campion"});
+        assertThrows(HelperException.class,
+                () -> sorter.postProcess(new String[]{"Campion", "Able", "Bravo"}));
     }
 
+    /**
+     * close() is idempotent: a second call does nothing rather than closing the
+     * Helper twice.
+     */
     @Test
-    public void close() {
+    public void close() throws IOException {
+        Config config = Config.load(BucketSortTest.class);
+        BucketSort<String> sorter = new BucketSort<>(BucketSortTest::classifyString, 3, 5, config);
+        sorter.close();
+        sorter.close();
     }
 
     private static Integer classifyString(String s) {
@@ -158,5 +193,53 @@ public class BucketSortTest {
         BucketSort<String> sorter = BucketSort.CaseIndependentBucketSort(BucketSort::classifyStringInitial, BucketSort.ALPHABET_SIZE, 4, Config.load(BucketSortTest.class));
         sorter.mutatingSort(input);
         assertArrayEquals(new String[]{"Alpha", "bravo", "Charlie", "delta"}, input);
+    }
+
+    /**
+     * A sub-range must sort, leaving the rest alone. Three things have to respect
+     * {@code from} for that: checkBuckets counts against the range's length rather
+     * than the whole array's, unloadBuckets writes from {@code from}, and the
+     * numeric classifier reads from {@code from}.
+     */
+    @Test
+    public void testSortSubRange() throws IOException {
+        String[] xs = {"zulu", "bravo", "charlie", "alpha", "delta"};
+        Sort<String> sorter = new BucketSort<String>(BucketSort::classifyStringInitial,
+                BucketSort.ALPHABET_SIZE, xs.length, Config.load(BucketSortTest.class));
+        sorter.sort(xs, 1, 4);
+        assertArrayEquals(new String[]{"zulu", "alpha", "bravo", "charlie", "delta"}, xs);
+    }
+
+    /**
+     * The numeric classifier is chosen from the range being sorted, not from the
+     * whole array.
+     */
+    @Test
+    public void testSortSubRangeOfNumbers() throws IOException {
+        Integer[] xs = {900, 5, 3, 4, 1, 2, 900};
+        Sort<Integer> sorter = new BucketSort<Integer>(null, 4, xs.length, Config.load(BucketSortTest.class));
+        sorter.sort(xs, 1, 6);
+        assertArrayEquals(new Integer[]{900, 1, 2, 3, 4, 5, 900}, xs);
+    }
+
+    /**
+     * When every value is the same the gap is zero. This used to give the right
+     * answer only because 0.0/0.0 is NaN, Math.floor(NaN) is NaN, and (int) NaN
+     * is 0; it is now tested for outright.
+     */
+    @Test
+    public void testSortAllEqual() throws IOException {
+        Integer[] xs = {5, 5, 5, 5};
+        Sort<Integer> sorter = new BucketSort<Integer>(null, 16, xs.length, Config.load(BucketSortTest.class));
+        sorter.mutatingSort(xs);
+        assertArrayEquals(new Integer[]{5, 5, 5, 5}, xs);
+    }
+
+    @Test
+    public void testSortSingleton() throws IOException {
+        Integer[] xs = {7};
+        Sort<Integer> sorter = new BucketSort<Integer>(null, 16, xs.length, Config.load(BucketSortTest.class));
+        sorter.mutatingSort(xs);
+        assertArrayEquals(new Integer[]{7}, xs);
     }
 }

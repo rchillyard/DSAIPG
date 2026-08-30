@@ -182,7 +182,12 @@ public class Entropy {
         }
         bits -= 8;
         lastIndex--;
-        assert lastIndex >= 0;
+        // NOTE -1 is a legitimate terminal state, not a bug: it means every byte
+        // has now been consumed. `bits` reaches 0 at the same moment, and
+        // getEntropy rejects any request larger than `bits`, so lastIndex can
+        // never be read again. Asserting >= 0 here forbade drawing exactly the
+        // entropy available -- e.g. 32 bits from a 32-bit Entropy.
+        assert lastIndex >= -1;
         return result;
     }
     /**

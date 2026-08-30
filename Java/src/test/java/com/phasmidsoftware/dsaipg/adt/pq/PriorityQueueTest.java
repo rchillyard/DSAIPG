@@ -7,9 +7,14 @@ import java.util.*;
 
 import static java.util.Collections.shuffle;
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 @SuppressWarnings("ConstantConditions")
 public class PriorityQueueTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testInverted1a() {

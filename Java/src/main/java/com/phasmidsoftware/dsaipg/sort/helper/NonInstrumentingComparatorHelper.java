@@ -86,12 +86,38 @@ public class NonInstrumentingComparatorHelper<X> extends BaseComparatorHelper<X>
     /**
      * Creates a new instance of {@code NonInstrumentingComparableHelper} based on the given description and size.
      *
-     * @param description a brief description for the helper instance being cloned.
-     * @param N           the number of elements relevant to the helper instance.
+     * @param description       a brief description for the helper instance being cloned.
+     * @param N                 the number of elements relevant to the helper instance.
+     * @param shareInstrumenter
      * @return a cloned instance of {@code Helper<X>}, specifically a {@code NonInstrumentingComparableHelper}.
      */
-    public Helper<X> clone(String description, int N) {
-        return new NonInstrumentingComparatorHelper<>(description, getComparator(), N, config);
+    public Helper<X> clone(String description, int N, boolean shareInstrumenter) {
+        return clone(description, getComparator(), N, shareInstrumenter);
+    }
+
+    /**
+     * Clone this Helper, giving the copy a different Comparator.
+     * <p>
+     * NOTE this was missing, so this class inherited
+     * {@link BaseComparatorHelper#clone(String, Comparator, int, boolean)}, which
+     * throws {@code SortException("not implementable")}. It is implementable, and
+     * necessary: {@code MSDStringSort} clones its Helper with a
+     * {@link com.phasmidsoftware.dsaipg.util.general.SuffixComparator} to hand the
+     * partition below the cutoff to a three-way quicksort. ClassicHelper carried a
+     * copy of its own for that reason alone, and has since been deleted.
+     * <p>
+     * {@code shareInstrumenter} is irrelevant here: this Helper counts nothing, so
+     * there is no instrumenter to share.
+     *
+     * @param description       a description of the clone.
+     * @param comparator        the Comparator for the clone to use.
+     * @param N                 the number of elements expected to be sorted.
+     * @param shareInstrumenter ignored.
+     * @return a new NonInstrumentingComparatorHelper.
+     */
+    @Override
+    public Helper<X> clone(String description, Comparator<X> comparator, int N, boolean shareInstrumenter) {
+        return new NonInstrumentingComparatorHelper<>(description, comparator, N, random, config);
     }
 
     /**
@@ -133,7 +159,6 @@ public class NonInstrumentingComparatorHelper<X> extends BaseComparatorHelper<X>
      */
     public NonInstrumentingComparatorHelper(String description, Comparator<X> comparator, int n, Random random, Config config) {
         super(description, comparator, n, random, new InstrumenterDummy(), config);
-        checkSorted = config.getBoolean(HELPER, "checksorted");
     }
 
     /**
@@ -173,31 +198,5 @@ public class NonInstrumentingComparatorHelper<X> extends BaseComparatorHelper<X>
      * Keep track of the random array that was generated. This is available via the InstrumentedHelper class.
      */
     protected X[] randomArray;
-
-    private final boolean checkSorted;
-
-    /**
-     * A custom runtime exception used within the context of helper-related operations.
-     * HelperException is intended to signal specific runtime errors that occur within
-     * the functionalities of the NonInstrumentingComparableHelper class or its associated methods.
-     */
-    public static class HelperException extends RuntimeException {
-
-        public HelperException(String message) {
-            super(message);
-        }
-
-        public HelperException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public HelperException(Throwable cause) {
-            super(cause);
-        }
-
-        public HelperException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-            super(message, cause, enableSuppression, writableStackTrace);
-        }
-    }
 
 }

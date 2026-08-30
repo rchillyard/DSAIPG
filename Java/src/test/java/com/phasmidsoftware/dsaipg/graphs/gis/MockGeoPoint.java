@@ -19,4 +19,14 @@ class MockGeoPoint implements GeoPoint {
     public Position getPosition() {
         return position;
     }
+
+    /**
+     * NOTE added so that an Edge between two of these prints something a test can
+     * assert. Without it, Edge.toString reports the default Object form, which is
+     * an address.
+     */
+    @Override
+    public String toString() {
+        return name;
+    }
 }

@@ -4,8 +4,13 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class StatPackTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     final static String key1 = "test1";
     final static String key2 = "test2";
@@ -19,7 +24,11 @@ public class StatPackTest {
         statPack.add(key2, 1);
         assertEquals(3, statPack.getCount(key1));
         assertEquals(1, statPack.getCount(key2));
-        assertEquals("StatPack {" + key2 + ": n=10; mean=1; normalized=0.721; " + key1 + ": n=10; mean=0; stdDev=1; normalized=0.000}", statPack.toString());
+        // NOTE n=1 and n=3, not n=10 as this used to assert. Statistics.toString
+        // reported the capacity of its store rather than the number of values
+        // added, so both read n=10 here -- contradicting the two assertions
+        // immediately above, which have always said 3 and 1.
+        assertEquals("StatPack {" + key2 + ": n=1; mean=1; normalized=0.721; " + key1 + ": n=3; mean=0; stdDev=1; normalized=0.000}", statPack.toString());
     }
 
     @Test

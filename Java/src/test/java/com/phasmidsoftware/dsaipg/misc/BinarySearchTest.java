@@ -4,8 +4,13 @@ package com.phasmidsoftware.dsaipg.misc;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class BinarySearchTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testSequence() {
@@ -54,5 +59,15 @@ public class BinarySearchTest {
         final int length = xs.length;
         for (int x : xs) sum += x;
         return sum / length;
+    }
+
+    /**
+     * Every element of a sorted array must be findable, including the first.
+     */
+    @Test
+    public void testEveryElement() {
+        int[] xs = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        for (int i = 0; i < xs.length; i++)
+            assertEquals("looking for " + xs[i], i, BinarySearch.binarySearch(xs, 0, xs.length, xs[i]));
     }
 }

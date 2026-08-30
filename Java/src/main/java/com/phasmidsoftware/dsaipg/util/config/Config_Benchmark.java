@@ -6,6 +6,7 @@ import org.ini4j.Ini;
 
 import static com.phasmidsoftware.dsaipg.sort.helper.InstrumentedComparableHelper.*;
 import static com.phasmidsoftware.dsaipg.sort.linearithmic.MergeSort.INSURANCE;
+import static com.phasmidsoftware.dsaipg.sort.linearithmic.MergeSort.MERGESORT;
 import static com.phasmidsoftware.dsaipg.sort.linearithmic.MergeSort.NOCOPY;
 
 /**
@@ -21,6 +22,12 @@ public class Config_Benchmark {
     public static final String SEED = "seed";
     public static final String CUTOFF = "cutoff";
     public static final String MSDCUTOFF = "msdcutoff";
+    /**
+     * Whether a Helper's postProcess should verify that the array really is sorted.
+     * Left false for benchmarks, so that an O(n) check per sort is not measured
+     * along with the sort; set true in test/resources/config.ini.
+     */
+    public static final String CHECKSORTED = "checksorted";
     public static final int CUTOFF_DEFAULT = 20;
 
     /**
@@ -103,8 +110,8 @@ public class Config_Benchmark {
         ini.put(sInstrumenting, COPIES, instrumenting);
         ini.put(sInstrumenting, FIXES, instrumenting);
         ini.put("huskyhelper", "countinteriminversions", interimInversions);
-        ini.put(Config_Benchmark.HELPER, INSURANCE, insurance);
-        ini.put(Config_Benchmark.HELPER, NOCOPY, noCopy);
+        ini.put(MERGESORT, INSURANCE, insurance);
+        ini.put(MERGESORT, NOCOPY, noCopy);
         return new Config(ini);
     }
 

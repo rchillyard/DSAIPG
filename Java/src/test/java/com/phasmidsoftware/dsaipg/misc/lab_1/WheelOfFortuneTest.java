@@ -7,8 +7,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class WheelOfFortuneTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     WheelOfFortune<String> wheel; // This wheel is not random: seed is always 0L
     private static final WheelOfFortune.Event<String> heads = WheelOfFortune.valueOf("Heads", 1);

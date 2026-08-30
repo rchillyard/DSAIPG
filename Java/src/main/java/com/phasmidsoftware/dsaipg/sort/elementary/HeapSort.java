@@ -71,17 +71,22 @@ public class HeapSort<X extends Comparable<X>> extends SortWithComparableHelper<
      *              This parameter is currently ignored as the method sorts the entire array.
      */
     public void sort(X[] array, int from, int to) {
-        if (array == null || array.length <= 1) return;
+        // NOTE the heap occupies array[from..to), so heap index k is array[from + k].
+        // This used to ignore from and to and work on array.length throughout,
+        // which meant that asking it to sort part of an array silently sorted
+        // all of it.
+        int n = to - from;
+        if (array == null || n <= 1) return;
 
         // XXX construction phase
-        buildMaxHeap(array);
+        buildMaxHeap(array, from, n);
 
         // XXX sort-down phase
         Helper<X> helper = getHelper();
         // TODO we over-count hits in the swap operation -- fix it.
-        for (int i = array.length - 1; i >= 1; i--) {
-            helper.swap(array, 0, i);
-            heapify(array, i, 0);
+        for (int i = n - 1; i >= 1; i--) {
+            helper.swap(array, from, from + i);
+            heapify(array, from, i, 0);
         }
     }
 
@@ -94,9 +99,9 @@ public class HeapSort<X extends Comparable<X>> extends SortWithComparableHelper<
      *              in place. The array should not be null, and its elements
      *              should support comparison.
      */
-    private void buildMaxHeap(X[] array) {
-        int half = array.length / 2;
-        for (int i = half; i >= 0; i--) heapify(array, array.length, i);
+    private void buildMaxHeap(X[] array, int from, int n) {
+        int half = n / 2;
+        for (int i = half; i >= 0; i--) heapify(array, from, n, i);
     }
 
     /**
@@ -111,17 +116,17 @@ public class HeapSort<X extends Comparable<X>> extends SortWithComparableHelper<
      * @param index    the index of the node potentially violating the max-heap property. The method ensures that the
      *                 subtree rooted at this index satisfies the max-heap property upon completion.
      */
-    private void heapify(X[] array, int heapSize, int index) {
+    private void heapify(X[] array, int from, int heapSize, int index) {
         // TODO we over-count hits in the swap operation -- fix it.
         Helper<X> helper = getHelper();
         final int left = index * 2 + 1;
         final int right = index * 2 + 2;
         int largest = index;
-        if (left < heapSize && helper.compare(array, largest, left) < 0) largest = left;
-        if (right < heapSize && helper.compare(array, largest, right) < 0) largest = right;
+        if (left < heapSize && helper.compare(array, from + largest, from + left) < 0) largest = left;
+        if (right < heapSize && helper.compare(array, from + largest, from + right) < 0) largest = right;
         if (index != largest) {
-            helper.swap(array, index, largest);
-            heapify(array, heapSize, largest);
+            helper.swap(array, from + index, from + largest);
+            heapify(array, from, heapSize, largest);
         }
     }
 

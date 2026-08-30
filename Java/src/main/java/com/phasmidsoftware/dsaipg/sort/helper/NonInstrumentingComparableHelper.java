@@ -60,11 +60,12 @@ public class NonInstrumentingComparableHelper<X extends Comparable<X>> extends B
     /**
      * Creates a new instance of {@code NonInstrumentingComparableHelper} based on the given description and size.
      *
-     * @param description a brief description for the helper instance being cloned.
-     * @param N           the number of elements relevant to the helper instance.
+     * @param description       a brief description for the helper instance being cloned.
+     * @param N                 the number of elements relevant to the helper instance.
+     * @param shareInstrumenter
      * @return a cloned instance of {@code Helper<X>}, specifically a {@code NonInstrumentingComparableHelper}.
      */
-    public Helper<X> clone(String description, int N) {
+    public Helper<X> clone(String description, int N, boolean shareInstrumenter) {
         return new NonInstrumentingComparableHelper<>(description, N, config);
     }
 
@@ -93,9 +94,8 @@ public class NonInstrumentingComparableHelper<X extends Comparable<X>> extends B
     @Override
     public void postProcess(X[] xs) {
         super.postProcess(xs);
-        super.postProcess(xs);
         if (checkSorted && !isSorted(xs))
-            throw new NonInstrumentingComparatorHelper.HelperException("NonInstrumentingComparatorHelper.postProcess: array is not sorted");
+            throw new HelperException("NonInstrumentingComparableHelper.postProcess: array is not sorted");
     }
 
     /**
@@ -120,7 +120,6 @@ public class NonInstrumentingComparableHelper<X extends Comparable<X>> extends B
      */
     public NonInstrumentingComparableHelper(String description, int n, Random random, Config config) {
         super(description, n, random, new InstrumenterDummy(), config);
-        checkSorted = config.getBoolean(HELPER, "checksorted");
     }
 
     /**
@@ -157,30 +156,5 @@ public class NonInstrumentingComparableHelper<X extends Comparable<X>> extends B
      * Keep track of the random array that was generated. This is available via the InstrumentedHelper class.
      */
     protected X[] randomArray;
-    private final boolean checkSorted;
-
-    /**
-     * A custom runtime exception used within the context of helper-related operations.
-     * HelperException is intended to signal specific runtime errors that occur within
-     * the functionalities of the NonInstrumentingComparableHelper class or its associated methods.
-     */
-    public static class HelperException extends RuntimeException {
-
-        public HelperException(String message) {
-            super(message);
-        }
-
-        public HelperException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public HelperException(Throwable cause) {
-            super(cause);
-        }
-
-        public HelperException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-            super(message, cause, enableSuppression, writableStackTrace);
-        }
-    }
 
 }

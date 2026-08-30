@@ -4,7 +4,8 @@ import com.phasmidsoftware.dsaipg.sort.helper.Helper;
 import com.phasmidsoftware.dsaipg.sort.helper.NonInstrumentingComparableHelper;
 import com.phasmidsoftware.dsaipg.sort.linearithmic.Partition;
 import com.phasmidsoftware.dsaipg.sort.linearithmic.Partitioner;
-import com.phasmidsoftware.dsaipg.sort.linearithmic.QuickSort_Basic;
+import com.phasmidsoftware.dsaipg.sort.linearithmic.QuickSort_Classic;
+import com.phasmidsoftware.dsaipg.util.general.ImplementationMissing;
 
 import java.util.List;
 
@@ -36,8 +37,8 @@ public class QuickSelect<X extends Comparable<X>> implements Select<X> {
         shuffle(xs);
         int from = 0, to = xs.length;
         // TO BE IMPLEMENTED  implement the logic for QuickSelect using the partition and createPartition methods below.
+         throw new ImplementationMissing();
         // END SOLUTION
-        return xs[k];
     }
 
     /**
@@ -48,7 +49,7 @@ public class QuickSelect<X extends Comparable<X>> implements Select<X> {
      */
     public QuickSelect() {
         Helper<X> helper = NonInstrumentingComparableHelper.getHelper(QuickSelect.class);
-        this.partitioner = new QuickSort_Basic.Partitioner_Basic<>(helper);
+        this.partitioner = new QuickSort_Classic.Partitioner_Basic<>(helper);
     }
 
     /**

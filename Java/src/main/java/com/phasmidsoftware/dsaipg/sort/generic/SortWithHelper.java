@@ -1,6 +1,7 @@
 package com.phasmidsoftware.dsaipg.sort.generic;
 
 import com.phasmidsoftware.dsaipg.sort.helper.Helper;
+import com.phasmidsoftware.dsaipg.sort.helper.HelperException;
 import com.phasmidsoftware.dsaipg.sort.helper.HelperFactory;
 import com.phasmidsoftware.dsaipg.util.config.Config;
 import com.phasmidsoftware.dsaipg.util.logging.LazyLogger;
@@ -52,15 +53,30 @@ public abstract class SortWithHelper<X> implements ProcessingSort<X> {
     }
 
     /**
-     * Method to post-process an array after sorting.
+     * Post-process the array, which for most Helpers means checking that it really
+     * is sorted.
      * <p>
-     * In this implementation, we delegate the post-processing to the helper.
+     * A {@link HelperException} means the Helper found something wrong with the
+     * result — in practice, that the array is not in order — and is rethrown. That
+     * is the whole point of the check: a sort which did not sort must not be
+     * allowed to look like a success.
+     * <p>
+     * Anything else came from the post-processing logic itself rather than from the
+     * sort, so it is logged and swallowed. Those are incidental and should not fail
+     * a run that sorted correctly.
+     * <p>
+     * NOTE this used to catch {@code Exception} and log everything, which made the
+     * check unreachable: every Helper's "array is not sorted" was reported at INFO
+     * level while the test passed. Whether the check ran at all was moot.
      *
-     * @param xs the array to be post-processed.
+     * @param xs the array which has been sorted.
+     * @throws HelperException if the Helper found the result unacceptable.
      */
     public void postProcess(X[] xs) {
         try {
             helper.postProcess(xs);
+        } catch (HelperException e) {
+            throw e;
         } catch (Exception e) {
             logger.info(getDescription() + ": postProcess: exception: " + e.getLocalizedMessage());
         }

@@ -22,12 +22,57 @@ import java.util.function.Consumer;
 public class DiGraph<V, E> extends AbstractGraph<V, Edge<V, E>> {
 
     /**
+     * Construct a DiGraph with an explicit source of randomness.
+     * <p>
+     * NOTE the Random matters because the adjacency bags iterate in a deliberately
+     * random order, so a traversal of this graph is only repeatable if the bags
+     * are. Without this constructor a DiGraph's bags each got their own unseeded
+     * Random, which is why DiGraphTest could not be made deterministic and why
+     * three DAGTest methods were commented out with "this fails because bags are
+     * iterated randomly now". DAG_Impl had it and DiGraph did not, for no reason
+     * beyond where it was first needed.
+     *
+     * @param random the source of randomness for the adjacency bags.
+     */
+    public DiGraph(Random random) {
+        this.random = random;
+    }
+
+    /**
+     * Construct a DiGraph with its own unseeded source of randomness.
+     */
+    public DiGraph() {
+        this(new Random());
+    }
+
+    /**
+     * Retrieve or create the adjacency bag for a vertex.
+     * <p>
+     * NOTE overridden so that the bag gets THIS graph's Random, which
+     * AbstractGraph knows nothing about.
+     *
+     * @param vertex the vertex.
+     * @return its adjacency bag, created if absent.
+     */
+    @Override
+    protected Bag<Edge<V, E>> getAdjacencyBag(V vertex) {
+        return adjacentEdges.computeIfAbsent(vertex, k -> new Bag_Array<>(random));
+    }
+
+    /**
      * Reverse the sense of this DAG.
      *
      * @return a DAG whose edges all point in the opposite direction to those in this DAG.
      */
     public DiGraph<V, E> reverse() {
-        DiGraph<V, E> result = new DiGraph<>();
+        DiGraph<V, E> result = new DiGraph<>(random);
+        // NOTE the vertices must be carried over first, and separately. Rebuilding
+        // from the edges alone loses any vertex with no edge at either end -- and
+        // since kernelDAG() walks reverse().reversePostOrderDFS(), such a vertex
+        // was then left out of the strongly-connected-component decomposition
+        // altogether, though it is a component of its own. A graph of one lone
+        // vertex produced no kernels at all.
+        for (V v : vertices()) result.getAdjacencyBag(v);
         for (Edge<V, E> e : edges()) result.addEdge(e.reverse());
         return result;
     }
@@ -51,7 +96,7 @@ public class DiGraph<V, E> extends AbstractGraph<V, Edge<V, E>> {
      * @return a {@code SizedIterable} containing all edges in the graph.
      */
     public SizedIterable<Edge<V, E>> edges() {
-        Bag<Edge<V, E>> result = new Bag_Array<>();
+        Bag<Edge<V, E>> result = new Bag_Array<>(random);
         for (Iterable<Edge<V, E>> b : adjacentEdges.values())
             for (Edge<V, E> e : b)
                 result.add(e);
@@ -67,7 +112,7 @@ public class DiGraph<V, E> extends AbstractGraph<V, Edge<V, E>> {
      */
     protected Stack<V> reversePostOrderDFS() {
         Stack<V> postOrderStack = new Stack_LinkedList<>();
-        new DepthFirstSearch(new TreeSet<>(), null, postOrderStack::push).innerDfs();
+        new DepthFirstSearch(new HashSet<>(), null, postOrderStack::push).innerDfs();
         return postOrderStack;
     }
 
@@ -83,7 +128,7 @@ public class DiGraph<V, E> extends AbstractGraph<V, Edge<V, E>> {
      */
     DAG<Kernel<V>, E> kernelDAG() {
         final DAG_Impl<Kernel<V>, E> result = new DAG_Impl<>(new Random(0L));
-        final TreeSet<V> marked = new TreeSet<>();
+        final Set<V> marked = new HashSet<>();
         for (V vertex : reverse().reversePostOrderDFS()) {
             Kernel<V> kernel = new Kernel<>();
             new DepthFirstSearch(marked, kernel::add, null).innerDfs(vertex);
@@ -106,6 +151,11 @@ public class DiGraph<V, E> extends AbstractGraph<V, Edge<V, E>> {
     }
 
     /**
+     * The source of randomness for the adjacency bags.
+     */
+    protected final Random random;
+
+    /**
      * This class implements Depth First Search (DFS) traversal for a graph.
      * It is designed to operate on a directed graph (DiGraph) and allows for both pre-order and post-order processing of vertices during the traversal.
      *
@@ -119,12 +169,12 @@ public class DiGraph<V, E> extends AbstractGraph<V, Edge<V, E>> {
          * The traversal allows optional pre-order and post-order Consumer functions to be
          * executed on vertices during traversal. Either one of the Consumers (pre or post) must be non-null.
          *
-         * @param marked a TreeSet to keep track of visited vertices to prevent cycles and revisits.
+         * @param marked a Set to keep track of visited vertices to prevent cycles and revisits.
          * @param pre    a Consumer function that is executed on each vertex before visiting its adjacent vertices (pre-order action).
          * @param post   a Consumer function that is executed on each vertex after all its adjacent vertices have been visited (post-order action).
          * @throws RuntimeException if both pre and post Consumers are null.
          */
-        public DepthFirstSearch(TreeSet<V> marked, Consumer<V> pre, Consumer<V> post) {
+        public DepthFirstSearch(Set<V> marked, Consumer<V> pre, Consumer<V> post) {
             this.pre = pre;
             this.post = post;
             this.marked = marked;
@@ -169,14 +219,14 @@ public class DiGraph<V, E> extends AbstractGraph<V, Edge<V, E>> {
             if (marked.contains(v)) return;
             marked.add(v);
             if (pre != null) pre.accept(v);
-            for (Edge<V, E> e : adjacentEdges.get(v)) {
+            for (Edge<V, E> e : adjacent(v)) {
                 V v1 = e.getTo();
                 if (!marked.contains(v1)) innerDfs(v1);
             }
             if (post != null) post.accept(v);
         }
 
-        private final TreeSet<V> marked;
+        private final Set<V> marked;
         private final Consumer<V> pre;
         private final Consumer<V> post;
     }

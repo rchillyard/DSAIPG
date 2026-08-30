@@ -1,0 +1,48 @@
+name: Java
+
+on:
+  push:
+    branches: [Fall2026, editionFirst]
+  pull_request:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: Java
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 21 because pom.xml sets both maven.compiler.source and target to 21.
+      # Temurin rather than the runner's default so the version is pinned rather
+      # than inherited from whatever the image happens to ship.
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Compile, main and test sources
+        run: mvn -B test-compile
+
+      # A plain `mvn test` is a meaningful gate now that CancelOnNotImplemented
+      # reports an unwritten exercise as skipped rather than failed. Before that
+      # roughly a quarter of the suite was red by design, so the build could only
+      # ever be red and said nothing at all.
+      #
+      # Expect around 1208 tests: all passing, about 300 skipped. A skip names
+      # the file and line of the exercise it is waiting for; a failure is a real
+      # problem.
+      - name: Test
+        run: mvn -B test
+
+      - name: Publish the test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: Java/target/surefire-reports/
+          if-no-files-found: warn

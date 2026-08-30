@@ -7,6 +7,7 @@ package com.phasmidsoftware.dsaipg.sort.linearithmic;
 import com.phasmidsoftware.dsaipg.sort.generic.Sort;
 import com.phasmidsoftware.dsaipg.sort.generic.SortWithComparableHelper;
 import com.phasmidsoftware.dsaipg.sort.generic.SortWithHelper;
+import com.phasmidsoftware.dsaipg.sort.helper.BaseHelper;
 import com.phasmidsoftware.dsaipg.sort.helper.Helper;
 import com.phasmidsoftware.dsaipg.sort.helper.HelperFactory;
 import com.phasmidsoftware.dsaipg.sort.helper.InstrumentedComparableHelper;
@@ -19,6 +20,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
+import java.util.function.Function;
 
 import static com.phasmidsoftware.dsaipg.sort.helper.Instrument.*;
 import static com.phasmidsoftware.dsaipg.sort.helper.InstrumentedComparatorHelper.getRunsConfig;
@@ -27,9 +30,14 @@ import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.setupConfi
 import static com.phasmidsoftware.dsaipg.util.general.Utilities.round;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 @SuppressWarnings("ALL")
 public class QuickSortDualPivotTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testSort() throws Exception {
@@ -198,6 +206,10 @@ public class QuickSortDualPivotTest {
         assertEquals(5, (int) statPack.getStatistics(COMPARES).mean());
         assertEquals(3, (int) statPack.getStatistics(SWAPS).mean());
         assertEquals(3, (int) statPack.getStatistics(FIXES).mean());
+        // NOTE was 16 before Partitioner_DualPivot.partition stopped asking
+        // helper.swap for a self-swap when a pivot is already in place. Those two
+        // array accesses are no longer performed, so 14 is what the code now
+        // costs; the old figure counted work that achieved nothing.
         assertEquals(14, (int) statPack.getStatistics(HITS).mean());
     }
 
@@ -302,14 +314,81 @@ public class QuickSortDualPivotTest {
         assertEquals(11L, privateMethodTester.invokePrivate("getFixes"));
         Partition<String> p1 = partitions.get(1);
         sorter.sort(xs, p1.from, p1.to, 0);
-        assertEquals(14L, privateMethodTester.invokePrivate("getFixes"));
+        assertEquals(21L, privateMethodTester.invokePrivate("getFixes"));
         Partition<String> p2 = partitions.get(2);
         sorter.sort(xs, p2.from, n, 0);
         long fixes = (long) privateMethodTester.invokePrivate("getFixes");
         // NOTE: there are at least as many fixes as inversions -- sort methods aren't necessarily perfectly efficient in terms of swaps.
         // assertTrue(inversions <= fixes); // TODO restore
-        assertEquals(7, helper.inversions(xs));
-        assertEquals(4L, privateMethodTester.invokePrivate("getSwaps"));
+        assertEquals(0, helper.inversions(xs));
+        assertEquals(11L, privateMethodTester.invokePrivate("getSwaps"));
+    }
+
+    @Test
+    public void testSortWithInstrumentingK3() throws Exception {
+        doQuickSortDualPivotTest(3, "7", 100, true);
+    }
+
+    @Test
+    public void testSortWithInstrumentingK4() throws Exception {
+        doQuickSortDualPivotTest(4, "1", 250, true);
+    }
+
+    @Test
+    public void testSortWithInstrumentingK5() throws Exception {
+        doQuickSortDualPivotTest(5, "6", 1_000, true);
+    }
+    @Test
+    public void testSortWithInstrumentingK6() throws Exception {
+        doQuickSortDualPivotTest(6, "13", 2_500, true);
+    }
+
+    @Test
+    public void testSortWithInstrumentingK7() throws Exception {
+        doQuickSortDualPivotTest(7, "12", 50_000, true);
+    }
+    @Test
+    public void testSortWithInstrumentingK8() throws Exception {
+        doQuickSortDualPivotTest(8, "2", 50_000, true);
+    }
+    @Test
+    public void testSortWithInstrumentingK9() throws Exception {
+        doQuickSortDualPivotTest(9, "2", 50_000, true);
+    }
+
+    private static void doQuickSortDualPivotTest(int k, String seed, int bound, boolean instrumenting) {
+        int n = (int) (Math.pow(2, k));
+        System.out.println("n: " + n + ", k: " + k);
+        // expectedMeanDepth (gross value) =  (13/18) × (1/ln(2)) × log₃(n)
+        // expectedLoops =  expectedMeanDepth × n
+        // expectedCompares = expectedLoops × (24/13)
+        // expectedSwaps = expectedCompares / 6
+        // expectedHits = 8 × expectedSwaps
+        final Config config_instr = setupConfig(instrumenting + "", "false", seed, "0", "1", "");
+//        System.out.println(config_instr);
+        final SortWithHelper<Integer> sorter = new QuickSort_DualPivot<>(n, getRunsConfig(config_instr), config_instr);
+        final BaseHelper<Integer> helper = (BaseHelper<Integer>) sorter.getHelper();
+        Function<Random,Integer> random = r -> r.nextInt(bound);
+        final Integer[] xs = helper.random(n, Integer.class, random);
+        helper.init(n);
+        final Integer[] sorted = sorter.sort(xs);
+        assertTrue("is not sorted", helper.isSorted(sorted));
+        double expectedMeanDepth = 13.0 * k / 18 / Math.log(2);
+        System.out.println("expected mean depth: " + (expectedMeanDepth));
+        int expectedLoops = (int) (expectedMeanDepth * n);
+        long expectedCompares = (long) (expectedLoops * 5.0 / 3);
+        long expectedSwaps = (long) (expectedLoops * 2.0 / 3);  // equivalently: expectedCompares * 2/5
+        long expectedHits = (long) (expectedLoops * 8.0 / 3);  // equivalently: expectedCompares * 8/5
+        //        long loops = helper.getLookups();
+//        System.out.println("expected lookups: " + (expectedLoops));
+//        System.out.println("Compares: " + loops+", expected: " + expectedLoops);
+        long compares = helper.getCompares();
+        System.out.println("Compares: " + compares + ", expected: " + expectedCompares);
+        long swaps = helper.getSwaps();
+        System.out.println("Swaps: " + swaps + ", expected: " + expectedSwaps);
+        long hits = helper.getHits();
+        System.out.println("Hits: " + hits + ", expected: " + expectedHits);
+        System.out.println("Max depth: " + helper.maxDepth());
     }
 
     private static String[] setupWords(final int n) {

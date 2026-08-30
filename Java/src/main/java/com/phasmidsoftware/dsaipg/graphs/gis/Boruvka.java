@@ -74,6 +74,13 @@ public class Boruvka<V, X extends Comparable<X> & Sequenced> extends MST<V, X> {
         this.mst = new ArrayList<>();  // Initialize mst to an empty list.
         try {
             mst = runBoruvka();
+        } catch (com.phasmidsoftware.dsaipg.util.general.ImplementationMissing e) {
+            // An unwritten exercise must not be dressed up as an empty MST. Swallowing
+            // it here left the student tree reporting three tunnels tests as genuine
+            // failures -- "the MST is empty" -- when the real answer was that
+            // UF_HWQUPC.find has yet to be written. Rethrowing lets
+            // CancelOnNotImplemented report them as skipped, which is the truth.
+            throw e;
         } catch (Exception e) {
             e.printStackTrace(); // TODO log this
         }

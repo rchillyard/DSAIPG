@@ -7,8 +7,13 @@ package com.phasmidsoftware.dsaipg.misc.functions;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class NewtonTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testNewton1() {

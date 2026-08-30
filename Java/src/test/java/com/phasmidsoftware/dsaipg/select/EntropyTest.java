@@ -7,8 +7,13 @@ import java.util.Random;
 import static com.phasmidsoftware.dsaipg.select.Entropy.log2;
 import static com.phasmidsoftware.dsaipg.select.Shuffle.calculateNBits;
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class EntropyTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testGetRandomWithSeed() {

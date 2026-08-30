@@ -29,8 +29,7 @@ public class Queue_Elements<Item> implements SizedIterable<Item>, Queue<Item> {
      */
     public void offer(Item item) {
         // TO BE IMPLEMENTED 
-
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**
@@ -44,8 +43,7 @@ public class Queue_Elements<Item> implements SizedIterable<Item>, Queue<Item> {
         if (isEmpty()) return null;
         else {
             // TO BE IMPLEMENTED 
-             return null;
-            // END SOLUTION
+                        throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         }
     }
 

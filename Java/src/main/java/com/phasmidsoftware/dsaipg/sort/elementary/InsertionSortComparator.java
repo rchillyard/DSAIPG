@@ -66,7 +66,7 @@ public class InsertionSortComparator<X> extends SortWithHelper<X> {
         final Helper<X> helper = getHelper();
 
         // TO BE IMPLEMENTED 
-                throw new RuntimeException("implementation missing");
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     public static final String DESCRIPTION = "Insertion sort";

@@ -4,8 +4,13 @@ import com.phasmidsoftware.dsaipg.util.PrivateMethodTester;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class FibonacciTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
     /**
      * Test method for Fibonacci
      */

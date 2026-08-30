@@ -94,9 +94,12 @@ public class HuffmanCoding {
             long val = code.value;
             int len = code.length;
             if (available < len) {
-                int shiftVal = 64 - len + available;
-                result = new Code(val << shiftVal >> shiftVal, len - available);
-                val = val >> (len - available);
+                int carried = len - available;
+                // NOTE a Code value is unsigned, so mask the carried-over bits out rather
+                // than shifting them left and back: >> would sign-extend a remainder whose
+                // top bit is set, and set every bit above it in the next Value.
+                result = new Code(val & ((1L << carried) - 1), carried);
+                val = val >> carried;
                 len = available;
             }
             encode(val, len);
@@ -169,8 +172,7 @@ public class HuffmanCoding {
     static class Code {
         public Code add(int x) {
             // TO BE IMPLEMENTED 
-             return null;
-            // END SOLUTION
+                        throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         }
 
         @Override
@@ -219,9 +221,11 @@ public class HuffmanCoding {
                     throw new RuntimeException("unknown symbol: " + symbol);
                 Code result = current.encode(code);
                 if (result != null) {
+                    // NOTE the new Value receives the remainder, which is the part of code
+                    // that did not fit. The bits that did fit are already in the closed Value.
                     values.add(current);
                     current = new Value(0L);
-                    current.encode(code);
+                    current.encode(result);
                 }
             }
             current.close();
@@ -235,7 +239,13 @@ public class HuffmanCoding {
         /**
          * Retrieves the Huffman-encoded {@code Code} associated with the given key.
          * If no code is found for the provided key, the method attempts to retrieve
-         * the code by appending a zero-width joiner (U+FE0F) character to the key.
+         * the code by appending a variation selector (U+FE0F) to the key, which is
+         * how the four suit symbols are held in the table.
+         * <p>
+         * NOTE this makes encoding many-to-one: "S" and "S️" encode alike. The
+         * decoder emits whichever form the tree holds, so a round trip returns the
+         * suit symbols with their selector even when the input lacked it. Compare
+         * with the selector stripped, as {@code HuffmanCodingTest} does.
          *
          * @param key the symbol for which to retrieve the corresponding {@code Code}
          * @return the {@code Code} associated with the given key, or {@code null}
@@ -279,8 +289,7 @@ public class HuffmanCoding {
         private Map<String, Code> getEncoder(Node node) {
             Map<String, Code> result = new HashMap<>();
             // TO BE IMPLEMENTED 
-            // END SOLUTION
-            return result;
+                        throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         }
 
         /**
@@ -334,9 +343,8 @@ public class HuffmanCoding {
          *         or {@code null} if the decoding process encounters an invalid state
          */
         private Node decode(StringBuilder stringBuilder, Node state, long x) {
-            // TO BE IMPLEMENTED 
-            // END SOLUTION
-            return state;
+            // TO BE IMPLEMENTED  : consume all 64 bits of x, one per step down the tree, emitting a symbol at each leaf
+                        throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         }
 
         /**
@@ -363,6 +371,13 @@ public class HuffmanCoding {
     public static class Node implements Comparable<Node> {
         /**
          * Compares this Node with the specified Node for order based on their frequency values.
+         * <p>
+         * NOTE frequency alone, so equal-frequency nodes are ordered arbitrarily by the
+         * PriorityQueue. Every resulting code is optimal and they all have the same expected
+         * length, but which of two equally common symbols gets the shorter code is not
+         * determined. Do not expect a particular codebook, and do not compare an encoding
+         * against a stored one. The Python port breaks the tie by insertion order, so its
+         * tree is reproducible and differs from this one.
          *
          * @param o the Node to be compared with this Node.
          * @return a negative integer, zero, or a positive integer as this Node's frequency
@@ -398,7 +413,7 @@ public class HuffmanCoding {
          */
         public void dfs(BiFunction<Object, Integer, Object> depthFunction, BiConsumer<Node, Object> consumer, Object depthIndicator, Integer branch) {
             // TO BE IMPLEMENTED 
-            // END SOLUTION
+                        throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         }
 
         /**

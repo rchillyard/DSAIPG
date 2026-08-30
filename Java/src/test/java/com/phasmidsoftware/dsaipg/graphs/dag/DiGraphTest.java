@@ -5,12 +5,17 @@ import com.phasmidsoftware.dsaipg.adt.bqs.Stack;
 import com.phasmidsoftware.dsaipg.util.iteration.SizedIterable;
 import org.junit.Test;
 
-import java.util.Iterator;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class DiGraphTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testVertices() {
@@ -39,6 +44,35 @@ public class DiGraphTest {
         assertEquals(1, edges.size());
     }
 
+    /**
+     * A vertex with no edge at either end must survive reverse(), and must appear
+     * in the kernel DAG as a component of its own.
+     * <p>
+     * Rebuilding from the edges alone would lose it — and since kernelDAG() walks
+     * reverse().reversePostOrderDFS(), it would then be missing from the
+     * strongly-connected-component decomposition too, leaving a graph of one lone
+     * vertex with no kernels at all. Worth asserting on its own, because every
+     * other test graph here has an edge at every vertex.
+     */
+    @Test
+    public void testReverseKeepsAnIsolatedVertex() {
+        DiGraph<String, Integer> graph = new DiGraph<>();
+        graph.addEdge(new Edge<>("A", "B", 1));
+        graph.addVertex("Z");
+        assertEquals(3, graph.vertices().size());
+        assertEquals(3, graph.reverse().vertices().size());
+        assertEquals(1, graph.reverse().edges().size());
+    }
+
+    @Test
+    public void testKernelDAGOfASingleIsolatedVertex() {
+        DiGraph<String, Integer> graph = new DiGraph<>();
+        graph.addVertex("A");
+        final SizedIterable<DiGraph.Kernel<String>> kernels = graph.kernelDAG().vertices();
+        assertEquals(1, kernels.size());
+        assertEquals("[A]", kernels.iterator().next().toString());
+    }
+
     @Test
     public void testKernelDAG() {
         DiGraph<String, Integer> graph = creatTestGraph();
@@ -55,23 +89,49 @@ public class DiGraphTest {
         }
     }
 
+    /**
+     * Reinstated. Five of this test's six assertions were commented out and it
+     * popped five values into locals it never looked at, so it checked only that
+     * the first vertex was "A" and that six things came off the stack.
+     * <p>
+     * The commented assertions cannot come back as they were: this graph has two
+     * cycles, so its reverse post-order genuinely depends on which edge the bag
+     * hands out first, and pinning one permutation would be asserting an accident.
+     * What is true regardless is asserted instead.
+     * <p>
+     * "A" first IS sound, and worth keeping: everything is reachable from A and A
+     * is the first vertex the search starts from, so A finishes last and therefore
+     * pops first, whatever order the bags choose.
+     */
     @Test
     public void testReversePostOrderDFS1() throws BQSException {
-        // FIXME
         DiGraph<String, Integer> graph = creatTestGraph();
         final Stack<String> reversePostOrder = graph.reversePostOrderDFS();
-        assertEquals("A", reversePostOrder.pop());
-        String pop1 = reversePostOrder.pop();
-        String pop2 = reversePostOrder.pop();
-        String pop3 = reversePostOrder.pop();
-        String pop4 = reversePostOrder.pop();
-        String pop5 = reversePostOrder.pop();
-        assertTrue(reversePostOrder.isEmpty());
-//        assertEquals("D", pop1);
-//        assertEquals("F", pop2);
-//        assertEquals("E", pop3);
-//        assertEquals("B", pop4);
-//        assertEquals("C", pop5);
+        assertEquals("everything is reachable from A, so A finishes last and pops first",
+                "A", reversePostOrder.pop());
+        final List<String> rest = new ArrayList<>();
+        while (!reversePostOrder.isEmpty()) rest.add(reversePostOrder.pop());
+        Collections.sort(rest);
+        assertEquals("every other vertex appears exactly once",
+                List.of("B", "C", "D", "E", "F"), rest);
+    }
+
+    /**
+     * The order within the run is not fixed, but the SET of vertices is, and so is
+     * the fact that nothing is visited twice. That holds for any bag ordering.
+     */
+    @Test
+    public void reversePostOrderVisitsEveryVertexOnce() throws BQSException {
+        for (long seed = 0; seed < 5; seed++) {
+            DiGraph<String, Integer> graph = creatTestGraph(new Random(seed));
+            final Stack<String> stack = graph.reversePostOrderDFS();
+            final List<String> popped = new ArrayList<>();
+            while (!stack.isEmpty()) popped.add(stack.pop());
+            assertEquals("seed " + seed + ": A always pops first", "A", popped.get(0));
+            final List<String> sorted = new ArrayList<>(popped);
+            Collections.sort(sorted);
+            assertEquals("seed " + seed, List.of("A", "B", "C", "D", "E", "F"), sorted);
+        }
     }
 
     @Test
@@ -88,7 +148,11 @@ public class DiGraphTest {
     }
 
     private DiGraph<String, Integer> creatTestGraph() {
-        DiGraph<String, Integer> graph = new DiGraph<>();
+        return creatTestGraph(new Random());
+    }
+
+    private DiGraph<String, Integer> creatTestGraph(Random random) {
+        DiGraph<String, Integer> graph = new DiGraph<>(random);
 //         /------->---------D------->------F
 //        A--->B           ^  |
 //         <-   |          | ->
@@ -102,6 +166,29 @@ public class DiGraphTest {
         graph.addEdge(new Edge<>("E", "D", 6));
         graph.addEdge(new Edge<>("D", "F", 7));
         return graph;
+    }
+
+    /**
+     * The depth-first search used a TreeSet for its marked vertices, which
+     * silently required V to be Comparable — a constraint the type does not
+     * express, so a perfectly ordinary vertex type failed at runtime with a
+     * ClassCastException. It is a HashSet now, which asks only for equals and
+     * hashCode.
+     */
+    @Test
+    public void aVertexTypeNeedNotBeComparable() {
+        record Point(int x, int y) {
+        }
+        DiGraph<Point, Integer> graph = new DiGraph<>();
+        Point a = new Point(0, 0), b = new Point(1, 1), c = new Point(2, 2);
+        graph.addEdge(new Edge<>(a, b, 1));
+        graph.addEdge(new Edge<>(b, c, 2));
+        assertEquals(3, graph.vertices().size());
+        assertEquals(3, graph.kernelDAG().vertices().size());
+        // Stack has no size(), so count what comes off it.
+        int popped = 0;
+        for (Point ignored : graph.reversePostOrderDFS()) popped++;
+        assertEquals(3, popped);
     }
 
     @Test

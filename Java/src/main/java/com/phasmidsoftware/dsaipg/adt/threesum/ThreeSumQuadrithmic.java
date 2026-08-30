@@ -58,8 +58,7 @@ class ThreeSumQuadrithmic implements ThreeSum {
      */
     Triple getTriple(int i, int j) {
         // TO BE IMPLEMENTED  : use binary search to find the third element
-        // END SOLUTION
-        return null;
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     private final int[] a;

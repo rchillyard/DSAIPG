@@ -6,8 +6,13 @@ import org.junit.Test;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.setupConfig;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class HelperTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
     final Config config = setupConfig("true", "false", "0", "1", "", "");
 
     final BaseComparatorHelper<String> helper = new InstrumentedComparatorHelper<>("test", String::compareToIgnoreCase, 20, config);

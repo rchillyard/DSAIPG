@@ -161,7 +161,6 @@ public class InstrumenterDummy implements Instrument {
      * Intended for use in scenarios where instrumentation or statistical monitoring is required.
      */
     public void incrementLookups(long n) {
-
     }
 
     /**

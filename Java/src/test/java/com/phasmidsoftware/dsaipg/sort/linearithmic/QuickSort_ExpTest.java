@@ -25,9 +25,14 @@ import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.setupConfi
 import static com.phasmidsoftware.dsaipg.util.general.Utilities.round;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 @SuppressWarnings("ALL")
 public class QuickSort_ExpTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testSort1() throws Exception {

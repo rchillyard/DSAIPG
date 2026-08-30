@@ -1,6 +1,6 @@
 # Compiled class file
 *.class
-/target/
+**/target/
 
 # Log filea
 logs/
@@ -22,3 +22,13 @@ bin/*
 *.kml
 
 Java/src/test/java/edu/neu/coe/info6205/admin/TicketTest.java
+
+# Python files
+*.pyc
+**/__pycache__/
+*.pyo
+**/.venv/
+**/.pytest_cache/
+**/.ruff_cache
+
+.DS_Store

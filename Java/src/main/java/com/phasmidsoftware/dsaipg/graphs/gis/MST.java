@@ -20,6 +20,11 @@ import java.util.Iterator;
  */
 public abstract class MST<V, X extends Comparable<X> & Sequenced> implements Iterable<Edge<V, X>> {
     public MST() {
+        // NOTE an empty tree, not null. If a subclass constructor fails to assign
+        // this -- because an exercise it depends on is unwritten, say -- the
+        // inherited iterator() should report no edges rather than throw a
+        // NullPointerException on the way to explaining nothing.
+        this.mst = new ArrayList<>();
     }
 
     /**

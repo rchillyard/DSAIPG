@@ -34,7 +34,7 @@ public class Instrumenter implements Instrument {
      * @return the {@code StatPack} instance containing the tracked statistical data.
      */
     public StatPack getStatPack() {
-        return statPack;
+        return statPack!=null ? statPack : StatPack.empty();
     }
 
     /**
@@ -217,6 +217,18 @@ public class Instrumenter implements Instrument {
      */
     public Instrumenter(Config config) {
         this(config.getBoolean(INSTRUMENTING, COPIES), config.getBoolean(INSTRUMENTING, SWAPS), config.getBoolean(INSTRUMENTING, COMPARES), config.getBoolean(INSTRUMENTING, FIXES), config.getBoolean(INSTRUMENTING, HITS), config.getBoolean(INSTRUMENTING, LOOKUPS), config.getBoolean(INSTRUMENTING, SHOW_STATS));
+    }
+
+    @Override
+    public String toString() {
+        return "Instrumenter{" +
+                "compares=" + compares +
+                ", copies=" + copies +
+                ", fixes=" + fixes +
+                ", hits=" + hits +
+                ", lookups=" + lookups +
+                ", swaps=" + swaps +
+                '}';
     }
 
     private void resetCounters() {

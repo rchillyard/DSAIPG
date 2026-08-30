@@ -14,8 +14,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import static junit.framework.TestCase.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class ComparableTupleTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     /**
      * Test methods for ComparableTuple

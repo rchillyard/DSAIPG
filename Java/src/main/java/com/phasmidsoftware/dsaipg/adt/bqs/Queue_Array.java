@@ -1,6 +1,7 @@
 package com.phasmidsoftware.dsaipg.adt.bqs;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Iterator;
 
 /**
@@ -51,7 +52,10 @@ public class Queue_Array<Item> implements Queue<Item> {
     public Iterator<Item> iterator() {
         assert items != null; // Should be not-null any time after construction.
         // NOTE: there is no Java-defined array iterator.
-        return Arrays.asList(asArray()).iterator();
+        // The cast is safe here for the same reason as in Bag_Array.iterator: Item
+        // is erased inside this class, so it compiles to nothing.
+        @SuppressWarnings("unchecked") List<Item> list = (List<Item>) Arrays.asList(asArray());
+        return list.iterator();
     }
 
     /**
@@ -68,15 +72,15 @@ public class Queue_Array<Item> implements Queue<Item> {
     /**
      * Package-scope method to get the contents of this Queue_Array as an array.
      * <p>
-     * NOTE: Internally, Object[] can be cast as an Item[] but it is not valid externally.
-     * Hence, the arraycopy.
-     * This is a quirk of Java Generics.
+     * NOTE: Object[], not Item[]. See Bag_Array.asArray for why: Item is erased,
+     * so the array really is an Object[] however it is declared, and declaring it
+     * Item[] promises a type no caller can actually use.
      *
      * @return this Queue as an array.
      */
-    Item[] asArray() {
+    Object[] asArray() {
         int count = size();
-        @SuppressWarnings("unchecked") Item[] items = (Item[]) new Object[count];
+        Object[] items = new Object[count];
         if (straddle() && !isEmpty()) {
             int l = n - i;
             System.arraycopy(this.items, i, items, 0, l);

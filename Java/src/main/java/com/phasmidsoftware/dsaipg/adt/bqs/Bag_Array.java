@@ -4,6 +4,7 @@
 
 package com.phasmidsoftware.dsaipg.adt.bqs;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
@@ -25,8 +26,7 @@ public class Bag_Array<Item> implements Bag<Item> {
      * @param random a random source.
      */
     public Bag_Array(Random random) {
-        //noinspection unchecked
-        grow((Item[]) new Object[0], 32);
+        allocate(INITIAL_CAPACITY);
         this.random = random;
     }
 
@@ -37,6 +37,32 @@ public class Bag_Array<Item> implements Bag<Item> {
      */
     public Bag_Array() {
         this(new Random());
+    }
+
+    /**
+     * Construct a Bag_Array containing the given items.
+     * <p>
+     * NOTE this deliberately does not call {@link #growFrom}: it allocates storage
+     * large enough at the outset. That matters because growFrom is an exercise. A
+     * bag which could not even be constructed until the exercise was written made
+     * every test that merely uses a bag depend on it -- of the tests blocked that
+     * way, two thirds were testing graphs and classification sorts, not bags.
+     * Now only genuine growth, past the initial capacity, needs the exercise.
+     * <p>
+     * The new bag has room to spare, so adding one more item does not immediately
+     * force a growth.
+     *
+     * @param items the items to put in the bag.
+     * @param <T>   the item type.
+     * @return a Bag_Array containing exactly those items.
+     */
+    @SafeVarargs
+    public static <T> Bag_Array<T> of(T... items) {
+        Bag_Array<T> result = new Bag_Array<>();
+        if (items.length * 2 > INITIAL_CAPACITY) result.allocate(items.length * 2);
+        System.arraycopy(items, 0, result.items, 0, items.length);
+        result.count = items.length;
+        return result;
     }
 
     /**
@@ -85,8 +111,14 @@ public class Bag_Array<Item> implements Bag<Item> {
      * @return true if the item is found in the bag, otherwise false
      */
     public boolean contains(Item item) {
-        for (Item i : items) {
-            if (i != null && i.equals(item))
+        // NOTE the first count entries only. Scanning the whole backing array
+        // meant that after clear(), which resets count and nothing else, this
+        // still answered true for items the bag no longer held -- while
+        // multiplicity, which happens to start with an isEmpty() guard, answered
+        // zero. Two methods disagreeing about the same question.
+        for (int i = 0; i < count; i++) {
+            Item x = items[i];
+            if (x != null && x.equals(item))
                 return true;
         }
         return false;
@@ -100,9 +132,9 @@ public class Bag_Array<Item> implements Bag<Item> {
      */
     public int multiplicity(Item item) {
         int result = 0;
-        if (isEmpty()) return 0;
-        for (Item i : items) {
-            if (i != null && i.equals(item))
+        for (int i = 0; i < count; i++) {
+            Item x = items[i];
+            if (x != null && x.equals(item))
                 result++;
         }
         return result;
@@ -115,22 +147,62 @@ public class Bag_Array<Item> implements Bag<Item> {
      */
     public Iterator<Item> iterator() {
         assert items != null; // Should be not-null any time after construction.
-        return new UnorderedIterator<>(asArray(), random);
+        // NOTE the cast is safe HERE and nowhere else. Inside a generic class Item
+        // erases to Object, so this compiles to nothing at all; it is only at a
+        // call site which knows what Item is that the compiler emits a checkcast
+        // and the Object[] is caught out. That asymmetry is what the old asArray
+        // javadoc was reaching for.
+        @SuppressWarnings("unchecked") Item[] typed = (Item[]) asArray();
+        return new UnorderedIterator<>(typed, random);
     }
 
     /**
      * Method to get this Bag as an array.
      * <p>
-     * Internally, Object[] can be cast as an Item[] but it is not valid externally.
-     * Hence, the arraycopy.
-     * This is a quirk of Java Generics.
+     * NOTE Object[], not Item[], and deliberately. Item is erased, so there is
+     * nothing at runtime to say what kind of array to allocate; the array really
+     * is an Object[] however it is declared. Declaring it Item[] promised
+     * something unobtainable — every use of the result at that type threw
+     * ClassCastException, including {@code asArray().length} and a for-each with
+     * the element type, because the compiler inserts a checkcast wherever it knows
+     * what Item is. Only widening to Object[] worked, which is why every caller
+     * already does. The old javadoc credited the arraycopy with fixing this; it
+     * did not, since it copied into another Object[].
+     * <p>
+     * {@link java.util.Collection#toArray()} returns Object[] for the same reason,
+     * and offers {@link java.util.Collection#toArray(Object[])} for a caller who
+     * has somewhere typed to put the result. Add the equivalent here if one is
+     * ever wanted.
      *
      * @return this Bag as an array.
      */
-    public Item[] asArray() {
-        @SuppressWarnings("unchecked") Item[] items = (Item[]) new Object[count];
-        System.arraycopy(this.items, 0, items, 0, count);
-        return items;
+    public Object[] asArray() {
+        Object[] result = new Object[count];
+        System.arraycopy(items, 0, result, 0, count);
+        return result;
+    }
+
+    /**
+     * Method to get this Bag as an array of the supplied array's component type.
+     * <p>
+     * Follows {@link java.util.Collection#toArray(Object[])}: the supplied array is
+     * filled and returned if it is big enough, and the element just past the
+     * contents is set to null so a caller can find the end; otherwise a new array
+     * of the same component type is allocated. Passing {@code new Item[0]} is the
+     * usual idiom and always allocates.
+     *
+     * @param a   an array of the desired component type.
+     * @param <T> the component type.
+     * @return this Bag as an array of T.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T[] asArray(T[] a) {
+        T[] result = a.length >= count
+                ? a
+                : (T[]) Array.newInstance(a.getClass().getComponentType(), count);
+        System.arraycopy(items, 0, result, 0, count);
+        if (result.length > count) result[count] = null;
+        return result;
     }
 
     @Override
@@ -153,13 +225,29 @@ public class Bag_Array<Item> implements Bag<Item> {
     }
 
     /**
+     * Allocate fresh, empty storage of the given size, discarding whatever was
+     * there. Used at construction, where there is nothing to copy.
+     *
+     * @param size the size of the new array.
+     */
+    private void allocate(int size) {
+        //noinspection unchecked
+        items = (Item[]) new Object[size];
+    }
+
+    /**
      * Retrieves the current capacity of the internal storage for the bag.
      * The capacity is defined as the size of the array used to store items.
      * It represents the maximum number of items the bag can hold without resizing.
      *
+     * NOTE package-private rather than private so that BagTest can assert that
+     * growth DOUBLES the capacity. That property cannot be observed from outside:
+     * an implementation which grew by a constant instead would satisfy every other
+     * test, while making n additions cost O(n^2) rather than amortized O(n).
+     *
      * @return the capacity of the internal storage.
      */
-    private int capacity() {
+    int capacity() {
         assert items != null; // Should be not-null any time after construction.
         return items.length;
     }
@@ -179,14 +267,26 @@ public class Bag_Array<Item> implements Bag<Item> {
      * copies all the elements of from into the start of the resulting array,
      * then returns the result.
      *
+     * NOTE package-private rather than private so that BagTest can test this
+     * contract directly. Testing it only through {@code add} is not enough: add
+     * always calls {@code grow(items, 2 * capacity())}, where the source is the
+     * whole backing array, so an implementation returning an array of
+     * {@code from.length * 2} is accidentally right at every call site while
+     * ignoring the size it was given.
+     *
      * @param from the source array
      * @param size the size of the new array
      */
-    private static <T> T[] growFrom(T[] from, int size) {
+    static <T> T[] growFrom(T[] from, int size) {
         // TO BE IMPLEMENTED  grow array and copy
-         return null;
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
+
+    /**
+     * The capacity a bag starts with. Growth doubles this, and only that doubling
+     * goes through growFrom.
+     */
+    private static final int INITIAL_CAPACITY = 32;
 
     private final Random random;
 

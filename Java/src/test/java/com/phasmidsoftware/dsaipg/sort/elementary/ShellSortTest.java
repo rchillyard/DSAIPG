@@ -20,9 +20,14 @@ import java.io.IOException;
 import static com.phasmidsoftware.dsaipg.sort.helper.Instrument.*;
 import static com.phasmidsoftware.dsaipg.util.config.ConfigTest.INVERSIONS;
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 @SuppressWarnings("ALL")
 public class ShellSortTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @BeforeClass
     public static void setupClass() {
@@ -196,6 +201,36 @@ public class ShellSortTest {
         ShellSort.doRandomDoubleShellSort(3, 1000, 10, Config.load());
     }
 
+    @Test
+    public void doShellSortBookExampleTest() throws IOException {
+        final Config config = Config.load(getClass());
+//        Character[] xs = new Character[]{'S', 'O', 'R', 'T', 'E', 'X', 'A', 'M', 'P', 'L', 'E'};
+        char[] zs1 = "SORTEXAMPLE".toCharArray();
+        char[] zs2 = "MORTEXASPLE".toCharArray();
+        char[] zs3 = "MOLTEXASPRE".toCharArray();
+        char[] zs4 = "MOLEEXASPRT".toCharArray();
+        char[] zs5 = "EOLMEXASPRT".toCharArray();
+        char[] zs6 = "EELMOXASPRT".toCharArray();
+        char[] zs7 = "AELEOXMSPRT".toCharArray();
+        char[] zs8 = "AELEOPMSXRT".toCharArray();
+//        char[] zs = "AELEOPMSXRT".toCharArray();
+        Character[] xs = new Character[11];
+        for (int i = 0; i < xs.length; i++) {xs[i] = zs8[i];}
+        int N = xs.length;
+        int gapSequence = 3;
+        InstrumentedComparatorHelper<Character> helper = new InstrumentedComparableHelper<>("ShellSort", N, config);
+        helper.init(N);
+        ShellSortTest.showInversions(helper, xs);
+        helper.preProcess(xs);
+        ShellSort<Character> sorter = new ShellSort<>(gapSequence, helper);
+        sorter.setShellFunction((h, ys) -> ShellSortTest.showInversions(h, ys));
+        sorter.mutatingSort(xs);
+        helper.postProcess(xs);
+        assertTrue(helper.isSorted(xs));
+        showStatistics(helper);
+        helper.close();
+    }
+
     private void doShellSortTest(int N, final int gapSequence) throws IOException {
         final Config config = Config.load(getClass());
         InstrumentedComparatorHelper<Integer> helper = new InstrumentedComparableHelper<>("ShellSort", N, config);
@@ -203,7 +238,7 @@ public class ShellSortTest {
         helper.init(N);
         helper.preProcess(xs);
         ShellSort<Integer> sorter = new ShellSort<>(gapSequence, helper);
-        sorter.setShellFunction((h) -> showInversions(h));
+        sorter.setShellFunction((h, ys) -> ShellSortTest.showInversions(h, ys));
         sorter.mutatingSort(xs);
         helper.postProcess(xs);
         assertTrue(helper.isSorted(xs));
@@ -222,14 +257,15 @@ public class ShellSortTest {
         }
     }
 
-    private void showInversions(AutoCloseable helper) {
+    static <X> Void showInversions(AutoCloseable helper, X[] xs) {
         if (InstrumentedComparableHelper.class.isAssignableFrom(helper.getClass())) {
-            InstrumentedComparatorHelper<Integer> instrumentedHelper = (InstrumentedComparatorHelper<Integer>) helper;
+            InstrumentedComparatorHelper<X> instrumentedHelper = (InstrumentedComparatorHelper<X>) helper;
             // TODO this doesn't really make sense.
-            System.out.println("inversions: " + instrumentedHelper.inversions(instrumentedHelper.getRandomArray()));
+            System.out.println("inversions: " + instrumentedHelper.inversions(xs));
             System.out.println("compares: " + instrumentedHelper.getCompares());
             System.out.println("swaps: " + instrumentedHelper.getSwaps());
         }
+        return null;
     }
 
     final static LazyLogger logger = new LazyLogger(ShellSort.class);

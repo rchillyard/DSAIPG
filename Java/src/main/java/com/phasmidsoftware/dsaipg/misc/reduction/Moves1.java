@@ -25,10 +25,21 @@ public class Moves1 implements Moves {
      * @return true if the target point (tx, ty) can be reached from the given point p, otherwise false
      */
     public boolean valid(Point p) {
-        if (p.x == tx && p.y == ty) return true;
-        //noinspection SimplifiableIfStatement
-        if (p.x > tx || p.y > ty) return false;
-        return valid(p.x, p.x + p.y) || valid(p.x + p.y, p.y);
+        // The base case for failure is what makes this terminate at all. Both
+        // coordinates only ever grow, so once either has passed the target that
+        // path is dead. Without inBounds the search walks q1, q1, q1, ... for
+        // ever, never reaching its second recursive call, and can only ever
+        // return true -- and then only if the target happens to lie on that one
+        // path.
+        return inBounds(p) && (p.equals(t) || valid(move(p, true)) || valid(move(p, false)));
+    }
+
+    /**
+     * @param p a point.
+     * @return true if neither coordinate has passed the target's.
+     */
+    private boolean inBounds(Point p) {
+        return p.x <= t.x && p.y <= t.y;
     }
 
     /**
@@ -39,24 +50,15 @@ public class Moves1 implements Moves {
      * @return a new Point representing the result of the move
      */
     public Point move(Point p, boolean which) {
-        return null;
+        return which ? new Point(p.x, p.x + p.y) : new Point(p.x + p.y, p.y);
     }
 
     /**
-     * Represents the target x-coordinate of the desired point (tx, ty) in the context of
-     * solving problems involving reaching a specific point through a series of valid moves.
-     * A valid move typically involves adding the x-coordinate and y-coordinate of the
-     * current point to compute the next point.
-     * <p>
-     * This variable is immutable and serves as one of the key components in determining
-     * the feasibility of reaching the target point from a given starting point.
+     * The point to be reached. Immutable, and the only thing the search is
+     * measured against: a point is in bounds while neither coordinate has passed
+     * the target's, and the answer is found when both are equal to it.
      */
-    private final int tx;
-    /**
-     * Represents the y-coordinate of the target point to be reached.
-     * This value is constant and initialized at the time of object creation.
-     */
-    private final int ty;
+    private final Point t;
 
     /**
      * Constructs an instance of the Moves1 class with the specified target coordinates.
@@ -65,7 +67,13 @@ public class Moves1 implements Moves {
      * @param ty the y-coordinate of the target point
      */
     public Moves1(int tx, int ty) {
-        this.tx = tx;
-        this.ty = ty;
+        this(new Point(tx, ty));
+    }
+
+    /**
+     * @param t the target.
+     */
+    public Moves1(Point t) {
+        this.t = t;
     }
 }

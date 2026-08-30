@@ -54,13 +54,16 @@ public class Equable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Equable equable = (Equable) o;
+        // NOTE the length check. The loop walks THIS one's elements, so without it a
+        // shorter Equable matching a prefix of a longer one ran out and returned
+        // true, while the longer one compared with the shorter returned false.
+        // equals was not symmetric, which the Object contract requires and which
+        // every hash-based collection relies on.
+        if (elements.size() != equable.elements.size()) return false;
         Iterator<?> thisIterator = elements.iterator();
         Iterator<?> thatIterator = equable.elements.iterator();
         while (thisIterator.hasNext())
-            if (thatIterator.hasNext()) {
-                if (!thisIterator.next().equals(thatIterator.next())) return false;
-            } else
-                return false;
+            if (!thisIterator.next().equals(thatIterator.next())) return false;
         return true;
     }
 

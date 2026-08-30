@@ -52,7 +52,10 @@ public class Stopwatch implements AutoCloseable {
         assert start != null : "Stopwatch is closed";
         final long lapStart = start;
         start = System.nanoTime();
-        return (start / timeFactor - lapStart / timeFactor);
+        // NOTE divide the elapsed time, not each reading. Dividing the readings
+        // separately truncates each one independently, so the result could be
+        // out by one unit in either direction.
+        return (start - lapStart) / timeFactor;
     }
 
     /**

@@ -32,7 +32,7 @@ public class RadixSortTest {
     @When("radix sort is performed over the {string} range from {int} to {int}")
     public void radix_sort_is_performed_over_the_range_from_to(String string, Integer rangeStart, Integer rangeEnd) throws Exception {
         // Write code here that turns the phrase above into concrete actions
-        rs.sort(intArr, rangeStart, rangeEnd);
+        rs.sort(intArr, rangeStart, exclusive(rangeEnd));
     }
 
     @Then("validate if the element of array within {int} and {int} are sorted")
@@ -54,7 +54,7 @@ public class RadixSortTest {
     public void radix_sort_is_performed_over_the_range_from_to_where(Integer rangeStart, Integer rangeEnd, String string) throws Exception {
         // Write code here that turns the phrase above into concrete actions
         try {
-            rs.sort(intArr, rangeStart, rangeEnd);
+            rs.sort(intArr, rangeStart, exclusive(rangeEnd));
         } catch (ArrayIndexOutOfBoundsException ae) {
             exp = ae;
         }
@@ -80,7 +80,7 @@ public class RadixSortTest {
     public void radix_sort_is_performed_over_the_range_to_where(Integer rangeStart, Integer rangeEnd, String string) {
         // Write code here that turns the phrase above into concrete actions
         try {
-            rs.sort(intArr, rangeStart, rangeEnd);
+            rs.sort(intArr, rangeStart, exclusive(rangeEnd));
         } catch (Exception e) {
             exp = e;
         }
@@ -105,7 +105,7 @@ public class RadixSortTest {
     @When("counting sort is performed over the range {int} to {int} at {int} radix")
     public void counting_sort_is_performed_over_the_range_to_at_radix(Integer rangeStart, Integer rangeEnd, Integer radix) {
         // Write code here that turns the phrase above into concrete actions
-        rs.countSort(intArr, radix, rangeStart, rangeEnd);
+        rs.countSort(intArr, radix, rangeStart, exclusive(rangeEnd));
     }
 
     @Then("validate if the element at of array within {int} and {int} are sorted at {int} radix")
@@ -126,7 +126,7 @@ public class RadixSortTest {
     @Then("maximum integer within {int} and {int} should be {int}")
     public void maximum_integer_within_and_should_be(Integer rangeStart, Integer rangeEnd, Integer expectedOutput) {
         // Write code here that turns the phrase above into concrete actions
-        assertEquals((int) expectedOutput, rs.findMaxInt(intArr, rangeStart, rangeEnd));
+        assertEquals((int) expectedOutput, rs.findMaxInt(intArr, rangeStart, exclusive(rangeEnd)));
     }
 
     /**
@@ -166,4 +166,18 @@ public class RadixSortTest {
     }
 
 
+
+    /**
+     * The feature file states its ranges inclusively -- "the elements within 3 and
+     * 8" -- which is the natural way to say it in prose. RadixSort takes an
+     * exclusive "to", as every other sort in this tree does. Converting here is
+     * what keeps both readable, and means the ~50 rows of example data did not
+     * have to change when the convention was tidied up.
+     *
+     * @param rangeEnd the last index, as the feature file names it.
+     * @return one past it.
+     */
+    private static int exclusive(int rangeEnd) {
+        return rangeEnd + 1;
+    }
 }

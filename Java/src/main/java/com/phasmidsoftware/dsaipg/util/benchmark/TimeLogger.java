@@ -54,13 +54,17 @@ public class TimeLogger {
      * @param time the time value to be formatted, in seconds or milliseconds, represented as a double.
      * @return a string representation of the formatted time.
      */
-    private static String formatTime(double time) {
+    // NOTE package-private, not private, so that TimeLoggerTest can check the
+    // formatting without going through the log.
+    static String formatTime(double time) {
         decimalFormat.applyPattern(timePattern);
         return decimalFormat.format(time);
     }
 
     private static final Locale locale = new Locale("en", "US");
-    private static final String timePattern = "######.0000";
+    // NOTE the integer part ends in "0", not "#", so that a value below one is
+    // rendered as "0.5000" rather than ".5000".
+    private static final String timePattern = "#####0.0000";
     private static final DecimalFormat decimalFormat = (DecimalFormat)
             NumberFormat.getNumberInstance(locale);
 

@@ -43,7 +43,7 @@ public class QuickSort_Exp<X extends Comparable<X>> extends QuickSort<X> {
     }
 
     /**
-     * Constructor for QuickSort_Basic
+     * Constructor for QuickSort_Classic
      *
      * @param helper an explicit instance of Helper to be used.
      */
@@ -53,7 +53,7 @@ public class QuickSort_Exp<X extends Comparable<X>> extends QuickSort<X> {
     }
 
     /**
-     * Constructor for QuickSort_Basic
+     * Constructor for QuickSort_Classic
      *
      * @param N      the number elements we expect to sort.
      * @param config the configuration.
@@ -63,7 +63,7 @@ public class QuickSort_Exp<X extends Comparable<X>> extends QuickSort<X> {
     }
 
     /**
-     * Constructor for QuickSort_Basic
+     * Constructor for QuickSort_Classic
      *
      * @param config the configuration.
      */
@@ -97,11 +97,16 @@ public class QuickSort_Exp<X extends Comparable<X>> extends QuickSort<X> {
             // NOTE: we are trying to avoid checking on instrumented for every time in the inner loop for performance reasons (probably a silly idea).
             // NOTE: if we were using Scala, it would be easy to set up a comparer function and a swapper function. With java, it's possible but much messier.
             if (helper.instrumented()) {
-                helper.incrementHits(1);
+                // NOTE helper.get, not a bare xs[...]. The scans read one element
+                // per step and every one of them must be counted. Reading the
+                // array directly and charging a single hit for the whole
+                // partition made this sort report 72% of the accesses it made,
+                // which is not a statistic anyone can use.
+                helper.incrementHits(1); // for the pivot, read above
                 while (true) {
-                    while (i < hi && helper.notInverted(xs[++i], v)) {
+                    while (i < hi && helper.notInverted(helper.get(xs, ++i), v)) {
                     }
-                    while (j > from && helper.notInverted(v, xs[--j])) {
+                    while (j > from && helper.notInverted(v, helper.get(xs, --j))) {
                     }
                     if (i >= j) break;
                     helper.swap(xs, i, j);
@@ -109,9 +114,13 @@ public class QuickSort_Exp<X extends Comparable<X>> extends QuickSort<X> {
                 if (from != j) helper.swap(xs, from, j);
             } else {
                 while (true) {
-                    while (i < hi && xs[++i].compareTo(v) < 0) {
+                    // NOTE pureComparison, NOT compareTo. This branch exists only to
+                    // skip the counting, not to change the ordering: compareTo ignores
+                    // the Helper's comparator, so an uninstrumented sort with a custom
+                    // comparator came out in the natural ordering instead.
+                    while (i < hi && helper.pureComparison(xs[++i], v) < 0) {
                     }
-                    while (j > from && xs[--j].compareTo(v) > 0) {
+                    while (j > from && helper.pureComparison(xs[--j], v) > 0) {
                     }
                     if (i >= j) break;
                     swap(xs, i, j);
@@ -154,3 +163,4 @@ public class QuickSort_Exp<X extends Comparable<X>> extends QuickSort<X> {
         private final Helper<X> helper;
     }
 }
+

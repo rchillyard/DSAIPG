@@ -10,16 +10,32 @@ import java.util.function.Function;
  */
 public class Utilities {
     /**
-     * There is really no better way that I could find to do this with library/language methods.
-     * Don't try to inline this if the generic type extends something like Comparable, or you will get a ClassCastException.
+     * Copy a Collection into an array of the given component type.
+     * <p>
+     * The class has to be passed in. Java erases T at runtime, so there is nothing
+     * in {@code Collection<T>} to say what kind of array to make.
+     * <p>
+     * NOTE this used to take the collection alone and use the runtime class of its
+     * FIRST element as the component type. That is right only when every element
+     * has that exact class, and silently wrong otherwise: a {@code List<Number>}
+     * holding 1 and 2.5 produced an {@code Integer[]} and then threw
+     * {@code ArrayStoreException} on the Double — in either order, since whichever
+     * element came first decided the type. Any collection whose static type is a
+     * supertype of its contents was at risk, which is exactly the case
+     * {@code Sort.sort} deals in. The old javadoc warned of a ClassCastException
+     * "if you inline this"; the real fault was neither a ClassCastException nor
+     * anything to do with inlining.
+     * <p>
+     * An empty collection is fine now. The old version rejected it, because with no
+     * first element it had no way to guess.
      *
-     * @param ts  a collection of Ts.
-     * @param <T> the underlying type of ts.
-     * @return an array T[].
+     * @param ts    a collection of Ts.
+     * @param clazz the component type of the resulting array.
+     * @param <T>   the underlying type of ts.
+     * @return an array T[] of the same length as ts.
      */
-    public static <T> T[] asArray(Collection<T> ts) {
-        if (ts.isEmpty()) throw new RuntimeException("ts may not be empty");
-        @SuppressWarnings("unchecked") T[] result = (T[]) Array.newInstance(ts.iterator().next().getClass(), 0);
+    public static <T> T[] asArray(Collection<T> ts, Class<T> clazz) {
+        @SuppressWarnings("unchecked") T[] result = (T[]) Array.newInstance(clazz, 0);
         return ts.toArray(result);
     }
 
@@ -101,13 +117,4 @@ public class Utilities {
         return Math.log(n) / Math.log(2);
     }
 
-    /**
-     * Create a string representing an integer, with commas to separate thousands.
-     *
-     * @param x the integer.
-     * @return a String representing the number with commas.
-     */
-    public static String formatWhole(final int x) {
-        return String.format("%,d", x);
-    }
 }

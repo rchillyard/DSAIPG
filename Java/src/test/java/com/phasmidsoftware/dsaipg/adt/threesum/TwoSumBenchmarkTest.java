@@ -9,8 +9,13 @@ import java.util.function.Supplier;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class TwoSumBenchmarkTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     /**
      * This class tests the method {@code runBenchmarks()} in the {@link TwoSumBenchmark} class.
@@ -85,6 +90,9 @@ public class TwoSumBenchmarkTest {
             }).runFromSupplier(supplier, runs);
             assertTrue(t1 >= 0);
         } catch (Exception e) {
+            // NOTE ImplementationMissing extends RuntimeException, so it would
+            // otherwise be swallowed here and reported as a genuine failure.
+            CancelOnNotImplemented.rethrowIfUnimplemented(e);
             throw new AssertionError("Benchmark failed to handle empty arrays.");
         }
     }

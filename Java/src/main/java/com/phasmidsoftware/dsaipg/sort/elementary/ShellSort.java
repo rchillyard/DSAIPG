@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import static com.phasmidsoftware.dsaipg.util.benchmark.SortBenchmark.BENCHMARKSTRINGSORTERS;
@@ -56,7 +57,7 @@ public class ShellSort<X extends Comparable<X>> extends SortWithComparableHelper
             hSort(gap, xs, from, to);
 //            logger.debug("hSort time: "+stopwatch.lap()+" microseconds");
             if (shellFunction != null)
-                shellFunction.accept(getHelper());
+                shellFunction.apply(getHelper(), xs);
             gap = h.next();
         }
 //        }
@@ -69,7 +70,7 @@ public class ShellSort<X extends Comparable<X>> extends SortWithComparableHelper
      *
      * @param shellFunction a consumer of Helper of X.
      */
-    public void setShellFunction(Consumer<AutoCloseable> shellFunction) {
+    public void setShellFunction(BiFunction<Helper<X>, X[], Void> shellFunction) {
         this.shellFunction = shellFunction;
     }
 
@@ -274,9 +275,9 @@ public class ShellSort<X extends Comparable<X>> extends SortWithComparableHelper
 
         while (N <= 100000) {
             int nRuns = 20;
-            Config config = Config_Benchmark.setupConfig("true", "false", "0", "0", "", "");
+            Config config = Config_Benchmark.setupConfig("true", "true", "0", "0", "", "true");
             InstrumentedComparatorHelper<Integer> instrumentedHelper = new InstrumentedComparableHelper<>("ShellSort", N, nRuns, config);
-            ShellSort<Integer> s = new ShellSort<>(5, instrumentedHelper);
+            ShellSort<Integer> s = new ShellSort<>(4, instrumentedHelper);
             int j = N;
             s.init(j);
             Integer[] xs = instrumentedHelper.random(Integer.class, r -> r.nextInt(j));
@@ -389,7 +390,7 @@ public class ShellSort<X extends Comparable<X>> extends SortWithComparableHelper
      * Initially, this variable is null. Its purpose can be defined or overridden
      * using the setShellFunction method provided in the ShellSort class.
      */
-    private Consumer<AutoCloseable> shellFunction = null;
+    private BiFunction<Helper<X>, X[], Void> shellFunction = null;
 
     /**
      * Performs an instrumented h-sort on a segment of an array using the specified helper.

@@ -39,10 +39,7 @@ final class ParSort {
             CompletableFuture<int[]> completableFuture1 = null;
             CompletableFuture<int[]> completableFuture2 = null;
             // TO BE IMPLEMENTED 
-            // END SOLUTION
-            CompletableFuture<int[]> completableFuture = completableFuture1.thenCombine(completableFuture2, ParSort::doMerge);
-            completableFuture.whenComplete((result, throwable) -> System.arraycopy(result, 0, array, from, result.length));
-            completableFuture.join();
+                        throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         } else
             Arrays.sort(array, from, to);
     }
@@ -59,10 +56,8 @@ final class ParSort {
      */
     static int[] sortRecursive(int[] array, int from, int to) {
         int[] result = new int[to - from];
-        // TO BE IMPLEMENTED 
-         // NOTE you need to do something here so that result is the sorted version of array.
-        // END SOLUTION
-        return result;
+        // TO BE IMPLEMENTED  you need to do something here so that result is the sorted version of array
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**

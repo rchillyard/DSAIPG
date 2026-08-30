@@ -11,6 +11,14 @@ import java.util.Arrays;
 
 /**
  * Height-weighted Quick Union with Path Compression
+ * <p>
+ * NOTE path compression can be switched off, which makes this a good place to measure what an
+ * optimisation is actually worth. Over two million random pairs on a million sites it halves
+ * the time in Java -- and makes no difference whatever in Python. What it costs is a couple of
+ * array accesses, nearly free in Java beside the cache miss they save, but in Python an
+ * interpreted operation costing about what the traversal step it saves costs. An optimisation's
+ * payoff is the ratio of what it saves to what it costs, and that ratio belongs to the
+ * implementation rather than to the algorithm. See {@code docs/Java vs Python.md}.
  */
 public class UF_HWQUPC implements UF {
     /**
@@ -92,7 +100,7 @@ public class UF_HWQUPC implements UF {
         validate(p);
         int root = p;
         // TO BE IMPLEMENTED 
-                throw new RuntimeException("implementation missing");
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**
@@ -206,7 +214,7 @@ public class UF_HWQUPC implements UF {
      */
     void mergeComponents(int i, int j) {
         // TO BE IMPLEMENTED  make shorter root point to taller one
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**
@@ -214,7 +222,7 @@ public class UF_HWQUPC implements UF {
      */
     void doPathCompression(int i) {
         // TO BE IMPLEMENTED  update parent to value of grandparent
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**

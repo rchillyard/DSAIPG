@@ -63,3 +63,4 @@ public class TrieBenchmark {
         System.out.printf("Trie delete time: %d ns%n", trieDeleteTime);
     }
 }
+

@@ -50,8 +50,7 @@ public class MyTree<X> {
         public Node<X> addChild(Node<X> y) {
             ImmutableList.Builder<Node<X>> builder = ImmutableList.builder();
             // TO BE IMPLEMENTED 
-             return null;
-            // END SOLUTION
+                        throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         }
 
         /**
@@ -75,8 +74,7 @@ public class MyTree<X> {
             boolean ok = Iterables.removeIf(ns, xNode -> Objects.equals(xNode, y));
             ImmutableList.Builder<Node<X>> builder = ImmutableList.builder();
             // TO BE IMPLEMENTED 
-             return null;
-            // END SOLUTION
+                        throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         }
 
         /**

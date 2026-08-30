@@ -21,11 +21,17 @@ import java.util.List;
 
 import static com.phasmidsoftware.dsaipg.sort.helper.Instrument.*;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.setupConfig;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 @SuppressWarnings("ALL")
 public class HeapSortTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void sortWithRange() throws Exception {
@@ -175,4 +181,30 @@ public class HeapSortTest {
 
     final static LazyLogger logger = new LazyLogger(HeapSort.class);
 
+
+    /**
+     * Only xs[from..to) may be touched. The heap indices are relative to from, so
+     * working on array.length throughout would silently sort the whole array.
+     */
+    @Test
+    public void testSortSubRange() {
+        Integer[] xs = {9, 3, 1, 2, 9};
+        Config config = setupConfig("false", "", "0", "0", "", "");
+        Helper<Integer> helper = HelperFactory.create("sub-range", xs.length, config);
+        try (SortWithHelper<Integer> sorter = new HeapSort<>(helper)) {
+            sorter.sort(xs, 1, 4);
+        }
+        assertArrayEquals("only xs[1..4) should move", new Integer[]{9, 1, 2, 3, 9}, xs);
+    }
+
+    @Test
+    public void testSortSubRangeAtTheEnd() {
+        Integer[] xs = {5, 4, 3, 2, 1};
+        Config config = setupConfig("false", "", "0", "0", "", "");
+        Helper<Integer> helper = HelperFactory.create("sub-range", xs.length, config);
+        try (SortWithHelper<Integer> sorter = new HeapSort<>(helper)) {
+            sorter.sort(xs, 2, 5);
+        }
+        assertArrayEquals(new Integer[]{5, 4, 1, 2, 3}, xs);
+    }
 }

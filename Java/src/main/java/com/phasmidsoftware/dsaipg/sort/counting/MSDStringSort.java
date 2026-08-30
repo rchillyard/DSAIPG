@@ -9,7 +9,7 @@ import com.phasmidsoftware.dsaipg.util.config.Config;
 import com.phasmidsoftware.dsaipg.util.general.CodePointMapper;
 import com.phasmidsoftware.dsaipg.util.general.SuffixComparator;
 
-import static com.phasmidsoftware.dsaipg.sort.helper.InstrumentedComparatorHelper.MSD_CUTOFF_DEFAULT;
+import static com.phasmidsoftware.dsaipg.sort.helper.BaseHelper.MSD_CUTOFF_DEFAULT;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.HELPER;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.MSDCUTOFF;
 
@@ -110,7 +110,7 @@ public class MSDStringSort extends SortWithHelperAndAdditionalMemory<String> {
      */
     private void cutToQuicksort(String[] xs, int from, int to, int d, int n) {
         SuffixComparator suffixComparator = new SuffixComparator(helper.getComparator(), d);
-        Helper<String> cloned = helper.clone("MSD 3-way quicksort", suffixComparator, n);
+        Helper<String> cloned = helper.clone("MSD 3-way quicksort", suffixComparator, n, true);
         try (Sort<String> sorter = new QuickSort_3way<>(cloned)) {
             sorter.sort(xs, from, to);
         }
@@ -150,10 +150,14 @@ public class MSDStringSort extends SortWithHelperAndAdditionalMemory<String> {
         // Copy back.
         helper.copyBlock(aux, 0, xs, from, n);
 
+        // Release the memory accounting before recursing. aux is dead once it has
+        // been copied back, so that part is exact; count is still read by the loop
+        // below, so its share is given back a little early.
+        additionalMemory(-(n + mapper.range + 1));
+
         // Recursively sort on the next character position in each String.
         // TO BE IMPLEMENTED 
-        // END SOLUTION
-        additionalMemory(-(n + mapper.range + 1));
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**

@@ -3,7 +3,7 @@
  */
 package com.phasmidsoftware.dsaipg.sort.linearithmic;
 
-import com.phasmidsoftware.dsaipg.sort.classic.ClassicHelper;
+import com.phasmidsoftware.dsaipg.sort.helper.NonInstrumentingComparatorHelper;
 import com.phasmidsoftware.dsaipg.sort.generic.SortWithComparableHelper;
 import com.phasmidsoftware.dsaipg.sort.generic.SortWithHelper;
 import com.phasmidsoftware.dsaipg.sort.helper.Helper;
@@ -83,7 +83,7 @@ public class TimSortWrapper<X extends Comparable<X>> extends SortWithComparableH
      * @return an instance of {@code SortWithHelper<String>} configured for case-insensitive sorting.
      */
     public static SortWithHelper<String> CaseInsensitiveSort(int N, Config config) {
-        return new SortWithHelper<>(new ClassicHelper<>(DESCRIPTION, String.CASE_INSENSITIVE_ORDER, N, new Random(), config)) {
+        return new SortWithHelper<>(new NonInstrumentingComparatorHelper<>(DESCRIPTION, String.CASE_INSENSITIVE_ORDER, N, new Random(), config)) {
             public void sort(String[] xs, int from, int to) {
                 TimSort.sort(xs, from, to, helper);
             }
@@ -120,3 +120,4 @@ public class TimSortWrapper<X extends Comparable<X>> extends SortWithComparableH
         }
     }
 }
+

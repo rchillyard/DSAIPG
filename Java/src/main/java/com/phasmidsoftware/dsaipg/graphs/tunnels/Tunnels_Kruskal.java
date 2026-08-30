@@ -31,6 +31,7 @@ public class Tunnels_Kruskal implements Iterable<Edge<Building, TunnelProperties
         Kml<Building, TunnelProperties> kml = new Kml<>(mst);
         String filename = "tunnels.kml";
         kml.createKML(new File(filename));
+        System.out.println("Number of tunnels: " + mst.geoEdges().size());
         System.out.println("Tunnels output to KML file: " + filename);
         System.out.println("Total cost: " + totalCost + ", total length: " + totalLength);
     }

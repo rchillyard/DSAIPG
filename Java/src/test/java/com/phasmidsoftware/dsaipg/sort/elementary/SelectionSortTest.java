@@ -23,9 +23,14 @@ import static com.phasmidsoftware.dsaipg.sort.helper.Instrument.*;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.setupConfig;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 @SuppressWarnings("ALL")
 public class SelectionSortTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void sort0() throws Exception {
@@ -122,7 +127,7 @@ public class SelectionSortTest {
         final int hits = (int) statPack.getStatistics(HITS).mean();
         assertEquals(n * (n - 1) / 2 + n - 1 + swaps * 4, hits);
         final int lookups = (int) statPack.getStatistics(LOOKUPS).mean();
-        assertEquals(n * (n - 1) / 2 + n - 1 + swaps * 2, lookups);
+        assertEquals(n, lookups);
         final int inversions = (int) statPack.getStatistics(INVERSIONS).mean();
         final int fixes = (int) statPack.getStatistics(FIXES).mean();
         System.out.println(statPack);

@@ -124,7 +124,11 @@ public class Statistics {
         final StringBuilder sb = new StringBuilder().append(property).append(": ");
         if (updated) {
             final boolean stats = stdDev() > 0.0;
-            sb.append("n=").append(doubles.length);
+            // NOTE count, not doubles.length: "n" in a statistical summary is the
+            // number of observations. doubles.length is the capacity of the store,
+            // which differs whenever fewer than nRuns values have been added, and
+            // again after resize() has doubled it.
+            sb.append("n=").append(count);
             final String s = "; mean=";
             sb.append(s).append(Utilities.asInt(mean()));
             if (stats)

@@ -34,9 +34,12 @@ public class RandomSort<X extends Comparable<X>> extends SortWithComparableHelpe
         int N = to - from;
         final Helper<X> helper = getHelper();
         boolean instrumented = helper.instrumented();
-        QuickRandom r = new QuickRandom(N, 0);
         long inversions = instrumented ? helper.inversions(xs) : 0;
         if (N > CUTOFF) {
+            // NOTE constructed here, not above. QuickRandom rejects a range of
+            // zero, so building it before this test meant an empty array threw
+            // rather than sorting trivially.
+            QuickRandom r = new QuickRandom(N, 0);
             int m = (int) (FACTOR * Utilities.lg(N) * N);
             for (int i = m; i > 0; i--) helper.swapConditional(xs, r.get() + from, r.get());
             if (instrumented) {

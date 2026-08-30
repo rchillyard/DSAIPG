@@ -22,10 +22,6 @@ import static com.phasmidsoftware.dsaipg.sort.helper.InstrumentedComparatorHelpe
  * <p>
  * CONSIDER re-implementing by doing ClassicSort first (based on buckets) then do insertion sort.
  * </p>
- * <p>
- *     NOTE: there is an alternative implementation of BucketSort in the huskySort package.
- * There are considerable differences so, for now, we'll leave both versions as is.
- * </p>
  *
  * @param <X> the underlying type which must extend Comparable.
  */
@@ -102,15 +98,15 @@ public class BucketSort<X extends Comparable<X>> extends ClassificationSorter<X,
     public void sort(X[] xs, int from, int to) {
         if (classifier == null) {
             if (Number.class.isAssignableFrom(xs[0].getClass())) {
-                Function<X, Integer> numberClassifier = getNumberClassifier((Number[]) xs, 0, to, buckets.length);
+                Function<X, Integer> numberClassifier = getNumberClassifier((Number[]) xs, from, to, buckets.length);
                 setClassifier((x, y) -> numberClassifier.apply(x));
             } else
                 throw new SortException("BucketSort: classifier undefined AND the type being sorted is not a Number");
         }
         clearBuckets();
         assignToBuckets(xs, from, to);
-        checkBuckets(xs);
-        unloadBuckets(buckets, xs, helper);
+        checkBuckets(to - from);
+        unloadBuckets(buckets, xs, from, to, helper);
         sort.sort(xs, from, to);
     }
 
@@ -124,7 +120,7 @@ public class BucketSort<X extends Comparable<X>> extends ClassificationSorter<X,
     public BucketSort(Helper<X> helper, Function<X, Integer> classifier, Object[] buckets) {
         super(helper, convertToBiFunction(classifier));
         this.buckets = buckets;
-        Helper<X> insertionSortHelper = helper.clone("insertion sort");
+        Helper<X> insertionSortHelper = helper.clone("insertion sort", true);
         this.sort = new InsertionSort<>(insertionSortHelper);
         for (int i = 0; i < buckets.length; i++) buckets[i] = new ArrayList<>();
         closeHelper = true;
@@ -205,13 +201,15 @@ public class BucketSort<X extends Comparable<X>> extends ClassificationSorter<X,
      * @param xs the array of elements to be checked against the total number of elements in all buckets.
      * @throws RuntimeException if the total number of elements in the buckets does not match the length of the input array.
      */
-    private void checkBuckets(X[] xs) {
+    private void checkBuckets(int expected) {
         int count = 0;
         for (Object b : buckets) {
             @SuppressWarnings("unchecked") int size = ((List<X>) b).size();
             count += size;
         }
-        if (count != xs.length) throw new RuntimeException("incorrect number of buckets: " + count + ", " + xs.length);
+        // NOTE compared against the size of the RANGE being sorted, not the length
+        // of the whole array, so that sorting a sub-range works.
+        if (count != expected) throw new RuntimeException("incorrect number of buckets: " + count + ", " + expected);
     }
 
     /**
@@ -278,6 +276,13 @@ public class BucketSort<X extends Comparable<X>> extends ClassificationSorter<X,
      */
     private static <T> Function<T, Integer> numberClassifier(final double min, final double gap, int nBuckets) {
         return x -> {
+            // NOTE a gap of zero means every value is the same, so everything
+            // belongs in the first bucket. Tested for rather than left to the
+            // arithmetic: without this the expression below is 0.0/0.0, and the
+            // right answer came out only because Math.floor(NaN) is NaN and
+            // (int) NaN is 0. That is too fragile to rely on, and it does not
+            // survive translation -- Python raises on the same division.
+            if (gap == 0) return 0;
             int index = (int) Math.floor((((Number) x).doubleValue() - min) / gap);
             if (index < 0) index = 0;
             if (index >= nBuckets) index = nBuckets - 1;
@@ -303,8 +308,10 @@ public class BucketSort<X extends Comparable<X>> extends ClassificationSorter<X,
      * @param <X>     the underlying type of the array and the Helper.
      */
     @SuppressWarnings("unchecked")
-    private static <X extends Comparable<X>> void unloadBuckets(Object[] buckets, X[] xs, final Helper<X> helper) {
-        final Index index = new Index(xs.length);
+    private static <X extends Comparable<X>> void unloadBuckets(Object[] buckets, X[] xs, int from, int to, final Helper<X> helper) {
+        // NOTE the elements go back into xs[from..to), not from index 0. Starting
+        // at zero was the other half of why a sub-range could not be sorted.
+        final Index index = new Index(from, to);
         Arrays.stream(buckets).forEach(xes -> unloadBucket(xs, helper, index, (List<X>) xes));
     }
 
@@ -341,11 +348,12 @@ public class BucketSort<X extends Comparable<X>> extends ClassificationSorter<X,
      * throwing an exception when the limit is exceeded.
      */
     static class Index {
-        public Index(int n) {
+        public Index(int from, int n) {
+            this.index = from;
             this.n = n;
         }
 
-        int index = 0;
+        int index;
 
         int getNext() throws IndexException {
             if (index >= 0 && index < n)

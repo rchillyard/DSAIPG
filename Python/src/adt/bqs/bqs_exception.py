@@ -1,0 +1,2 @@
+class BQSException(Exception):
+    pass

@@ -103,6 +103,11 @@ public class Timer {
      */
     public double meanLapTime() {
         if (running) throw new TimerException();
+        // NOTE without this guard, no laps gives ticks/0 -- Infinity, silently, as
+        // the answer to "how long did each run take". repeat(0, ...) does exactly
+        // that. A benchmark reporting Infinity is better than one reporting a
+        // number nobody checks, but an exception is better still.
+        if (laps <= 0) throw new TimerException("meanLapTime: no laps were recorded");
         return toMillisecs(ticks) / laps;
     }
 
@@ -215,8 +220,7 @@ public class Timer {
      */
     private <T, U> int doRepeatForIteration(int n, boolean warmup, Supplier<T> supplier, Function<T, U> function, UnaryOperator<T> preFunction, Consumer<U> postFunction, int lastx, int i) {
         // TO BE IMPLEMENTED : note that the timer should be paused when this method is invoked. You may use doPrintStatus to show progress (but optional).
-        // END SOLUTION
-        return lastx;
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**
@@ -303,8 +307,7 @@ public class Timer {
      */
     private static long getClock() {
         // TO BE IMPLEMENTED 
-         return 0;
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     static Consumer<String> progressFunction(boolean showProgress) {
@@ -321,8 +324,7 @@ public class Timer {
      */
     private static double toMillisecs(long ticks) {
         // TO BE IMPLEMENTED 
-         return 0;
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**

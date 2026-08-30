@@ -261,8 +261,7 @@ public class BSTSimple<Key extends Comparable<Key>, Value> implements BstDetail<
     @NotNull
     private Node hibbardDeletion(Node x) {
         // TO BE IMPLEMENTED 
-         return x;
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**

@@ -48,7 +48,7 @@ public class FrequencyCounter<Key> extends BaseImmutableSymbolTable<Key, Integer
     public void increment(Key s) {
         validateKey(s);
         // TO BE IMPLEMENTED 
-                throw new RuntimeException("implementation missing");
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**

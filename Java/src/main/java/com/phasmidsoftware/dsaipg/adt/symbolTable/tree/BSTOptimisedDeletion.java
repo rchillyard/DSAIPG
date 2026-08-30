@@ -340,8 +340,7 @@ public class BSTOptimisedDeletion<Key extends Comparable<Key>, Value> implements
         private Node delete(Key k) {
             // CONSIDER using navigate
             // TO BE IMPLEMENTED 
-             return null;
-            // END SOLUTION
+                        throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         }
 
         /**
@@ -659,4 +658,5 @@ public class BSTOptimisedDeletion<Key extends Comparable<Key>, Value> implements
         }
     }
 }
+
 

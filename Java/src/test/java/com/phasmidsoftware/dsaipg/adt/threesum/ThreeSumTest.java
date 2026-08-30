@@ -7,8 +7,13 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class ThreeSumTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testGetTriplesJ0Quadrithmic() {

@@ -17,7 +17,7 @@ import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.*;
  *
  * @param <X> the type of elements managed by this helper.
  */
-public abstract class BaseHelper<X> {
+public abstract class BaseHelper<X> implements Helper<X> {
     /**
      * Determines if instrumentation is enabled for this helper.
      *
@@ -80,6 +80,13 @@ public abstract class BaseHelper<X> {
     public int cutoff() {
         // NOTE that a cutoff value of 0 or less will result in an infinite recursion for any recursive method that uses it.
         return (cutoff >= 1) ? cutoff : CUTOFF_DEFAULT;
+    }
+
+    /**
+     * @return the cutoff below which MSD radix sort hands over to quicksort.
+     */
+    public int MSDCutoff() {
+        return MSDcutoff;
     }
 
     /**
@@ -265,6 +272,10 @@ public abstract class BaseHelper<X> {
         return "Helper for " + description + " with " + n + " elements" + (instrumented() ? " instrumented" : "");
     }
 
+    public String showInterimStats(String context) {
+        return description + "/" + context + ": " + instrumenter.toString();
+    }
+
     /**
      * Constructor for the BaseHelper class.
      *
@@ -281,6 +292,8 @@ public abstract class BaseHelper<X> {
         this.config = config;
         this.n = n;
         this.cutoff = config.getInt(HELPER, CUTOFF, CUTOFF_DEFAULT);
+        this.MSDcutoff = config.getInt(HELPER, MSDCUTOFF, MSD_CUTOFF_DEFAULT);
+        this.checkSorted = config.getBoolean(HELPER, CHECKSORTED);
     }
 
     /**
@@ -322,10 +335,41 @@ public abstract class BaseHelper<X> {
      */
     protected final int cutoff;
     /**
+     * The cutoff below which MSD radix sort hands over to quicksort.
+     * NOTE this lives here, rather than on InstrumentedComparatorHelper where it
+     * used to, so that it is the same whether or not we are instrumenting.
+     * While it was only on the instrumented Helper, MSDStringSort cut over at
+     * MSDCutoff() == 20 -- the Helper default -- for an ordinary run, and at 256
+     * when instrumented, so the measurements described a different algorithm
+     * from the one that normally ran.
+     */
+    /**
+     * Whether postProcess should verify that the array really is sorted.
+     * <p>
+     * Off for production and benchmark runs, where an O(n) check per sort would be
+     * measured along with the sort. On for tests, where a sort which did not sort
+     * must not be able to pass. That split is expressed by the two config.ini
+     * files: the one in test/resources sets it true, the shipped one leaves it
+     * false.
+     * <p>
+     * NOTE an instrumented Helper checks unconditionally and ignores this flag,
+     * which is deliberate: an instrumented run is gathering statistics rather than
+     * timings, so the check costs it nothing that matters.
+     * <p>
+     */
+    protected final boolean checkSorted;
+
+    protected final int MSDcutoff;
+    /**
      * Keep track of the random array that was generated. This is available via the InstrumentedHelper class.
      */
     protected X[] randomArray;
     protected int n;
 
     public static final String INSTRUMENT = "instrument";
+
+    /**
+     * The default cutoff for MSD radix sort, as documented in config.ini.
+     */
+    public static final int MSD_CUTOFF_DEFAULT = 256;
 }

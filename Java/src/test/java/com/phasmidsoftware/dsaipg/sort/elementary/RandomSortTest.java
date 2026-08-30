@@ -25,9 +25,14 @@ import static com.phasmidsoftware.dsaipg.sort.helper.Instrument.FIXES;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.setupConfig;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 @SuppressWarnings("ALL")
 public class RandomSortTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void sort0() throws Exception {
@@ -151,4 +156,19 @@ public class RandomSortTest {
 
     final static LazyLogger logger = new LazyLogger(RandomSort.class);
 
+
+    /**
+     * An empty array sorts trivially. QuickRandom rejects a range of zero, so it
+     * must not be built until after the cutoff test.
+     */
+    @Test
+    public void testSortEmpty() throws IOException {
+        Integer[] xs = {};
+        Config config = Config.load(RandomSortTest.class);
+        Helper<Integer> helper = HelperFactory.create("empty", 1, config);
+        try (SortWithHelper<Integer> sorter = new RandomSort<>(helper)) {
+            sorter.sort(xs, 0, 0);
+        }
+        assertEquals(0, xs.length);
+    }
 }

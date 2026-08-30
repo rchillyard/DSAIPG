@@ -114,6 +114,7 @@ public interface Helper<X> extends AutoCloseable, Comparator<X>, Instrument {
      * @param j  the index of the higher of the elements to be swapped.
      */
     default void swapVW(X v, X w, X[] xs, int i, int j) {
+//        System.out.println("Swapping " + v + " with " + w + " at indices " + i + " and " + j);
         xs[j] = v;
         xs[i] = w;
     }
@@ -385,6 +386,18 @@ public interface Helper<X> extends AutoCloseable, Comparator<X>, Instrument {
     }
 
     /**
+     * Compare values xs[i] and xs[j] and return true if xs[i] is less than xs[j], i.e., not inverted.
+     *
+     * @param xs the array.
+     * @param i  the index of the first value.
+     * @param j  the index of the second value.
+     * @return true if v is less than w.
+     */
+    default boolean notInvertedWithLookups(X[] xs, int i, int j, int lookups) {
+        return notInverted(xs, xs[i], j);
+    }
+
+    /**
      * Compare values xs[i] and xs[j] and return true if xs[i] is more than xs[j], i.e., they are inverted.
      *
      * @param xs the array.
@@ -466,17 +479,31 @@ public interface Helper<X> extends AutoCloseable, Comparator<X>, Instrument {
      * Method to sort a trio of adjacent elements.
      * It is the caller's responsibility to ensure that to - from = 3
      *
+     * NOTE I believe we can revert to the original here because this is the non-instrumenting case.
+     * But first let's check that the other implementation is correct.
+     *
      * @param xs   the array of X elements.
      * @param from the index of the first element.
      * @param to   one plus the index of the third element.
      */
     default void sortTrio(X[] xs, int from, int to) {
         if (to == from + 3) {
-            boolean swappedXY = swapConditional(xs, from, from + 1);
-            boolean swappedYZ = swapConditional(xs, from + 1, from + 2);
+            int from_1 = from + 1;
+            X xFrom = get(xs, from);
+            X xFrom1 = get(xs, from_1);
+            boolean swappedXY = swapConditional(xs, lookup(xFrom), from, from_1, lookup(xFrom1));
+            if (swappedXY) {
+                xFrom = xs[from];
+                xFrom1 = xs[from_1];
+            }
+            int from_2 = from + 2;
+            X xFrom2 = get(xs, from_2);
+            boolean swappedYZ = swapConditional(xs, xFrom1, from_1, from_2, lookup(xFrom2));
             if (!swappedXY && !swappedYZ) return; // xyz
-            if (swappedYZ) swapConditional(xs, from, from + 1);
-            else swapConditional(xs, from, from + 2);
+            if (swappedYZ)
+                swapConditional(xs, xFrom, from, from_1, xs[from_1]);
+            else
+                swapConditional(xs, xFrom, from, from_2, xs[from_2]);
         }
     }
 
@@ -489,6 +516,7 @@ public interface Helper<X> extends AutoCloseable, Comparator<X>, Instrument {
      * @return true if there was an inversion (i.e., the order was wrong and had to be fixed).
      */
     default boolean swapConditional(X[] xs, int i, int j) {
+        if (i == j) return false;
         return swapConditional(xs, xs[i], i, j);
     }
 
@@ -515,6 +543,7 @@ public interface Helper<X> extends AutoCloseable, Comparator<X>, Instrument {
      * @return true if there was an inversion (i.e., the order was wrong and had to be fixed).
      */
     default boolean swapConditional(X[] xs, X v, int i, int j) {
+        if (i == j) return false;
         return swapConditional(xs, v, i, j, xs[j]);
     }
 
@@ -590,27 +619,39 @@ public interface Helper<X> extends AutoCloseable, Comparator<X>, Instrument {
      */
     default void swapIntoSorted(X[] xs, int from, int i) {
         X x = get(xs, i);
-        int j = binarySearch(xs, from, i, x);
-        if (j < from) j = from - j - 1;
+        int j = binarySearchUpperBound(xs, from, i, x);
         if (j < i) swapInto(xs, j, i, x);
     }
 
     /**
-     * Performs a binary search on a specified sub-array to find the index of the given element.
-     * The array must be sorted prior to making this call.
-     * If the array is not sorted, the results are undefined.
+     * Find where x belongs in the sorted range xs[from..to), placing it AFTER any
+     * elements equal to it.
+     * <p>
+     * That is what makes this sort stable: an element must not move past one that
+     * compares equal to it. It also means no element is moved unnecessarily, so
+     * the number of elements moved is exactly the number of inversions.
+     * <p>
+     * NOTE this is written in terms of compare and get, both of which the
+     * instrumented Helper overrides, so there is one implementation rather than
+     * one per Helper. binarySearch has two -- Arrays.binarySearch here and a copy
+     * in InstrumentedComparatorHelper -- and duplication of exactly that kind is
+     * what let several counting and comparison bugs survive in this package.
      *
-     * @param xs   the array to be searched
-     * @param from the index of the first element (inclusive) to be searched
-     * @param to   the index of the last element (exclusive) to be searched
-     * @param x    the value to be searched for
-     * @return the index of the search key, if it is contained in the array within the specified range;
-     * otherwise, (-(insertion point) - 1). The insertion point is defined as the point at which
-     * the key would be inserted into the array: the index of the first element greater than the key,
-     * or toIndex if all elements in the range are less than the specified key.
+     * @param xs   the array, which must be sorted over the given range.
+     * @param from the index of the first element of the range.
+     * @param to   one past the index of the last element of the range.
+     * @param x    the value to place.
+     * @return the index of the first element greater than x, or to if there is none.
      */
-    default int binarySearch(X[] xs, int from, int to, X x) {
-        return Arrays.binarySearch(xs, from, to, x, getComparator());
+    default int binarySearchUpperBound(X[] xs, int from, int to, X x) {
+        int low = from;
+        int high = to;
+        while (low < high) {
+            int mid = (low + high) >>> 1;
+            if (compare(get(xs, mid), x) <= 0) low = mid + 1;
+            else high = mid;
+        }
+        return low;
     }
 
     /**
@@ -815,32 +856,68 @@ public interface Helper<X> extends AutoCloseable, Comparator<X>, Instrument {
         return "";
     }
 
+    default public String showStats(String context) {
+        return "";
+    }
+
     /**
      * Creates and returns a new instance of Helper with the specified description and size.
      *
-     * @param description the description of the Helper instance to be cloned
-     * @param N the size parameter for the Helper instance to be cloned
+     * @param description       the description of the Helper instance to be cloned
+     * @param N                 the size parameter for the Helper instance to be cloned
+     * @param shareInstrumenter
      * @return a new Helper instance with the given description and size
      */
-    Helper<X> clone(String description, int N);
+    Helper<X> clone(String description, int N, boolean shareInstrumenter);
 
     /**
      * Creates a new clone of the current Helper object with the specified description, comparator, and limit.
      *
-     * @param description a string representing the description for the new cloned Helper
-     * @param comparator  a Comparator used to define the sorting or comparison logic for the clone
-     * @param N           an integer specifying the limit or size constraint for the clone
+     * @param description       a string representing the description for the new cloned Helper
+     * @param comparator        a Comparator used to define the sorting or comparison logic for the clone
+     * @param N                 an integer specifying the limit or size constraint for the clone
+     * @param shareInstrumenter
      * @return a new Helper instance with the specified parameters applied
      */
-    Helper<X> clone(String description, Comparator<X> comparator, int N);
+    Helper<X> clone(String description, Comparator<X> comparator, int N, boolean shareInstrumenter);
 
     /**
      * Creates and returns a clone of the current object with the specified description.
      *
-     * @param description the description for the cloned object
+     * @param description       the description for the cloned object
+     * @param shareInstrumenter
      * @return a new instance of Helper with the provided description
      */
-    default Helper<X> clone(String description) {
-        return clone(description, getN());
+    default Helper<X> clone(String description, boolean shareInstrumenter) {
+        return clone(description, getN(), shareInstrumenter);
     }
+
+    /**
+     * Get the value from the heap represented by the reference `x`.
+     * In reality, this is a no-op, other than incrementing the lookup count.
+     *
+     * @param x the input object to be looked up and returned
+     * @return the same input object that was provided
+     */
+    default X lookup(X x) {
+        incrementLookups(1);
+        return x;
+    }
+
+    /**
+     * Compares two elements in the given array at the specified indices, while also incrementing the lookup count.
+     *
+     * @param xs      the array containing the elements to be compared
+     * @param i       the index of the first element to compare
+     * @param j       the index of the second element to compare
+     * @param lookups the number of lookups to increment; must be between 0 and 2 (inclusive)
+     * @return a negative integer, zero, or a positive integer as the element at index {@code i} is less than,
+     *         equal to, or greater than the element at index {@code j}
+     */
+    default int compareWithLookups(X[] xs, int i, int j, int lookups) {
+        assert lookups >= 0 && lookups <= 2;
+        incrementLookups(lookups);
+        return compare(xs, i, j);
+    }
+
 }

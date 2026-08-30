@@ -5,8 +5,13 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Random;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class SymbolTableBenchmarkTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testBenchmarkStringSortersWithValidInput() throws IOException {

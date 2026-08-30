@@ -5,8 +5,13 @@ import org.junit.Test;
 import static com.phasmidsoftware.dsaipg.util.general.GeoConversions.Degrees;
 import static com.phasmidsoftware.dsaipg.util.general.GeoConversions.UTM;
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class GeoConversionsTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     /**
      * CN Tower. See <a href="https://en.wikipedia.org/wiki/Universal_Transverse_Mercator_coordinate_system#Locating_a_position_using_UTM_coordinates">Locating a position using UTM coordinates</a>

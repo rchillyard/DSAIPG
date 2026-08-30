@@ -25,8 +25,7 @@ public class WheelOfFortune<T> {
     public T get() {
         int r = random.nextInt(total);
         // TO BE IMPLEMENTED 
-        throw new RuntimeException("logic error: " + r);
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**

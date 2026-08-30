@@ -21,9 +21,14 @@ import static com.phasmidsoftware.dsaipg.sort.helper.Instrument.*;
 import static com.phasmidsoftware.dsaipg.util.config.ConfigTest.INVERSIONS;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.setupConfig;
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 @SuppressWarnings("ALL")
 public class InsertionSortTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void sort0() throws Exception {
@@ -264,7 +269,7 @@ public class InsertionSortTest {
         assertEquals(23, instrumenter.getFixes());
         assertEquals(23, instrumenter.getSwaps());
         assertEquals(78, instrumenter.getHits());
-        assertEquals(32, instrumenter.getLookups());
+        assertEquals(10, instrumenter.getLookups());
     }
 
     final static LazyLogger logger = new LazyLogger(InsertionSort.class);

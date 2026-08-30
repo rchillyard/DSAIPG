@@ -58,6 +58,11 @@ public class MergeSortBasic<X extends Comparable<X>> extends SortWithComparableH
             insertionSort.sort(a, from, to);
             return;
         }
+        // NOTE aux is normally allocated by sort(X[], boolean), but this is the
+        // method the Sort interface requires, so a caller may reach it directly and
+        // must find aux ready. Allocating here costs nothing on the recursive calls,
+        // since aux is already big enough by then.
+        if (aux == null || aux.length < a.length) aux = Arrays.copyOf(a, a.length);
         final int n = to - from;
         int mid = from + n / 2;
         sort(a, from, mid);
@@ -143,7 +148,7 @@ public class MergeSortBasic<X extends Comparable<X>> extends SortWithComparableH
      */
     public MergeSortBasic(int N, Config config) {
         super(DESCRIPTION + ":" + getConfigString(config), N, 1, config);
-        // TODO use impersonat (like in MergeSort)
+        // TODO use impersonate (like in MergeSort)
         insertionSort = new InsertionSort<>(getHelper());
     }
 
@@ -188,3 +193,4 @@ public class MergeSortBasic<X extends Comparable<X>> extends SortWithComparableH
     private int additionalMemory;
     private int maxMemory;
 }
+

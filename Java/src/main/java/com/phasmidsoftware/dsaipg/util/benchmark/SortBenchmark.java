@@ -61,6 +61,7 @@ public class SortBenchmark {
         logger.info("!!!!!!!!!!!!!!!!!!!! SortBenchmark Start !!!!!!!!!!!!!!!!!!!!\n");
         logger.info("SortBenchmark.main: version " + config.get("sortbenchmark", "version") + " with word counts: " + Arrays.toString(args));
         if (args.length == 0) logger.warn("No word counts specified on the command line");
+        logger.info(config.toString());
         new SortBenchmark(config).doMain(args);
     }
 
@@ -85,9 +86,12 @@ public class SortBenchmark {
      * @param timeLoggers  a set of timeLoggers to be used.
      */
     static void runStringSortBenchmark(String[] words, int nWords, int nRuns, SortWithHelper<String> sorter, UnaryOperator<String[]> preProcessor, TimeLogger[] timeLoggers) {
+        System.gc();
         logger.info("****************************** String sort: " + nRuns + " runs of " + nWords + " " + sorter.getDescription() + " ******************************");
         new SorterBenchmark<>(String.class, preProcessor, sorter, words, nRuns, timeLoggers).run(getDescription(nWords, sorter), nWords);
         sorter.close();
+        logger.info("Sort benchmark completed: hinting to GC");
+        System.gc();
     }
 
     /**
@@ -215,7 +219,7 @@ public class SortBenchmark {
             }
 
         if (isConfigBenchmarkStringSorter("quicksort") && nRunsLinearithmic > 0)
-            try (SortWithHelper<String> sorter = new QuickSort_Basic<>(nWords, nRunsLinearithmic, config)) {
+            try (SortWithHelper<String> sorter = new QuickSort_Classic<>(nWords, nRunsLinearithmic, config)) {
                 runStringSortBenchmark(words, nWords, 6 * nRunsLinearithmic, sorter, timeLoggersLinearithmic);
             }
 

@@ -50,6 +50,12 @@ public class ComparableEquable extends Equable implements Comparable<ComparableE
      *         two ComparableEquable instances do not have the same number of elements.
      */
     public int compareTo(ComparableEquable o) {
+        // NOTE as with equals, the loop walks THIS one's elements, so the
+        // "same length" rule below only ever fired when this was the longer.
+        // A shorter Equable compared with a longer one ran out and reported 0 --
+        // equal -- where the longer one compared with the shorter threw.
+        if (elements.size() != o.elements.size())
+            throw new ComparableEquableException("ComparableEquable can only compare Equables of the same length");
         Iterator<?> thisIterator = elements.iterator();
         Iterator<?> thatIterator = o.elements.iterator();
         while (thisIterator.hasNext()) {

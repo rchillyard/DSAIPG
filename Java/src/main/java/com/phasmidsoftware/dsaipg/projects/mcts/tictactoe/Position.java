@@ -61,8 +61,7 @@ public class Position {
         int[][] matrix = copyGrid();
         if (matrix[x][y] < 0) {
             // TO BE IMPLEMENTED 
-             return null;
-            // END SOLUTION
+                        throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         }
         throw new RuntimeException("Position is occupied: " + x + ", " + y);
     }
@@ -78,8 +77,8 @@ public class Position {
         for (int i = 0; i < gridSize; i++)
             for (int j = 0; j < gridSize; j++)
                 if (grid[i][j] < 0)
-                    // TO BE IMPLEMENTED 
-  ;
+        // TO BE IMPLEMENTED 
+         throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
         // END SOLUTION
         return result;
     }
@@ -141,8 +140,7 @@ public class Position {
      */
     boolean threeInARow() {
         // TO BE IMPLEMENTED 
-         return false;
-        // END SOLUTION
+                throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
     }
 
     /**

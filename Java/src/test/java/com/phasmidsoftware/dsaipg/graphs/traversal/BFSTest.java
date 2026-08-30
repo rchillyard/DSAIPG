@@ -4,8 +4,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.LinkedList;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class BFSTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     @Test
     public void testbfs1() {

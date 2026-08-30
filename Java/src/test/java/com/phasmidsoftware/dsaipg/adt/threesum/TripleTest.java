@@ -3,8 +3,13 @@ package com.phasmidsoftware.dsaipg.adt.threesum;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 
 public class TripleTest {
+    @Rule
+    public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
 
     /**
      * Tests the `sum` method of the Triple class.
