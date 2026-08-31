@@ -747,7 +747,8 @@ public interface Helper<X> extends AutoCloseable, Comparator<X>, Instrument {
     }
 
     /**
-     * Retrieves the default MSD (Mean Squared Deviation) cutoff value.
+     * Retrieves the default cutoff below which MSD (Most Significant Digit) radix
+     * sort hands the remaining sub-array to quicksort.
      *
      * @return the default cutoff value as an integer
      */

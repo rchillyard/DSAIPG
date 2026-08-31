@@ -405,7 +405,8 @@ public class InstrumentedComparatorHelper<X> extends BaseComparatorHelper<X> {
     }
 
     /**
-     * Retrieves the cutoff value for MSD (Mean Square Displacement) calculation.
+     * Retrieves the cutoff below which MSD (Most Significant Digit) radix sort hands
+     * the remaining sub-array to quicksort.
      *
      * @return the current MSD cutoff value as an integer.
      */
