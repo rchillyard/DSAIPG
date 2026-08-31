@@ -111,7 +111,6 @@ public class NoVacuousTestsTest {
             "util/general/UTMTest.java:testToPositionEdgeCasePoleHemisphereChange",
             // genuinely disabled: never annotated at all
             "adt/symbolTable/hashtable/HashTableLPTest.java:testHashTable5",
-            "misc/lab_1/MyTreeTest.java:Node1",
             "sort/helper/InstrumentedComparableHelperTest.java:testMergeSortMany",
             "sort/linearithmic/QuickSort_ClassicTest.java:testSortDetailedRandom",
             "util/benchmark/SortBenchmarkTest.java:testMinComparisons",
