@@ -126,6 +126,15 @@ get lost:
   reading the corpus files, which failed for anyone whose home directory contained
   a space.
 
+## Errata
+
+The book is printed, so corrections to it live in `docs/Errata.md`.
+The first entry concerns Table 8.1: its MSD row is labelled as using a cutoff of 256
+and was in fact measured at 20, because the cutoff was honoured only on the
+instrumented code path and a timing run is uninstrumented.
+The numbers are sound; the caption is not, and honouring it would reverse the
+chapter's conclusion.
+
 ## Comparing the two
 
 Having the same algorithms twice makes it possible to ask what survives a change

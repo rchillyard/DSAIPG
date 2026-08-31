@@ -1,10 +1,7 @@
 package com.phasmidsoftware.dsaipg.misc.lab_1;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
-import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -65,13 +62,16 @@ public class MyTree<X> {
 
         /**
          * Method to replace child y by z in this Node.
+         * <p>
+         * Children are compared by value, so y need not be the very Node held here.
+         * Where several children are equal to y, only the first is replaced, and z
+         * takes that child's position rather than being appended. A Node which has
+         * no child equal to y is returned unchanged.
          *
          * @param y the Node which is to replace y.
          * @return the new Node which is a copy of this Node but with y replaced by z.
          */
         public Node<X> replace(Node<X> y, Node<X> z) {
-            Collection<Node<X>> ns = Lists.newArrayList(children.iterator());
-            boolean ok = Iterables.removeIf(ns, xNode -> Objects.equals(xNode, y));
             ImmutableList.Builder<Node<X>> builder = ImmutableList.builder();
             // TO BE IMPLEMENTED 
                         throw new com.phasmidsoftware.dsaipg.util.general.ImplementationMissing();
@@ -85,6 +85,37 @@ public class MyTree<X> {
          */
         public Node<X> replace(Node<X> y, X z) {
             return replace(y, new Node<>(z));
+        }
+
+        /**
+         * Two Nodes are equal when their values are equal and their children are
+         * equal, in order. This class is immutable, so a Node is a value and is
+         * compared as one -- that is also what lets replace(Node, Node) find a child
+         * the caller has described rather than one the caller already holds.
+         * <p>
+         * NOTE this is O(n) in the size of the subtree, as is hashCode, since both
+         * descend through every child. That is the price of value semantics on a
+         * recursive structure: fine for comparing trees, but do not put either in a
+         * loop over a large one, and do not use a Node as a key in a hash table that
+         * is written to often.
+         *
+         * @param o the object to compare with.
+         * @return true if o is a Node with the same value and the same children.
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Node)) return false;
+            Node<?> node = (Node<?>) o;
+            return Objects.equals(x, node.x) && Objects.equals(children, node.children);
+        }
+
+        /**
+         * @return a hash code consistent with equals, and O(n) for the same reason.
+         */
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, children);
         }
 
         final X x;

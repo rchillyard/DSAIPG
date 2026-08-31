@@ -1,12 +1,11 @@
 """
 Ported from misc/lab_1/MyTree.java.
 
-NOTE the Java's reference answers to addChild and replace are missing: both read
-``return null; // TODO what should go here?`` inside their SOLUTION blocks, so the
-solutions repository does not have a solution here. The stubs below are faithful
-to that, and MyTree is therefore an exercise with no published answer in either
-tree. Recorded in INFO6205/docs/Deferred work.md; whether to write it is Robin's
-call, not something to slip in.
+NOTE Node is a frozen dataclass, so it already compares by value, and replace
+finds a child the caller has described rather than one the caller already holds --
+which is what the Java now does too, having gained equals and hashCode. Comparing
+or hashing a Node descends through its children, so both are O(n) in the size of
+the subtree: fine for comparing trees, but not for a loop over a large one.
 """
 
 from __future__ import annotations
@@ -49,6 +48,11 @@ class Node(Generic[X]):
 
     def replace(self, y: Node[X], z: Node[X]) -> Node[X]:
         """
+        Children are compared by value, so y need not be the very Node held here.
+        Where several children are equal to y, only the first is replaced, and z
+        takes that child's position rather than being appended. A Node with no
+        child equal to y is returned unchanged.
+
         :param y: the child to remove.
         :param z: the child to put in its place.
         :return: a new Node with the replacement made.

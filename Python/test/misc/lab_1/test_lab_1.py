@@ -54,11 +54,11 @@ class TestWheelOfFortune:
 
 class TestMyTree:
     """
-    NOTE most of this is skipped in both trees, and not because anyone has yet to
-    do the exercise: the Java's own reference answers to addChild and replace are
-    missing -- both read "return null; // TODO what should go here?" -- so there is
-    no published solution to port. The Java test that would catch it is annotated
-    @Ignore and carries no @Test at all.
+    NOTE these skip until add_child and replace are written, like any other
+    exercise. That was not always the reason: the Java had no reference answer
+    either, both SOLUTION blocks reading "return null", so there was nothing to
+    port. Written on 2026-08-31, along with equals and hashCode, so the two trees
+    now agree that a Node is a value.
     """
 
     def test_a_root_on_its_own(self):
@@ -90,6 +90,25 @@ class TestMyTree:
         two, three = Node(2), Node(3)
         root = Node(1).add_child(two)
         assert root.replace(two, three).children == (three,)
+
+    def test_replace_matches_by_value_not_by_identity(self):
+        root = Node(1).add_child(Node(2))
+        assert root.replace(Node(2), Node(9)).children[0].x == 9
+
+    def test_replace_leaves_a_node_with_no_such_child_alone(self):
+        root = Node(1).add_child(Node(2))
+        assert root.replace(Node(7), Node(9)) == root
+
+    def test_replace_changes_only_the_first_of_several_equal_children(self):
+        root = Node(1).add_child(Node(2)).add_child(Node(2))
+        replaced = root.replace(Node(2), Node(9))
+        assert replaced.children[0].x == 9
+        assert replaced.children[1].x == 2
+
+    def test_replace_keeps_the_position(self):
+        root = Node(1).add_child(Node(2)).add_child(Node(3)).add_child(Node(4))
+        replaced = root.replace(Node(2), Node(9))
+        assert [c.x for c in replaced.children] == [9, 3, 4]
 
     def test_replace_by_value(self):
         two = Node(2)

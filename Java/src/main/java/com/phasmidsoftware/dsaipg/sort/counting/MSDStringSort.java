@@ -94,6 +94,12 @@ public class MSDStringSort extends SortWithHelperAndAdditionalMemory<String> {
         if (n <= 1)
             return;
         // NOTE that we never cut over to Quicksort at the top-level.
+        // NOTE the cutoff used to be honoured only on the instrumented Helper, so
+        // every timed run silently took the default of 20 whatever was configured.
+        // Table 8.1 in the book is captioned 256 and was measured at 20; on the
+        // corpus here 20 is the better choice above about 16,000 words anyway. See
+        // docs/Errata.md. Assert MSDCutoff() is what you asked for before trusting
+        // any measurement of this sort.
         if (d > 0 && n <= helper.MSDCutoff()) cutToQuicksort(xs, from, to, d, n);
         else doMSDrecursive(xs, from, to, d);
     }
