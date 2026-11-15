@@ -419,7 +419,10 @@ public class MergeSortTest {
 
     @Test
     public void testSort12() {
-        Config config1 = config.copy(MergeSort.MERGESORT, MergeSort.INSURANCE, "true");
+        // NOTE cutoff 1, not 0: BaseHelper.cutoff() is (cutoff >= 1) ? cutoff : CUTOFF_DEFAULT,
+        // so 0 silently falls back to 20 and, with only 8 elements, this test would never recurse
+        // -- it would test insertion sort and call it merge sort. See config.ini's own note.
+        Config config1 = config.copy(MergeSort.MERGESORT, MergeSort.INSURANCE, "true").copy("helper", "cutoff", "1");
         Config config2 = config1.copy(MergeSort.MERGESORT, MergeSort.NOCOPY, "false");
         SortWithHelper<Integer> sorter = new MergeSort<>(8, 1, config2);
         System.out.println("testing " + sorter);
@@ -431,7 +434,7 @@ public class MergeSortTest {
 
     @Test
     public void testSort13() {
-        SortWithHelper<Integer> sorter = new MergeSort<>(8, 1, config.copy(MergeSort.MERGESORT, MergeSort.INSURANCE, "false").copy(MergeSort.MERGESORT, MergeSort.NOCOPY, "true"));
+        SortWithHelper<Integer> sorter = new MergeSort<>(8, 1, config.copy(MergeSort.MERGESORT, MergeSort.INSURANCE, "false").copy(MergeSort.MERGESORT, MergeSort.NOCOPY, "true").copy("helper", "cutoff", "1"));
         System.out.println("testing " + sorter);
         Helper<Integer> helper = sorter.getHelper();
         Integer[] ints = helper.random(Integer.class, r -> r.nextInt(1000));
@@ -441,13 +444,62 @@ public class MergeSortTest {
 
     @Test
     public void testSort14() {
-        SortWithHelper<Integer> sorter = new MergeSort<>(8, 1, config.copy(MergeSort.MERGESORT, MergeSort.INSURANCE, "true").copy(MergeSort.MERGESORT, MergeSort.NOCOPY, "true").copy("helper","seed","2"));
+        SortWithHelper<Integer> sorter = new MergeSort<>(8, 1, config.copy(MergeSort.MERGESORT, MergeSort.INSURANCE, "true").copy(MergeSort.MERGESORT, MergeSort.NOCOPY, "true").copy("helper","seed","2").copy("helper", "cutoff", "1"));
         System.out.println("testing " + sorter);
         Helper<Integer> helper = sorter.getHelper();
         Integer[] ints = helper.random(Integer.class, r -> r.nextInt(1000));
         Integer[] sorted = sorter.sort(ints);
         assertTrue(helper.isSorted(sorted));
     }
+
+    /**
+     * The insurance optimization, actually exercised. Added 2026-09-30 after the equivalent code
+     * in HuskySort's MergeHuskySort was found to have been wrong for four years.
+     * <p>
+     * testSort12, 13 and 14 above are the only tests that enable insurance, and all three sort
+     * <b>8</b> elements against a default cutoff of 20 -- so they never recurse, and the merge
+     * code they mean to test never executes. Every test here with n past the cutoff sets
+     * insurance to "false" explicitly. testSort11_partialsorted builds the right shape of data
+     * but constructs its sorter with the unmodified config and asserts nothing at all.
+     * <p>
+     * Enlarging those tests would not be enough either. The check fires only when the left
+     * partition's maximum is at most the right partition's minimum, which for uniformly random
+     * halves essentially never happens: measured 0 hits in 200 sorts of 1,024 random ints.
+     * Fully ascending input fires it constantly but cannot expose a defect, because both arrays
+     * then hold the same thing anyway. <b>Nearly</b> sorted input is what does it -- 1,024
+     * elements with 5 random swaps fired the branch 2,483 times in 50 sorts and caught an
+     * injected fault 50 times out of 50.
+     * <p>
+     * The assertion is on the whole array rather than isSorted, because the corresponding failure
+     * in HuskySort produced output that ascended perfectly and simply was not a permutation of
+     * its input.
+     */
+    @Test
+    public void testSortNearlySortedWithInsuranceAndNoCopy() {
+        for (String noCopy : new String[]{"true", "false"})
+            for (String insurance : new String[]{"true", "false"}) {
+                Config configuration = config.copy(MergeSort.MERGESORT, MergeSort.INSURANCE, insurance)
+                        .copy(MergeSort.MERGESORT, MergeSort.NOCOPY, noCopy);
+                Random random = new Random(20260930L);
+                for (int n : new int[]{64, 256, 1024})
+                    for (int swaps : new int[]{1, 5, 20}) {
+                        Integer[] xs = new Integer[n];
+                        for (int i = 0; i < n; i++) xs[i] = i;
+                        for (int k = 0; k < swaps; k++) {
+                            int p = random.nextInt(n), q = random.nextInt(n);
+                            Integer temp = xs[p];
+                            xs[p] = xs[q];
+                            xs[q] = temp;
+                        }
+                        Integer[] expected = Arrays.copyOf(xs, n);
+                        Arrays.sort(expected);
+                        SortWithHelper<Integer> sorter = new MergeSort<>(n, 1, configuration);
+                        assertArrayEquals("nocopy=" + noCopy + " insurance=" + insurance
+                                + " n=" + n + " swaps=" + swaps, expected, sorter.sort(xs));
+                    }
+            }
+    }
+
     @Test
     public void testSortWithInstrumenting16() throws Exception {
         int n = 16;

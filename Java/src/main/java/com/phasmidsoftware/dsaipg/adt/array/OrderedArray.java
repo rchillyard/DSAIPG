@@ -1,5 +1,7 @@
 package com.phasmidsoftware.dsaipg.adt.array;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 
 /**
@@ -11,18 +13,67 @@ import java.util.*;
  *
  * @param <K> the underlying type of the ordered array.
  */
-public class OrderedArray<K extends Comparable<K>> implements Iterable<K> {
+public class OrderedArray<K> implements Iterable<K> {
+
+    /**
+     * Class method to create a new OrderedArray from a varargs list of T elements.
+     *
+     * @param array      the input array of `T` elements.
+     * @param comparator a Comparator that can compare elements of type `T`.
+     * @param <T>  the underlying type of the args and the result.
+     * @return an OrderedArray of T.
+     */
+    public static <T> OrderedArray<T> from(T[] array, Comparator<T> comparator) {
+        return new OrderedArray<>(array, true, comparator);
+    }
+
+    /**
+     * Class method to create a new OrderedArray from a collection of T elements.
+     * This is just an alternative to the constructor.
+     *
+     * @param input a Collection of `T` elements.
+     * @param comparator a Comparator that can compare elements of type `T`.
+     * @param <T>  the underlying type of the args and the result.
+     * @return an OrderedArray of T.
+     */
+    public static <T> OrderedArray<T> from(Collection<T> input, Comparator<T> comparator) {
+        return new OrderedArray<>(input, comparator);
+    }
+
+    /**
+     * Class method to create a new OrderedArray from a collection of `T` elements.
+     *
+     * @param input a Collection of `T` elements.
+     * @param <T>  the underlying type of the args and the result such that T extends Comparable<T>.
+     * @return an OrderedArray of T.
+     */
+    public static <T extends Comparable<T>> OrderedArray<T> from(Collection<T> input) {
+        return new OrderedArray<>(input, getComparator());
+    }
+
+    /**
+     * Class method to create a new OrderedArray from a varargs list of T elements.
+     *
+     * @param args a comma-separated list of `T`s.
+     * @param comparator a Comparator that can compare elements of type `T`.
+     * @param <T>  the underlying type of the args and the result.
+     * @return an OrderedArray of T.
+     */
+    @SafeVarargs
+    public static <T> OrderedArray<T> from(Comparator<T> comparator, T... args) {
+        return new OrderedArray<T>(args, false, comparator);
+    }
 
     /**
      * Class method to create a new OrderedArray from a varargs list of T elements.
      *
      * @param args a comma-separated list of Ts.
-     * @param <T>  the underlying type of the args and the result.
+     * @param <T>  the underlying type of the args such that T extends Comparable of T.
      * @return an OrderedArray of T.
      */
     @SafeVarargs
     public static <T extends Comparable<T>> OrderedArray<T> from(T... args) {
-        return new OrderedArray<>(args, false, getComparator());
+        return from(getComparator(), args);
     }
 
     /**
@@ -61,6 +112,8 @@ public class OrderedArray<K extends Comparable<K>> implements Iterable<K> {
      *
      * @return an Iterator.
      */
+    @Override
+    @NotNull
     public Iterator<K> iterator() {
         List<K> list = new ArrayList<>();
         for (Object k : array) //noinspection unchecked
@@ -91,12 +144,12 @@ public class OrderedArray<K extends Comparable<K>> implements Iterable<K> {
     /**
      * Primary constructor.
      *
-     * @param array      the input array.
+     * @param array      the input array of K elements.
      * @param makeCopy   true if the constructor should make a copy of the input array rather than simply referencing the input array.
      * @param comparator the comparator for ordering the array of Ks--by default, use getComparator().
      */
-    public OrderedArray(K[] array, boolean makeCopy, Comparator<Object> comparator) {
-        this.comparator = comparator;
+    public OrderedArray(K[] array, boolean makeCopy, Comparator<K> comparator) {
+        this.comparator = (Comparator<Object>) comparator;
         int length = array.length;
         if (makeCopy) {
             this.array = new Object[length];
@@ -107,37 +160,16 @@ public class OrderedArray<K extends Comparable<K>> implements Iterable<K> {
     }
 
     /**
-     * Secondary constructor where only parameter array is explicit.
-     * makeCopy is set to true; comparator is set to OrderedArray.getComparator().
-     *
-     * @param array the original array, which will NOT be affected by the sort.
-     */
-    public OrderedArray(K[] array) {
-        this(array, true, OrderedArray.getComparator());
-    }
-
-    /**
-     * Secondary constructor where only parameter array and makeCopy are explicit.
-     * Comparator is set to OrderedArray.getComparator().
-     *
-     * @param makeCopy true if the constructor should make a copy of the input array rather than simply referencing the input array.
-     * @param array    the original array, which will NOT be affected by the sort.
-     */
-    public OrderedArray(K[] array, boolean makeCopy) {
-        this(array, makeCopy, OrderedArray.getComparator());
-    }
-
-    /**
-     * Secondary constructor where only parameter input is explicit.
-     * Comparator is set to OrderedArray.getComparator() for the generic type K.
+     * Secondary constructor where parameter `input` represents a Collection of `K` elements.
+     * Comparator is set to `getComparator()` for the generic type `K`.
      * The input collection will never be affected by the ordering.
      *
-     * @param input a Collection of K elements.
+     * @param input a Collection of `K` elements.
+     * @param comparator the comparator for ordering the array of Ks--by default, use getComparator().
      */
-    public OrderedArray(Collection<K> input) {
-        comparator = OrderedArray.getComparator();
-        array = input.toArray();
-        update(array.length);
+    public OrderedArray(Collection<K> input, Comparator<K> comparator) {
+        //noinspection unchecked
+        this((K[])input.toArray(), false, comparator);
     }
 
     /**
@@ -166,12 +198,11 @@ public class OrderedArray<K extends Comparable<K>> implements Iterable<K> {
 
     private void update(int length) {
         this.size = length;
-        Arrays.sort(array, comparator);
+        Arrays.sort(array, 0, this.size, comparator);
     }
 
-    private static <T extends Comparable<T>> Comparator<Object> getComparator() {
-        //noinspection unchecked
-        return Comparator.comparing(o -> ((T) o));
+    private static <T extends Comparable<T>> Comparator<T> getComparator() {
+        return Comparator.comparing(o -> o);
     }
 
     private final Comparator<Object> comparator;

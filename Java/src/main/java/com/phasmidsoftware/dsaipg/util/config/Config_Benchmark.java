@@ -31,6 +31,56 @@ public class Config_Benchmark {
     public static final int CUTOFF_DEFAULT = 20;
 
     /**
+     * Should a range of {@code n} elements be split further, or has it reached the cutoff?
+     * <p>
+     * This is the one place the cutoff comparison is written. Every recursive sort in this
+     * project asks the same question and, before 2026-09-30, each answered it in its own words:
+     * {@code to <= from + cutoff}, {@code n <= cutoff}, {@code hi - lo < CUTOFF},
+     * {@code to - from >= cutoff}. Two of those were off by one and one did not terminate at a
+     * cutoff of 1, which is exactly the sort of thing a single method makes impossible.
+     * <p>
+     * The convention: <b>a cutoff of k means ranges of up to k elements stop</b>. So we recurse
+     * when {@code n > k}, which is {@code to > from + cutoff} written in terms of the size.
+     * <p>
+     * NOTE the {@link Math#max}. A cutoff of 0 or less would let a range of one element recurse,
+     * and a one-element range splits into an empty half and itself -- the recursion never ends.
+     * Rather than trust every caller to have excluded that, the floor is applied here, so no
+     * cutoff value can produce an infinite recursion. Callers that want 0 to mean "use my
+     * default" resolve that themselves before calling, as {@code BaseHelper.cutoff()} does; this
+     * method deliberately does not substitute {@link #CUTOFF_DEFAULT}, because the right default
+     * differs by sort ({@code msdcutoff} is 256, not 20).
+     *
+     * @param n      the size of the range, that is {@code to - from}.
+     * @param cutoff the cutoff in force.
+     * @return true if the range should be split further; false if it has reached the cutoff.
+     */
+    public static boolean shouldRecurse(int n, int cutoff) {
+        return n > Math.max(cutoff, 1);
+    }
+
+    /**
+     * As {@link #shouldRecurse(int, int)}, taking the cutoff from a configuration.
+     *
+     * @param n      the size of the range, that is {@code to - from}.
+     * @param config the configuration to read {@code helper.cutoff} from.
+     * @return true if the range should be split further; false if it has reached the cutoff.
+     */
+    public static boolean shouldRecurse(int n, Config config) {
+        return shouldRecurse(n, getCutoff(config));
+    }
+
+    /**
+     * @param config the configuration.
+     * @return the configured {@code helper.cutoff}, with 0 or less meaning "unset" and so
+     * yielding {@link #CUTOFF_DEFAULT}. This is the resolution {@code BaseHelper.cutoff()}
+     * applies; it is here too so that a caller holding only a Config gets the same answer.
+     */
+    public static int getCutoff(Config config) {
+        int cutoff = config.getInt(HELPER, CUTOFF, CUTOFF_DEFAULT);
+        return cutoff >= 1 ? cutoff : CUTOFF_DEFAULT;
+    }
+
+    /**
      * Retrieves the seed value from the configuration.
      * If the seed value is not explicitly set or cannot be retrieved,
      * the current system time in milliseconds is used as the default value.

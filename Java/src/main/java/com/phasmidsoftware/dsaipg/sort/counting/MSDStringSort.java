@@ -12,6 +12,7 @@ import com.phasmidsoftware.dsaipg.util.general.SuffixComparator;
 import static com.phasmidsoftware.dsaipg.sort.helper.BaseHelper.MSD_CUTOFF_DEFAULT;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.HELPER;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.MSDCUTOFF;
+import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.shouldRecurse;
 
 /**
  * This class implements the Most-Significant-Digit (MSD) string sort algorithm.
@@ -100,8 +101,10 @@ public class MSDStringSort extends SortWithHelperAndAdditionalMemory<String> {
         // corpus here 20 is the better choice above about 16,000 words anyway. See
         // docs/Errata.md. Assert MSDCutoff() is what you asked for before trusting
         // any measurement of this sort.
-        if (d > 0 && n <= helper.MSDCutoff()) cutToQuicksort(xs, from, to, d, n);
-        else doMSDrecursive(xs, from, to, d);
+        if (d > 0 && !shouldRecurse(n, helper.MSDCutoff()))
+            cutToQuicksort(xs, from, to, d, n);
+        else
+            doMSDrecursive(xs, from, to, d);
     }
 
     /**

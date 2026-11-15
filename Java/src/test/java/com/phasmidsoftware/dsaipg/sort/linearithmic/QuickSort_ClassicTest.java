@@ -258,19 +258,23 @@ public class QuickSort_ClassicTest {
     @Test
     public void testSortWithInstrumenting5a() throws Exception {
         int n = 1000;
-        final SortWithHelper<Integer> sorter = new QuickSort_Classic<>(n, config_instr.copy(HELPER, CUTOFF, "7")); // with cutoff = 16
+        // NOTE the effective cutoff really is 7. It was 6 until 2026-09-30, when QuickSort
+        // stopped subtracting 1 from the configured value; hence 12,168 compares below where it
+        // used to be 12,189. (The comment here previously said "with cutoff = 16", which was not
+        // so under either convention.)
+        final SortWithHelper<Integer> sorter = new QuickSort_Classic<>(n, config_instr.copy(HELPER, CUTOFF, "7"));
         final Helper<Integer> helper = sorter.getHelper();
         final Integer[] xs = helper.random(Integer.class, r -> r.nextInt(10000));
         final Integer[] sorted = sorter.sort(xs);
         assertTrue(helper.isSorted(sorted));
         double averageCompares = 2 * n * Math.log(n);
-        long expectedCompares = 12189;
+        long expectedCompares = 12168;
         assertEquals(expectedCompares, helper.getCompares());
         double averageSwaps = averageCompares / 6;
-        long expectedSwaps = 2466L;
+        long expectedSwaps = 2614L;
         assertEquals(expectedSwaps, helper.getSwaps());
-        assertEquals(17759, helper.getHits());
-        assertEquals(11915, helper.getLookups());
+        assertEquals(17956, helper.getHits());
+        assertEquals(11681, helper.getLookups());
         assertEquals(averageCompares, expectedCompares, 2000);
         assertEquals(averageSwaps, expectedSwaps, 800);
     }

@@ -6,6 +6,8 @@ import java.util.Iterator;
 
 /**
  * Class to represent a circular queue.
+ * The queue is represented by an internal array and two indexes which indicate the head and tail positions.
+ * See {@code i} and {@code j} for details.
  *
  * @param <Item> the underlying type.
  */
@@ -103,17 +105,28 @@ public class Queue_Array<Item> implements Queue<Item> {
     }
 
     /**
-     * Primary constructor of a queue using an array representation.
+     * Package-private primary constructor of a queue using an array representation.
      *
      * @param items the initial array of items for the queue
      * @param i     the starting index of the queue
      * @param j     the ending index representing the next available position in the queue
+     *              NOTE: the queue is empty if i == j.
      */
-    public Queue_Array(Item[] items, int i, int j) {
+    Queue_Array(Item[] items, int i, int j) {
         this.items = items;
         this.i = i;
         this.j = j;
         this.n = items.length;
+    }
+
+    /**
+     * Secondary constructor of a queue using an array representation.
+     *
+     * @param items the initial array of items for the queue
+     * @param k     the starting index of the queue: arbitrary but must be within the bounds of the array and results in an empty queue.
+     */
+    public Queue_Array(Item[] items, int k) {
+        this(items, k, k);
     }
 
     /**
@@ -124,7 +137,7 @@ public class Queue_Array<Item> implements Queue<Item> {
      */
     public Queue_Array(int n) {
         //noinspection unchecked
-        this((Item[]) new Object[n], 0, 0);
+        this((Item[]) new Object[n], 0);
     }
 
     /**
@@ -184,9 +197,9 @@ public class Queue_Array<Item> implements Queue<Item> {
 
     /**
      * Represents the head index of the queue in the internal array representation.
-     * This variable points to the position of the first element in the queue.
      * <p>
      * In the context of a circular queue implementation:
+     * - This variable {@code i} points to the position of the first (head) element in the queue.
      * - The value of {@code i} is updated when elements are removed (dequeued) from the queue.
      * - It will wrap around to the beginning of the array when exceeding the array's capacity to maintain the circular behavior.
      * - Plays a critical role in computing the current size of the queue as well as determining if the queue is empty or full.
@@ -194,10 +207,13 @@ public class Queue_Array<Item> implements Queue<Item> {
     private int i;
 
     /**
-     * Represents the index of the tail of the queue in the internal array.
-     * This variable is used to track the position where the next item will be added.
-     * It is incremented (with wrap-around logic using modulo operation) whenever an item is added to the queue.
-     * The value of this variable, in conjunction with the head index (`i`), determines the state and size of the queue.
+     * Represents the index of the internal array where a new element (at the tail) will be placed.
+     * <p>
+     * In the context of a circular queue implementation:
+     * - In general, if there is a tail element `(i != j)`, then it is at index `j-1`.
+     * - The value of {@code j} is updated when elements are inserted (enqueued) into the queue.
+     * - It will wrap around to the beginning of the array when exceeding the array's capacity to maintain the circular behavior.
+     * - Plays a critical role in computing the current size of the queue as well as determining if the queue is empty or full.
      */
     private int j;
 

@@ -8,6 +8,7 @@ import com.phasmidsoftware.dsaipg.sort.helper.NonInstrumentingComparableHelper;
 import com.phasmidsoftware.dsaipg.util.config.Config;
 
 import java.util.Arrays;
+import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.shouldRecurse;
 
 /**
  * A class that implements the Introsort algorithm, a hybrid sorting algorithm
@@ -43,12 +44,65 @@ public class IntroSort<X extends Comparable<X>> extends QuickSort_DualPivot<X> {
      * @param to   the index of the first element not to sort.
      */
     public void sort(X[] xs, int from, int to) {
-        sort(xs, from, to, 2 * floor_lg(to - from));
+        // NOTE the LAST argument of sort(X[], int, int, int) is the CURRENT depth, which starts
+        // at zero; the limit goes in depthThreshold, exactly as sort(X[], boolean) does it. This
+        // method used to pass 2 * floor_lg(to - from) there -- the limit -- as the starting
+        // depth, which broke the depth mechanism in both directions. Measured 2026-09-30 over
+        // 20,000 elements:
+        //   called on its own, depthThreshold was still Integer.MAX_VALUE (only sort(X[],
+        //   boolean) ever set it), so the heapSort fallback never fired at all and this
+        //   degenerated to plain dual-pivot quicksort -- losing the O(n log n) worst case that
+        //   is the whole point of Introsort;
+        //   called on the whole array after sort(X[], boolean) had set depthThreshold, the
+        //   starting depth equalled the threshold, so the very first terminator call heapsorted
+        //   all 20,000 elements.
+        // Both answers were correct, which is why no test noticed.
+        // NOTE this never affected the benchmarks. Benchmarks.runBenchmark goes through
+        // mutatingSort, hence sort(X[], boolean), which this method is not on the path of; see
+        // terminator's javadoc for why heapSort does not appear in those runs.
+        depthThreshold = 2 * floor_lg(Math.max(to - from, 1));
+        sort(xs, from, to, 0);
     }
 
     /**
-     * Protected method to determine to terminate the recursion of this quick sort.
-     * NOTE that in this implementation, the depth is ignored.
+     * Protected method to determine whether to terminate the recursion of this quick sort.
+     * <p>
+     * Both of Introsort's escape hatches live here. <b>The defining one is the cutover to
+     * heapSort</b>: quicksort is abandoned once the recursion passes {@code 2 lg n} levels, and
+     * that is what turns quicksort's quadratic worst case into an O(n log n) guarantee. The
+     * insertion-sort cutoff is the secondary, ordinary small-range optimisation that any
+     * quicksort may carry.
+     * <p>
+     * <b>Why heapSort never shows up in the benchmarks.</b> Not because anything is broken: it is
+     * that random input does not come close to the limit. Depths actually reached through
+     * {@code mutatingSort}, which is the entry point {@code Benchmarks} uses, measured
+     * 2026-09-30:
+     * <pre>
+     *   input             n         limit 2 lg n   max depth   heapSort calls
+     *   uniform random    2,000     20             10          0
+     *   uniform random    20,000    28             14          0
+     *   uniform random    200,000   34             22          0
+     *   organ pipe        20,000    28             28          66
+     *   all equal         20,000    28             28          1
+     *   already sorted    20,000    28             28          1
+     * </pre>
+     * Random input settles around {@code lg n}, not {@code 2 lg n}, so the fallback is never
+     * invoked --- which is the design working, not failing. It takes an input that defeats a
+     * naive quicksort to reach the limit, and then it fires.
+     * <p>
+     * The <i>tests</i> are nevertheless written the other way round, size before depth, and that
+     * is deliberate rather than a statement about which matters. When both apply --- a range of
+     * 16 or fewer that is also too deep --- insertion sort is the better answer, so it wins. All
+     * four Introsort variants across this project and HuskySort order them this way.
+     * <p>
+     * NOTE the javadoc here used to say "the depth is ignored", which is true of
+     * {@code QuickSort.terminator}, where it presumably came from, and has never been true here.
+     * <p>
+     * NOTE also that this overrides {@code QuickSort.terminator} completely, so the configured
+     * {@code helper.cutoff()} has no effect on Introsort: the size at which it stops is
+     * {@link #sizeThreshold}, which is a constant. That is defensible --- the threshold is part
+     * of the algorithm rather than a tuning knob --- but it does surprise a caller who sets a
+     * cutoff and sees nothing change.
      *
      * @param xs    the complete array from which this sub-array derives.
      * @param from  the index of the first element to sort.
@@ -57,17 +111,16 @@ public class IntroSort<X extends Comparable<X>> extends QuickSort_DualPivot<X> {
      * @return true if there is no further work to be done.
      */
     protected boolean terminator(X[] xs, int from, int to, int depth) {
-        if (to - from <= sizeThreshold) {
-            if (to > from + 1)
-                getInsertionSort().sort(xs, from, to);
+        if (!shouldRecurse(to - from, sizeThreshold)) {
+            // NOTE no "if (to > from + 1)" guard: InsertionSort.sort opens with
+            // "if (to <= from + 1) return", so a range of one is already a no-op there.
+            getInsertionSort().sort(xs, from, to);
             return true;
         }
-
         if (depth >= depthThreshold) {
             heapSort(xs, from, to);
             return true;
         }
-
         return false;
     }
 
@@ -114,6 +167,21 @@ public class IntroSort<X extends Comparable<X>> extends QuickSort_DualPivot<X> {
     private void heapSort(X[] a, int from, int to) {
         Helper<X> helper = getHelper();
         int n = to - from;
+        // NOTE heapSort carries its own cutoff, as HuskySort's QuickHuskySort.heapSort and
+        // IntroHuskySort.heapSort do. Building a heap out of a handful of elements costs more
+        // than insertion-sorting them, and a method that switches to quicksort's fallback should
+        // not be the one place that ignores the small-range rule.
+        // NOTE as this class calls it today the guard cannot fire: terminator tests the size
+        // before the depth, so heapSort is only ever reached with n > sizeThreshold. Confirmed by
+        // counting, 2026-09-30 -- over every length from 1 to 400 in both organ-pipe and
+        // duplicate-heavy shapes, plus organ-pipe and all-equal at 5,000 and 20,000, heapSort was
+        // entered 492 times, the smallest range it ever saw was 18, and the guard fired 0 times.
+        // It is here so that heapSort is right when called from anywhere else, which is exactly
+        // the position the two HuskySort versions are in.
+        if (!shouldRecurse(n, sizeThreshold)) {
+            getInsertionSort().sort(a, from, to);
+            return;
+        }
         for (int i = n / 2; i >= 1; i = i - 1) {
             downHeap(a, i, n, from, helper);
         }

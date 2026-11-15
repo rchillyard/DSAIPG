@@ -8,6 +8,7 @@ import com.phasmidsoftware.dsaipg.util.logging.LazyLogger;
 
 import java.util.Arrays;
 import java.util.Collection;
+import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.shouldRecurse;
 
 /**
  * Abstract class representing the QuickSort algorithm,
@@ -99,9 +100,20 @@ public abstract class QuickSort<X extends Comparable<X>> extends SortWithCompara
             helper.sortTrio(xs, from, to);
             return true;
         }
-        // NOTE: we reduce the cutoff by 1 so that we can use 1 to disable cutoff (because 0 gives the default of 7).
-        int cutoff = Math.max(getHelper().cutoff() - 1, 3); // NOTE it makes no sense to partition an array smaller than 3 elements, regardless of cutoff.
-        if (n > cutoff) return false;
+        // NOTE the condition below is "n <= cutoff", i.e. "to <= from + cutoff", which is the
+        // convention throughout this project and HuskySort: a cutoff of k means ranges of up to
+        // k elements go to insertion sort. Reviewed 2026-09-30 and correct.
+        // NOTE the "- 1", however, makes this sort's effective cutoff one less than MergeSort's
+        // for the same configuration -- 19 against 20 at the default. It is safe, but it is not
+        // needed for the reason given: Math.max(..., 3) already lets a cutoff of 1 disable the
+        // mechanism, because n of 3 or less is handled above, so insertion sort is never reached
+        // either way. (The old parenthetical also said that 0 gives a default of 7; that has not
+        // been so since CUTOFF_DEFAULT became 20 -- 0 gives 20.) Dropping the "- 1" would align
+        // the two sorts but changes one instrumented expectation:
+        // QuickSort_ClassicTest.testSortWithInstrumenting5a counts 12,168 compares instead of
+        // 12,189. Left alone pending a decision, since that figure is course material.
+        int cutoff = Math.max(getHelper().cutoff(), 3); // NOTE it makes no sense to partition an array smaller than 3 elements, regardless of cutoff.
+        if (shouldRecurse(n, cutoff)) return false;
         insertionSort.sort(xs, from, to);
         return true;
     }
