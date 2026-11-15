@@ -9,10 +9,12 @@ import com.phasmidsoftware.dsaipg.sort.helper.InstrumentedComparatorHelper;
 import com.phasmidsoftware.dsaipg.util.config.Config;
 import com.phasmidsoftware.dsaipg.util.config.Config_Benchmark;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import static com.phasmidsoftware.dsaipg.sort.linearithmic.MergeSort.INSURANCE;
 import static com.phasmidsoftware.dsaipg.sort.linearithmic.MergeSort.MERGESORT;
+import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.shouldRecurse;
 
 /**
  * MergeSortBasic is a simple implementation of the Merge Sort algorithm,
@@ -52,18 +54,14 @@ public class MergeSortBasic<X extends Comparable<X>> extends SortWithComparableH
      * @param from the starting index of the portion of the array to be sorted
      * @param to   the ending index (exclusive) of the portion of the array to be sorted
      */
-    public void sort(X[] a, int from, int to) {
+    public void sort(X[] a, final int from, final int to) {
         Helper<X> helper = getHelper();
-        if (to <= from + helper.cutoff()) {
+        final int n = to - from;
+        if (!shouldRecurse(n, helper.cutoff())) {
             insertionSort.sort(a, from, to);
             return;
         }
-        // NOTE aux is normally allocated by sort(X[], boolean), but this is the
-        // method the Sort interface requires, so a caller may reach it directly and
-        // must find aux ready. Allocating here costs nothing on the recursive calls,
-        // since aux is already big enough by then.
-        if (aux == null || aux.length < a.length) aux = Arrays.copyOf(a, a.length);
-        final int n = to - from;
+        allocateAuxiliaryArrayIfRequired(a);
         int mid = from + n / 2;
         sort(a, from, mid);
         sort(a, mid, to);
@@ -82,6 +80,17 @@ public class MergeSortBasic<X extends Comparable<X>> extends SortWithComparableH
             arrayMemory = n;
             additionalMemory(n);
         }
+    }
+
+    /**
+     * Allocates or resizes the auxiliary array `aux` used during sorting if it is either uninitialized or smaller than the required size.
+     *
+     * @param a the reference array whose size determines the required length of the auxiliary array.
+     */
+    @SuppressWarnings("unchecked")
+    private void allocateAuxiliaryArrayIfRequired(X[] a) {
+        if (aux == null || aux.length < a.length)
+            aux = (X[]) Array.newInstance(a.getClass().getComponentType(), a.length);
     }
 
     /**
@@ -165,28 +174,32 @@ public class MergeSortBasic<X extends Comparable<X>> extends SortWithComparableH
     }
 
     /**
-     * Merges two sorted subarrays into a single sorted array.
+     * Merges two sorted subarrays (in `sorted`) into `merged`.
      *
-     * @param aux an auxiliary array used for merging.
-     * @param a the array to be merged.
+     * @param sorted an array comprising two sorted partitions.
+     * @param merged the array in which to place the merged result.
      * @param from the starting index of the first subarray.
      * @param mid the ending index of the first subarray and the starting index of the second subarray.
      * @param to the ending index of the second subarray (exclusive)
      */
-    private void merge(X[] aux, X[] a, int from, int mid, int to) {
+    private void merge(X[] sorted, X[] merged, int from, int mid, int to) {
         final Helper<X> helper = getHelper();
         int i = from;
         int j = mid;
         int k = from;
         for (; k < to; k++)
-            if (i >= mid) helper.copy(aux, j++, a, k);
-            else if (j >= to) helper.copy(aux, i++, a, k);
-            else if (helper.inverted(aux, i, j)) {
+            if (i >= mid) helper.copy(sorted, j++, merged, k);
+            else if (j >= to) helper.copy(sorted, i++, merged, k);
+            else if (helper.inverted(sorted, i, j)) {
                 helper.incrementFixes(mid - i);
-                helper.copy(aux, j++, a, k);
-            } else helper.copy(aux, i++, a, k);
+                helper.copy(sorted, j++, merged, k);
+            } else helper.copy(sorted, i++, merged, k);
     }
 
+    /**
+     * The auxiliary array required for merging.
+     * It is actually allocated by the recursive sort method on its first invocation.
+     */
     private X[] aux = null;
     private final InsertionSort<X> insertionSort;
     private int arrayMemory = -1;

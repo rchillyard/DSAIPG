@@ -20,6 +20,7 @@ import static com.phasmidsoftware.dsaipg.sort.helper.Instrument.*;
 import static com.phasmidsoftware.dsaipg.util.config.ConfigTest.INVERSIONS;
 import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.setupConfig;
 import static com.phasmidsoftware.dsaipg.util.general.Utilities.round;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Rule;
@@ -30,6 +31,56 @@ import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
 public class IntroSortTest {
     @Rule
     public final TestRule cancelOnNotImplemented = new CancelOnNotImplemented();
+
+    /**
+     * The sub-array entry point must do the same <b>work</b> as the whole-array one. Added
+     * 2026-09-30, when {@code sort(xs, from, to)} was found to pass the depth <i>limit</i> where
+     * the <i>current depth</i> belongs, so that it either never heapsorted (called on its own,
+     * with depthThreshold still Integer.MAX_VALUE) or heapsorted everything on the first call
+     * (after sort(X[], boolean) had set depthThreshold to the value it was also passing as the
+     * depth).
+     * <p>
+     * <b>Both produced correct output</b>, which is why nothing caught it -- and why this test
+     * counts compares rather than checking the answer. An Introsort whose depth fallback never
+     * fires is a plain quicksort; one that fires immediately is a plain heapsort. The input is
+     * organ-pipe, which defeats a naive quicksort and so drives the recursion past the limit.
+     */
+    @Test
+    public void subArrayEntryPointDoesTheSameWorkAsTheWholeArrayEntryPoint() throws Exception {
+        int n = 20000;
+        Integer[] organPipe = new Integer[n];
+        for (int i = 0; i < n; i++) organPipe[i] = i < n / 2 ? i : n - i;
+        Integer[] expected = java.util.Arrays.copyOf(organPipe, n);
+        java.util.Arrays.sort(expected);
+
+        long viaWhole = comparesFor(organPipe, expected, false, false);
+        long viaSub = comparesFor(organPipe, expected, true, false);
+        long viaSubReused = comparesFor(organPipe, expected, true, true);
+
+        assertEquals("the sub-array entry point must do the same work as the whole-array one",
+                viaWhole, viaSub);
+        assertEquals("and must not be poisoned by an earlier whole-array sort on the same instance",
+                viaWhole, viaSubReused);
+    }
+
+    /**
+     * @param subArray true to go through sort(xs, from, to) rather than sort(xs, makeCopy).
+     * @param reuse    true to run a whole-array sort on the same instance first, which is what
+     *                 used to set depthThreshold and poison the sub-array path.
+     * @return the number of compares, having first checked the answer is right.
+     */
+    private long comparesFor(Integer[] input, Integer[] expected, boolean subArray, boolean reuse) throws Exception {
+        Config config = setupConfig("true", "false", "0", "1", "", "");
+        Helper<Integer> helper = HelperFactory.create("IntroSort", input.length, config);
+        IntroSort<Integer> sorter = new IntroSort<>(helper);
+        if (reuse) sorter.sort(java.util.Arrays.copyOf(input, input.length), false);
+        helper.init(input.length);
+        Integer[] xs = java.util.Arrays.copyOf(input, input.length);
+        if (subArray) sorter.sort(xs, 0, xs.length);
+        else sorter.sort(xs, false);
+        assertArrayEquals("output must be sorted whichever entry point is used", expected, xs);
+        return helper.getCompares();
+    }
 
     @Test
     public void testSort1() throws Exception {

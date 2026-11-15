@@ -53,29 +53,11 @@
         </repository>
     </repositories>
     <dependencies>
-        <!--
+        <!-- Gryphon brings its own Visitor and Flog transitively; do not pin them here. -->
         <dependency>
             <groupId>com.phasmidsoftware</groupId>
             <artifactId>gryphon_3</artifactId>
-            <version>1.3.0</version>
-            <scope>system</scope>
-            <systemPath>${user.home}/.m2/repository/com/phasmidsoftware/gryphon_3/1.3.0/gryphon_3-1.3.0.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.phasmidsoftware</groupId>
-            <artifactId>visitor_3</artifactId>
-            <version>1.5.0</version>
-        </dependency>
-        -->
-        <dependency>
-            <groupId>com.phasmidsoftware</groupId>
-            <artifactId>gryphon_3</artifactId>
-            <version>1.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.phasmidsoftware</groupId>
-            <artifactId>args_2.13</artifactId>
-            <version>1.0.3</version>
+            <version>1.9.0</version>
         </dependency>
         <dependency>
             <groupId>com.phasmidsoftware</groupId>

@@ -33,7 +33,7 @@ public class Queue_ArrayTest {
     @Test
     public void iterator() {
         Integer[] Integers = new Integer[7];
-        Queue_Array<Integer> queue = new Queue_Array<>(Integers, 5, 5);
+        Queue_Array<Integer> queue = new Queue_Array<>(Integers, 5);
         queue.show();
         queue.offer(1);
         queue.show();
@@ -66,7 +66,7 @@ public class Queue_ArrayTest {
     @Test
     public void offer0() {
         Integer[] Integers = new Integer[7];
-        Queue_Array<Integer> queue = new Queue_Array<>(Integers, 5, 5);
+        Queue_Array<Integer> queue = new Queue_Array<>(Integers, 5);
         queue.offer(1);
         queue.offer(2);
         queue.offer(3);
@@ -100,7 +100,7 @@ public class Queue_ArrayTest {
     @Test
     public void offer2() {
         Integer[] Integers = new Integer[7];
-        Queue_Array<Integer> queue = new Queue_Array<>(Integers, 5, 5);
+        Queue_Array<Integer> queue = new Queue_Array<>(Integers, 5);
         queue.offer(1);
         queue.offer(2);
         queue.offer(3);
@@ -126,7 +126,7 @@ public class Queue_ArrayTest {
     @Test
     public void asArray1() {
         Integer[] Integers = new Integer[7];
-        Queue_Array<Integer> queue = new Queue_Array<>(Integers, 5, 5);
+        Queue_Array<Integer> queue = new Queue_Array<>(Integers, 5);
         queue.offer(1);
         queue.offer(2);
         queue.offer(3);

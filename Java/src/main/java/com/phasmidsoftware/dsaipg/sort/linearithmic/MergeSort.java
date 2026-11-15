@@ -145,7 +145,13 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
         boolean noCopy = config.getBoolean(MERGESORT, NOCOPY); // XXX I recommend that you test noCopy before testing insurance.
         boolean insurance = config.getBoolean(MERGESORT, INSURANCE);
         assert !noCopy || Arrays.compare(primary, from, to, secondary, from, to) == 0 : "MergeSort::sort: partitions are not the same";
-        if (to <= from + helper.cutoff()) { // XXX check that a cutoff value of 1 effectively stops the cutoff mechanism.
+        int n = to - from;
+        // NOTE checked 2026-09-30: a cutoff value of 1 does stop the cutoff mechanism. The test
+        // is then "to <= from + 1", which is true only for a range of 0 or 1 elements -- already
+        // sorted, so insertion sort does nothing and the recursion still reaches every merge.
+        // It must be 1 and not 0: BaseHelper.cutoff() returns (cutoff >= 1) ? cutoff :
+        // CUTOFF_DEFAULT, so 0 or any negative value silently gives 20 instead of disabling it.
+        if (!shouldRecurse(n, helper.cutoff())) {
             insertionSort.sort(primary, from, to);
             return;
         }
@@ -161,12 +167,12 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
      * CONSIDER combine with MergeSortBasic, perhaps.
      *
      * @param sorted The source array containing the two sorted partitions to be merged.
-     * @param result The destination array where the merged results will be stored.
+     * @param merged The destination array where the merged results will be stored.
      * @param from   The starting index (inclusive) of the first partition.
      * @param mid    The ending index (exclusive) of the first partition and the starting index of the second partition.
      * @param to     The ending index (exclusive) of the second partition.
      */
-    private void merge(X[] sorted, X[] result, int from, int mid, int to) {
+    private void merge(X[] sorted, X[] merged, int from, int mid, int to) {
         int i = from;
         int j = mid;
         helper.incrementLookups(to - from); // NOTE this is optimistic
@@ -175,20 +181,20 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
         X w = helper.get(sorted, j);
         for (int k = from; k < to; k++) {
             if (i >= mid) {
-                helper.copy(w, result, k);
+                helper.copy(w, merged, k);
                 if (++j < to)
                     w = helper.get(sorted, j);
             } else if (j >= to) {
-                helper.copy(v, result, k);
+                helper.copy(v, merged, k);
                 if (++i < mid)
                     v = helper.get(sorted, i);
             } else if (helper.inverted(v, w)) {
                 helper.incrementFixes(mid - i);
-                helper.copy(w, result, k);
+                helper.copy(w, merged, k);
                 if (++j < to)
                     w = helper.get(sorted, j);
             } else {
-                helper.copy(v, result, k);
+                helper.copy(v, merged, k);
                 if (++i < mid)
                     v = helper.get(sorted, i);
             }

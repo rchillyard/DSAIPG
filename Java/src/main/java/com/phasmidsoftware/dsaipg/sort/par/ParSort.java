@@ -2,6 +2,7 @@ package com.phasmidsoftware.dsaipg.sort.par;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
+import static com.phasmidsoftware.dsaipg.util.config.Config_Benchmark.shouldRecurse;
 
 /**
  * ParSort is a class implementing a parallel sorting algorithm.
@@ -35,7 +36,20 @@ final class ParSort {
      * @param to    the ending index (exclusive) of the portion of the array to be sorted
      */
     public static void sort(int[] array, int from, int to) {
-        if (to - from >= cutoff) {
+        int n = to - from;
+        // NOTE the sense reads the opposite way round from the cutoff conditions elsewhere --
+        // "big enough to be worth splitting" rather than "small enough to stop" -- but it is the
+        // same question, so it goes through the same method. shouldRecurse carries the floor
+        // that makes it safe: a cutoff of 1 would otherwise send a single-element range down the
+        // parallel path, where mid = from + (to - from) / 2 == from, so the second half is the
+        // whole range again and the recursion never ends. Measured 2026-09-30: cutoff 0 and 1
+        // both ran forever; 2 and above were fine. cutoff is public and mutable, and choosing it
+        // is the point of this exercise, so it must be safe for any value.
+        // NOTE this also shifts the threshold by one element: the test was "n >= cutoff" and is
+        // now "n > cutoff", so a range of exactly cutoff elements is sorted sequentially rather
+        // than in parallel. That is a difference in where parallelism starts, not in the answer,
+        // and it is the price of "cutoff" meaning the same thing here as everywhere else.
+        if (shouldRecurse(n, cutoff)) {
             CompletableFuture<int[]> completableFuture1 = null;
             CompletableFuture<int[]> completableFuture2 = null;
             // TO BE IMPLEMENTED 
