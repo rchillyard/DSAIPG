@@ -15,6 +15,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 import com.phasmidsoftware.dsaipg.util.general.CancelOnNotImplemented;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 
 public class HuffmanCodingTest {
     @Rule
@@ -256,5 +259,32 @@ public class HuffmanCodingTest {
         assertEquals("W", s);
     }
 
+
+
+    /**
+     * The one-argument showTree wraps System.out in a PrintWriter. It must NOT close that writer:
+     * closing it closes System.out itself, after which every later println in the JVM is silently
+     * discarded — PrintStream swallows the IOException and merely sets an error flag, so nothing
+     * complains. showTree(tree) is called from main code, so this was reachable.
+     * <p>
+     * The existing testShowTree exercises the two-argument form with a StringWriter, which cannot
+     * detect this.
+     */
+    @Test
+    public void showTreeLeavesSystemOutUsable() {
+        HuffmanCoding huffmanCoding = HuffmanCoding.createHuffmanCoding();
+        HuffmanCoding.Node tree = huffmanCoding.generateCode();
+        PrintStream original = System.out;
+        ByteArrayOutputStream captured = new ByteArrayOutputStream();
+        try {
+            System.setOut(new PrintStream(captured, true, StandardCharsets.UTF_8));
+            showTree(tree);
+            System.out.println("STILL-ALIVE");
+        } finally {
+            System.setOut(original);
+        }
+        assertTrue("System.out was closed by showTree, so later output went nowhere",
+                captured.toString(StandardCharsets.UTF_8).contains("STILL-ALIVE"));
+    }
 
 }

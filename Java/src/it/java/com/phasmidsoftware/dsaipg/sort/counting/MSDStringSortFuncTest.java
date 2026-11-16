@@ -126,41 +126,21 @@ public class MSDStringSortFuncTest {
      * @return an array of Strings.
      */
     static String[] getWords(final String resource, final Function<String, List<String>> stringListFunction) {
+        // Delegates to SortBenchmarkHelper, which reads the resource as a stream. The private
+        // copies that used to live here went via `url.getPath()`, which does not URL-decode, so a
+        // space anywhere in the path arrived as "%20" and the resource was not found. They then
+        // swallowed that and returned an empty array, which surfaced in every test as
+        // "IllegalArgumentException: bound must be positive" from `r.nextInt(words.length)` --
+        // pointing nowhere near the cause.
         try {
-            final File file = new File(getPathname(resource, MSDStringSortFuncTest.class));
-            final String[] result = getWordArray(file, stringListFunction, 2);
-            System.out.println("getWords: testing with " + Utilities.formatWholeWithCommas(result.length) + " unique words: from " + file);
+            final String[] result = SortBenchmarkHelper.getWords(resource, stringListFunction::apply);
+            System.out.println("getWords: testing with " + Utilities.formatWholeWithCommas(result.length) + " unique words: from " + resource);
             return result;
         } catch (final FileNotFoundException e) {
-            System.out.println("Cannot find resource: " + resource);
-            return new String[0];
+            throw new AssertionError("test resource not found: " + resource, e);
         }
     }
 
-    private static List<String> getWordList(final FileReader fr, final Function<String, List<String>> stringListFunction, final int minLength) {
-        final List<String> words = new ArrayList<>();
-        for (final Object line : new BufferedReader(fr).lines().toArray())
-            words.addAll(stringListFunction.apply((String) line));
-        return words.stream().distinct().filter(s -> s.length() >= minLength).collect(Collectors.toList());
-    }
-
-
-    /**
-     * Method to read given file and return a String[] of its content.
-     *
-     * @param file               the file to read.
-     * @param stringListFunction a function which takes a String and splits into a List of Strings.
-     * @param minLength          the minimum acceptable length for a word.
-     * @return an array of Strings.
-     */
-    static String[] getWordArray(final File file, final Function<String, List<String>> stringListFunction, final int minLength) {
-        try (final FileReader fr = new FileReader(file)) {
-            return getWordList(fr, stringListFunction, minLength).toArray(new String[0]);
-        } catch (final IOException e) {
-            System.out.println("Cannot open file: " + file);
-            return new String[0];
-        }
-    }
 
     static List<String> lineAsList(final String line) {
         final List<String> words = new ArrayList<>();
@@ -168,10 +148,5 @@ public class MSDStringSortFuncTest {
         return words;
     }
 
-    private static String getPathname(final String resource, @SuppressWarnings("SameParameterValue") final Class<?> clazz) throws FileNotFoundException {
-        final URL url = clazz.getClassLoader().getResource(resource);
-        if (url != null) return url.getPath();
-        throw new FileNotFoundException(resource + " in " + clazz);
-    }
 
 }

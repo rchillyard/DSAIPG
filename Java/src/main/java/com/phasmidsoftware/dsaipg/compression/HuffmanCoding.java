@@ -562,10 +562,13 @@ public class HuffmanCoding {
      *             the hierarchical encoding structure of symbols and frequencies
      */
     public static void showTree(Node tree) {
+        // Flushed but deliberately NOT closed. This PrintWriter wraps System.out, so closing it
+        // closes System.out itself — after which every later println in the JVM is silently
+        // discarded, because PrintStream swallows the IOException and merely sets its error flag.
+        // showTree(tree) is called from main code (see line ~507), so this was reachable.
         PrintWriter pw = new PrintWriter(System.out);
         showTree(tree, pw);
         pw.flush();
-        pw.close();
     }
 
     /**

@@ -5,8 +5,9 @@ import com.phasmidsoftware.dsaipg.graphs.undirected.EdgeGraph;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -42,19 +43,25 @@ public class Kml<V extends GeoPoint, E extends Sequenced> {
      */
     public void createKML(File file) throws IOException {
         boolean x = file.createNewFile();
-        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-        writer.write(preamble);
-        Iterable<V> vertices = graph.vertices();
-        for (V vertex : vertices) writer.write(asPoint(vertex));
+        // UTF-8 is explicit because `preamble` declares `encoding="UTF-8"`. `new FileWriter(file)`
+        // uses the JVM's default charset instead, so on any machine where that is not UTF-8 the
+        // file asserted an encoding it was not written in, and a single accented character — a
+        // building name, say — produced a KML that Google Earth rejects.
+        //
+        // The writer is also in a try-with-resources now. It used to be closed on the last line,
+        // so any exception while writing leaked the handle and left a half-written file.
+        try (BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
+            writer.write(preamble);
+            Iterable<V> vertices = graph.vertices();
+            for (V vertex : vertices) writer.write(asPoint(vertex));
 
-        Iterable<Edge<V, E>> edges = graph.edges();
-        List<Edge<V, E>> list = new ArrayList<>();
-        for (Edge<V, E> edge : edges) list.add(edge);
-        list.sort(Comparator.comparingInt(o -> o.getAttribute().getSequence()));
-        for (Edge<V, E> edge : list) writer.write(asLine(edge));
-        writer.write(colophon);
-        writer.close();
-
+            Iterable<Edge<V, E>> edges = graph.edges();
+            List<Edge<V, E>> list = new ArrayList<>();
+            for (Edge<V, E> edge : edges) list.add(edge);
+            list.sort(Comparator.comparingInt(o -> o.getAttribute().getSequence()));
+            for (Edge<V, E> edge : list) writer.write(asLine(edge));
+            writer.write(colophon);
+        }
     }
 
     /**

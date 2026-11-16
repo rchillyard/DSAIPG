@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 /**
  * @param <T>
@@ -22,13 +24,15 @@ public class FileHandlerImpl_CSV<T extends FileData> implements FileHandler<T> {
         try {
             //noinspection ResultOfMethodCallIgnored
             f.createNewFile();
-            FileWriter fWriter = new FileWriter(fileName);
-            BufferedWriter bw = new BufferedWriter(fWriter);
-            bw.write(colName);
-            for (T row : data) {
-                bw.write(row.toFile());
+            // try-with-resources: bw.close() used to be the last statement, so a failure in any
+            // row.toFile() leaked the handle and left a truncated CSV. UTF-8 is explicit so the
+            // file does not vary with the machine's default charset.
+            try (BufferedWriter bw = Files.newBufferedWriter(f.toPath(), StandardCharsets.UTF_8)) {
+                bw.write(colName);
+                for (T row : data) {
+                    bw.write(row.toFile());
+                }
             }
-            bw.close();
         } catch (IOException e) {
 
             e.printStackTrace();
