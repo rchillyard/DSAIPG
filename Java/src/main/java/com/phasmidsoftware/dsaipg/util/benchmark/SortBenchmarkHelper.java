@@ -5,7 +5,6 @@ import com.phasmidsoftware.dsaipg.sort.generic.SortException;
 import com.phasmidsoftware.dsaipg.util.logging.LazyLogger;
 
 import java.io.*;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -64,8 +63,21 @@ public class SortBenchmarkHelper {
      */
     // TEST
     public static String[] getWords(final String resource, Function<String, Collection<String>> getStrings) throws FileNotFoundException {
-        try (InputStream inputStream = SortBenchmarkHelper.class.getResourceAsStream(resource)) {
-            if (inputStream == null) throw new FileNotFoundException(resource);
+        // getResourceAsStream resolves a name WITHOUT a leading slash relative to this class's
+        // package — com/phasmidsoftware/dsaipg/util/benchmark — rather than the classpath root,
+        // where these files actually live. Normalising here rather than at each call site is
+        // deliberate: when this method moved from FileReader to getResourceAsStream, the slash was
+        // added at one of six call sites and the other five were left throwing the very
+        // FileNotFoundException the change was made to fix.
+        final String absolute = resource.startsWith("/") ? resource : "/" + resource;
+        // The missing-resource check is deliberately OUTSIDE the try. FileNotFoundException
+        // extends IOException, so throwing it inside would be caught by the handler below and
+        // rewrapped as a RuntimeException — making this method's declared `throws
+        // FileNotFoundException` unreachable, and the `catch (FileNotFoundException)` blocks in
+        // SortBenchmark, BSTBenchmark and SymbolTableBenchmark dead code.
+        final InputStream inputStream = SortBenchmarkHelper.class.getResourceAsStream(absolute);
+        if (inputStream == null) throw new FileNotFoundException(resource);
+        try (inputStream) {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             List<String> words = new ArrayList<>();
             for (Object line : bufferedReader.lines().toArray()) words.addAll(getStrings.apply((String) line));
@@ -131,20 +143,10 @@ public class SortBenchmarkHelper {
         return result;
     }
 
-    /**
-     * Retrieves the file path of a resource from the class loader of the specified class.
-     *
-     * @param resource the name of the resource file to locate
-     * @param clazz    the class whose class loader is used to locate the resource
-     * @return the file path of the located resource
-     * @throws FileNotFoundException if the specified resource cannot be found
-     */
-    // TEST
-    private static String getFile(String resource, @SuppressWarnings("SameParameterValue") Class<?> clazz) throws FileNotFoundException {
-        final URL url = clazz.getClassLoader().getResource(resource);
-        if (url != null) return url.getFile();
-        throw new FileNotFoundException(resource + " in " + clazz);
-    }
+    // `getFile` was removed here. It returned `url.getFile()`, which does NOT URL-decode, so a
+    // space anywhere in the path arrived as "%20" and the file was not found — the bug this
+    // family of changes exists to fix. Nothing calls it now that getWords reads the stream
+    // directly, which also works inside a jar, where there is no file to name.
 
     /**
      * Returns a random element from the provided array of strings.

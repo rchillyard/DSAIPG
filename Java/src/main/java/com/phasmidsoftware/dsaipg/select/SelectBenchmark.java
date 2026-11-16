@@ -16,6 +16,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.function.Supplier;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 
 import static com.phasmidsoftware.dsaipg.util.config.Config.getConfig;
 
@@ -185,13 +188,14 @@ public class SelectBenchmark {
         //noinspection ResultOfMethodCallIgnored
         file.createNewFile();
 
-        FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
-        BufferedWriter bw = new BufferedWriter(fw);
-
-        bw.append(header);
-        bw.append(sb);
-
-        bw.close();
+        // try-with-resources: the writer used to be closed on the last line, so an exception
+        // while appending leaked the handle. UTF-8 is explicit because the default charset varies
+        // by machine, which would make this CSV differ between students for the same run.
+        try (BufferedWriter bw = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8,
+                StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+            bw.append(header);
+            bw.append(sb);
+        }
     }
 
     private final int runs;

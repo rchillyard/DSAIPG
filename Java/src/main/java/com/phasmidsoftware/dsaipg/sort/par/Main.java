@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * This code has been fleshed out by Ziyao Qiao. Thanks very much.
@@ -44,17 +48,27 @@ public class Main {
 
         }
         try {
-            FileOutputStream fis = new FileOutputStream("./src/result.csv");
-            OutputStreamWriter isr = new OutputStreamWriter(fis);
-            BufferedWriter bw = new BufferedWriter(isr);
-            int j = 0;
-            for (long i : timeList) {
-                String content = (double) 10000 * (j + 1) / 2000000 + "," + (double) i / 10 + "\n";
-                j++;
-                bw.write(content);
-                bw.flush();
+            // Written to target/, not ./src/result.csv as it used to be. src/ is for sources; the
+            // old path dropped an untracked file into the source tree — neither tracked nor
+            // gitignored — where it showed up in `git status` and could be committed by accident.
+            // target/ is gitignored (.gitignore:3) and is where Maven already puts generated
+            // output. The path is also resolved and reported, because the old one was relative to
+            // the working directory, so where the file landed depended on where you ran from.
+            //
+            // try-with-resources: the three writers were closed only by the final bw.close(), so
+            // any exception mid-loop leaked all of them. UTF-8 is explicit — OutputStreamWriter
+            // with no charset takes the machine's default, so this CSV varied between students.
+            final Path output = Paths.get("target", "result.csv");
+            Files.createDirectories(output.getParent());
+            try (BufferedWriter bw = Files.newBufferedWriter(output, StandardCharsets.UTF_8)) {
+                int j = 0;
+                for (long i : timeList) {
+                    String content = (double) 10000 * (j + 1) / 2000000 + "," + (double) i / 10 + "\n";
+                    j++;
+                    bw.write(content);
+                }
             }
-            bw.close();
+            System.out.println("results written to " + output.toAbsolutePath());
 
         } catch (IOException e) {
             e.printStackTrace();
